@@ -1,0 +1,496 @@
+/* ============================================
+   MyJourney - Travel Platform Auth Styles
+   ألوان عصرية للمنصة السياحية
+   ============================================ */
+
+:root {
+    /* ألوان عصرية للموقع السياحي */
+    --ocean-blue: #0ea5e9;
+    --tropical-teal: #14b8a6;
+    --sunset-orange: #f97316;
+    --coral-pink: #ec4899;
+    --sandy-beige: #fef3c7;
+    --deep-navy: #1e293b;
+    --soft-white: #ffffff;
+    --light-gray: #f1f5f9;
+
+    /* Gradients */
+    --gradient-ocean: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+    --gradient-sunset: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
+    --gradient-bg: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 50%, #f97316 100%);
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px rgba(14, 165, 233, 0.15);
+    --shadow-medium: 0 8px 30px rgba(14, 165, 233, 0.2);
+    --shadow-strong: 0 12px 40px rgba(14, 165, 233, 0.25);
+
+    --radius: 16px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ============================================
+   Body & Background
+   ============================================ */
+.auth-body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: var(--gradient-bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    
+}
+
+/* خطوط مموجة رفيعة احترافية */
+.wave-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    opacity: 0.4;
+}
+
+.wave-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.6);
+    left: 0;
+}
+
+.wave-line:nth-child(1) {
+    top: 15%;
+    transform: translateY(-50%);
+}
+
+.wave-line:nth-child(2) {
+    top: 30%;
+    transform: translateY(-50%);
+}
+
+.wave-line:nth-child(3) {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.wave-line:nth-child(4) {
+    top: 70%;
+    transform: translateY(-50%);
+}
+
+.wave-line:nth-child(5) {
+    top: 85%;
+    transform: translateY(-50%);
+}
+
+/* SVG موجات رفيعة احترافية */
+.wave-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        url("data:image/svg+xml,%3Csvg width='120' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20 Q30 10, 60 20 T120 20' stroke='rgba(255,255,255,0.7)' stroke-width='1' fill='none'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg width='100' height='30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 15 Q25 5, 50 15 T100 15' stroke='rgba(255,255,255,0.6)' stroke-width='1' fill='none'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg width='140' height='35' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 18 Q35 8, 70 18 T140 18' stroke='rgba(255,255,255,0.5)' stroke-width='0.8' fill='none'/%3E%3C/svg%3E");
+    background-size: 240px 40px, 200px 30px, 280px 35px;
+    background-position: 0 25%, 0 55%, 0 75%;
+    background-repeat: repeat-x;
+    opacity: 0.8;
+    animation: waveMove 20s linear infinite;
+}
+
+@keyframes waveMove {
+    0% {
+        background-position: 0 25%, 0 55%, 0 75%;
+    }
+    100% {
+        background-position: 240px 25%, 200px 55%, 280px 75%;
+    }
+}
+
+/* ============================================
+   Container
+   ============================================ */
+.auth-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================
+   Cards
+   ============================================ */
+.login-card,
+.register-card {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+    padding: 40px 35px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: var(--transition);
+}
+
+.login-card:hover,
+.register-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-strong);
+}
+
+.login-card::before,
+.register-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gradient-ocean);
+}
+
+.register-card::before {
+    background: var(--gradient-sunset);
+}
+
+/* ============================================
+   Header
+   ============================================ */
+.card-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.logo-icon {
+    font-size: 2.5rem;
+    background: var(--gradient-ocean);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.card-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    background: var(--gradient-ocean);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.card-header p {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ============================================
+   Form Elements
+   ============================================ */
+.form-group {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--deep-navy);
+    font-size: 14px;
+}
+
+.form-label i {
+    color: var(--ocean-blue);
+    font-size: 16px;
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 45px 14px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 15px;
+    background: var(--soft-white);
+    color: var(--deep-navy);
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--ocean-blue);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-input::placeholder {
+    color: #94a3b8;
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 18px;
+    transition: var(--transition);
+}
+
+.form-input:focus + .input-icon {
+    color: var(--ocean-blue);
+}
+
+.is-invalid {
+    border-color: var(--coral-pink);
+    background: rgba(236, 72, 153, 0.05);
+}
+
+.invalid-feedback {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--coral-pink);
+    text-align: right;
+    font-weight: 500;
+}
+
+/* ============================================
+   Buttons
+   ============================================ */
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--gradient-ocean);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: inherit;
+    box-shadow: var(--shadow-soft);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.register-btn {
+    background: var(--gradient-sunset);
+}
+
+.register-btn:hover {
+    box-shadow: 0 8px 25px rgba(249, 115, 22, 0.3);
+}
+
+/* ============================================
+   Links
+   ============================================ */
+.form-links {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.form-link {
+    color: var(--ocean-blue);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 10px;
+}
+
+.form-link:hover {
+    color: var(--tropical-teal);
+    transform: translateY(-1px);
+}
+
+/* ============================================
+   Optional Section (مبسط)
+   ============================================ */
+.optional-section {
+    margin-top: 20px;
+    padding: 16px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    background: var(--light-gray);
+    text-align: center;
+}
+
+.section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--deep-navy);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.section-text {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
+.file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: white;
+    border: 2px solid var(--ocean-blue);
+    border-radius: 8px;
+    color: var(--ocean-blue);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 13px;
+}
+
+.file-label:hover {
+    background: var(--ocean-blue);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.file-input-hidden {
+    display: none;
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+.card-footer {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   Form Check
+   ============================================ */
+.form-check {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.form-check-input:checked {
+    background-color: var(--ocean-blue);
+    border-color: var(--ocean-blue);
+}
+
+.form-check-label {
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--deep-navy);
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 15px;
+    }
+
+    .login-card,
+    .register-card {
+        padding: 30px 25px;
+    }
+
+    .card-header h2 {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-card,
+    .register-card {
+        padding: 25px 20px;
+    }
+
+    .form-input {
+        padding: 12px 40px 12px 12px;
+        font-size: 14px;
+    }
+
+    .input-icon {
+        left: 12px;
+        font-size: 16px;
+    }
+
+    .form-link {
+        margin: 5px 0;
+        display: block;
+    }
+}
