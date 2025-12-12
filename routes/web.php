@@ -10,7 +10,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 require __DIR__.'/auth.php';
 
 // routes تحت المصادقة
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'two-factor'])->group(function () {
     // Dashboard للمستخدمين العاديين
     Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 

@@ -17,7 +17,7 @@ test('admin can authenticate using admin guard', function () {
         'password' => 'password',
     ]);
 
-    $response->assertRedirect(route('admin.dashboard'));
+    $response->assertRedirect(route('admin.dashboard.redirect'));
     expect(Auth::guard('admin')->check())->toBeTrue();
     expect(Auth::guard('admin')->user()?->id)->toBe($admin->id);
 });

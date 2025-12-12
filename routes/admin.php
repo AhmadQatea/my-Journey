@@ -20,8 +20,9 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     // تسجيل الخروج
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Dashboard - مع دعم role في الـ URL
+    Route::get('/dashboard', [DashboardController::class, 'redirectToRoleDashboard'])->name('dashboard.redirect');
+    Route::get('/dashboard-{role}', [DashboardController::class, 'index'])->name('dashboard');
 
     // Users
     Route::resource('users', UserController::class)->except(['create', 'store']);

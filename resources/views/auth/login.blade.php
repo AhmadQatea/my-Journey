@@ -87,6 +87,27 @@
                 </a>
             </div>
 
+            <!-- قسم تسجيل الدخول بالوسائط الاجتماعية -->
+            <div class="social-login-section">
+                <div class="social-divider">
+                    أو تابع باستخدام
+                </div>
+
+                <div class="social-buttons">
+                    <!-- زر Google -->
+                    <a href="{{ route('login.google') }}" class="social-btn google-btn" id="googleLoginBtn">
+                        <i class="fab fa-google"></i>
+                        <span>Google</span>
+                    </a>
+
+                    <!-- زر Facebook (غير مفعل) -->
+                    <button type="button" class="social-btn facebook-btn" disabled>
+                        <i class="fab fa-facebook-f"></i>
+                        <span>Facebook</span>
+                    </button>
+                </div>
+            </div>
+
             <div class="card-footer">
                 <p>ابدأ رحلتك مع MyJpurney © 2024</p>
             </div>
@@ -95,4 +116,39 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+<script>
+    // تأثيرات لأزرار السوشيال ميديا
+    document.addEventListener('DOMContentLoaded', function() {
+        const googleBtn = document.getElementById('googleLoginBtn');
+
+        if (googleBtn) {
+            // تأثير تحميل عند الضغط على زر Google
+            googleBtn.addEventListener('click', function(e) {
+                // إضافة مؤشر التحميل
+                this.classList.add('loading');
+                this.querySelector('span').textContent = 'جاري التوجيه...';
+
+                // منع النقر المزدوج
+                this.style.pointerEvents = 'none';
+
+                // استعادة الزر بعد 5 ثواني (في حال فشل التوجيه)
+                setTimeout(() => {
+                    this.classList.remove('loading');
+                    this.querySelector('span').textContent = 'Google';
+                    this.style.pointerEvents = 'auto';
+                }, 5000);
+            });
+        }
+
+        // تأثير hover لزر Facebook (للإعلام أنه غير مفعل)
+        const facebookBtn = document.querySelector('.facebook-btn');
+        if (facebookBtn) {
+            facebookBtn.addEventListener('mouseenter', function() {
+                this.style.cursor = 'not-allowed';
+                // إضافة تلميح (tooltip) افتراضي
+                this.title = 'هذه الميزة قيد التطوير، ستكون متاحة قريباً';
+            });
+        }
+    });
+    </script>
 </html>

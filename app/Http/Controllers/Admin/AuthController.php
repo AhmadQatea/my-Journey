@@ -12,7 +12,21 @@ class AuthController extends Controller
     public function showLoginForm()
     {
         if (Auth::guard('admin')->check()) {
-            return redirect()->route('admin.dashboard');
+            /** @var \App\Models\Admin $admin */
+            $admin = Auth::guard('admin')->user();
+
+            // تحميل role إذا لم يكن محملاً
+            if (! $admin->relationLoaded('role')) {
+                $admin->load('role');
+            }
+
+            $roleSlug = $admin->getRoleSlug();
+            if ($roleSlug) {
+                return redirect()->route('admin.dashboard', ['role' => $roleSlug]);
+            }
+
+            // إذا لم يكن هناك role، نعيد التوجيه إلى dashboard redirect
+            return redirect()->route('admin.dashboard.redirect');
         }
 
         return view('admin.auth.login');
@@ -31,6 +45,7 @@ class AuthController extends Controller
         if (Auth::guard('admin')->attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
+            /** @var \App\Models\Admin $admin */
             $admin = Auth::guard('admin')->user();
 
             // التحقق من أن المسؤول نشط
@@ -42,7 +57,21 @@ class AuthController extends Controller
                 return back()->with('error', 'حسابك غير نشط. يرجى الاتصال بالمسؤول.');
             }
 
-            return redirect()->intended(route('admin.dashboard'));
+            // تحميل role إذا لم يكن محملاً
+            if (! $admin->relationLoaded('role')) {
+                $admin->load('role');
+            }
+
+            // إعادة التوجيه إلى dashboard مع role في الـ URL
+            $roleSlug = $admin->getRoleSlug();
+
+            if ($roleSlug) {
+                // استخدام redirect مباشر بدلاً من intended لتجنب مشاكل الـ URL القديم
+                return redirect()->route('admin.dashboard', ['role' => $roleSlug]);
+            }
+
+            // إذا لم يكن هناك role، نعيد التوجيه إلى dashboard redirect
+            return redirect()->route('admin.dashboard.redirect');
         }
 
         throw ValidationException::withMessages([

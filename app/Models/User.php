@@ -22,6 +22,11 @@ class User extends Authenticatable
         'identity_back_image',
         'total_bookings',
         'role_id',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
+        'google_id',
+        'avatar',
     ];
 
     protected $hidden = [
@@ -91,5 +96,14 @@ class User extends Authenticatable
     public function incrementBookings(): void
     {
         $this->increment('total_bookings');
+    }
+
+    public function twoFactorQrCodeSvg(): string
+    {
+        return app('pragmarx.google2fa')->getQRCodeInline(
+            config('app.name'),
+            $this->email,
+            $this->two_factor_secret
+        );
     }
 }

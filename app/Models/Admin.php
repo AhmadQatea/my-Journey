@@ -78,4 +78,35 @@ class Admin extends Authenticatable
     {
         return auth('admin')->check();
     }
+
+    /**
+     * Get the role slug for URL.
+     */
+    public function getRoleSlug(): ?string
+    {
+        // تحميل العلاقة إذا لم تكن محملة
+        if (! $this->relationLoaded('role')) {
+            $this->load('role');
+        }
+
+        // إذا لم يكن هناك role_id أو role غير موجود
+        if (! $this->role_id || ! $this->role) {
+            return null;
+        }
+
+        $roleName = $this->role->name;
+
+        if (empty($roleName)) {
+            return null;
+        }
+
+        // تحويل role name إلى slug للـ URL بناءً على نوع الدور
+        return match ($roleName) {
+            'big_boss' => 'bigboss',
+            'site_admin' => 'site',
+            'booking_admin' => 'booking',
+            'users_admin' => 'users',
+            default => str_replace('_', '', $roleName), // fallback: إزالة underscore
+        };
+    }
 }

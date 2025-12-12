@@ -210,6 +210,7 @@
             height: 0;
             margin: 0;
             padding: 0;
+            color: #3B82F6 !important;
         }
 
         .sidebar.collapsed .sidebar-header,
@@ -629,9 +630,9 @@
 
         <div class="sidebar-menu p-4 space-y-1">
             <!-- Dashboard -->
-            <a href="{{ route('admin.dashboard') }}" class="menu-item flex items-center space-x-3 space-x-reverse p-4 text-blue-100 hover:text-white transition-all duration-300 {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            <a href="{{ $adminRoleSlug ? route('admin.dashboard', ['role' => $adminRoleSlug]) : route('admin.dashboard.redirect') }}" class="menu-item flex items-center space-x-3 space-x-reverse p-4 text-blue-100 hover:text-white transition-all duration-300 {{ request()->routeIs('admin.dashboard*') ? 'active' : '' }}">
                 <i class="fas fa-tachometer-alt w-5 text-lg"></i>
-                <span class="menu-text font-medium transition-all duration-300">لوحة التحكم</span>
+                <span class="menu-text font-medium transition-all duration-300 ">لوحة التحكم</span>
             </a>
 
             <!-- Users -->
@@ -704,7 +705,7 @@
                     <button class="toggle-sidebar p-3 rounded-xl hover:bg-blue-500/10 dark:hover:bg-green-500/10 transition-all duration-300 lg:hidden" id="mobileToggleSidebar">
                         <i class="fas fa-bars text-blue-600 dark:text-green-400"></i>
                     </button>
-                    <h4 class="text-xl font-bold text-gray-800 dark:text-white bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                    <h4 class="text-xl font-bold text-gray-100 dark:text-white bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
                         @yield('page-title', 'مرحباً بعودتك! 👋')
                     </h4>
                 </div>

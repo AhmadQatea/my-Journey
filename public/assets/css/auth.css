@@ -45,7 +45,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    
+
 }
 
 /* خطوط مموجة رفيعة احترافية */
@@ -492,5 +492,186 @@
     .form-link {
         margin: 5px 0;
         display: block;
+    }
+}
+
+/* ============================================
+   Social Login Buttons - أزرار الوسائط الاجتماعية
+   ============================================ */
+
+   .social-login-section {
+    margin: 25px 0;
+}
+
+.social-divider {
+    position: relative;
+    text-align: center;
+    margin: 25px 0;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.social-divider::before,
+.social-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 42%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e2e8f0);
+}
+
+.social-divider::before {
+    right: 0;
+}
+
+.social-divider::after {
+    left: 0;
+    background: linear-gradient(90deg, #e2e8f0, transparent);
+}
+
+.social-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.social-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    transition: var(--transition);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    font-family: inherit;
+}
+
+.social-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
+}
+
+.social-btn:hover::before {
+    left: 100%;
+}
+
+.social-btn i {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.social-btn:hover i {
+    transform: scale(1.1);
+}
+
+/* زر Google */
+.google-btn {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-color: #e2e8f0;
+    color: #1e293b;
+}
+
+.google-btn:hover {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-color: #cbd5e1;
+    color: #0f172a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.15);
+}
+
+.google-btn:active {
+    transform: translateY(0);
+}
+
+/* زر Facebook (غير مفعل) */
+.facebook-btn {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-color: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+    position: relative;
+    opacity: 0.7;
+}
+
+.facebook-btn::after {
+    content: 'قريباً';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    background: var(--sunset-orange);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    transform: rotate(-15deg);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.facebook-btn:hover {
+    transform: none;
+    box-shadow: var(--shadow-soft);
+}
+
+/* مؤشر التحميل عند الضغط على زر Google */
+.google-btn.loading {
+    position: relative;
+    color: transparent;
+}
+
+.google-btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e2e8f0;
+    border-top-color: var(--ocean-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   Responsive لأزرار السوشيال
+   ============================================ */
+@media (max-width: 768px) {
+    .social-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .social-btn {
+        padding: 12px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .social-divider {
+        font-size: 13px;
+        margin: 20px 0;
+    }
+
+    .social-divider::before,
+    .social-divider::after {
+        width: 38%;
     }
 }

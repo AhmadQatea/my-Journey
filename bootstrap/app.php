@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => CheckPermission::class,
             'identity.verified' => CheckIdentityVerified::class,
             'user.type' => CheckUserType::class,
+            'two-factor' => \App\Http\Middleware\TwoFactorMiddleware::class,
         ]);
 
         // groups middleware الـ
