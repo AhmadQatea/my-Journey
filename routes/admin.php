@@ -4,7 +4,9 @@ use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\GovernorateController;
 use App\Http\Controllers\Admin\OfferController;
+use App\Http\Controllers\Admin\TouristSpotController;
 use App\Http\Controllers\Admin\TripController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +25,16 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     // Dashboard - مع دعم role في الـ URL
     Route::get('/dashboard', [DashboardController::class, 'redirectToRoleDashboard'])->name('dashboard.redirect');
     Route::get('/dashboard-{role}', [DashboardController::class, 'index'])->name('dashboard');
+
+    // المحافظات
+    Route::resource('governorates', GovernorateController::class);
+    Route::post('/governorates/{governorate}/activate', [GovernorateController::class, 'activate'])->name('governorates.activate');
+    Route::post('/governorates/{governorate}/deactivate', [GovernorateController::class, 'deactivate'])->name('governorates.deactivate');
+
+    // الأماكن السياحية
+    Route::resource('tourist-spots', TouristSpotController::class);
+    Route::post('/tourist-spots/{tourist_spot}/activate', [TouristSpotController::class, 'activate'])->name('tourist-spots.activate');
+    Route::post('/tourist-spots/{tourist_spot}/deactivate', [TouristSpotController::class, 'deactivate'])->name('tourist-spots.deactivate');
 
     // Users
     Route::resource('users', UserController::class)->except(['create', 'store']);
@@ -49,20 +61,4 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
 
     // Deals/Offers
     Route::resource('deals', OfferController::class);
-    Route::get('/deals', [OfferController::class, 'index'])->name('deals.index');
-    Route::get('/deals/create', [OfferController::class, 'create'])->name('deals.create');
-    Route::post('/deals', [OfferController::class, 'store'])->name('deals.store');
-    Route::get('/deals/{deal}', [OfferController::class, 'show'])->name('deals.show');
-    Route::get('/deals/{deal}/edit', [OfferController::class, 'edit'])->name('deals.edit');
-    Route::put('/deals/{deal}', [OfferController::class, 'update'])->name('deals.update');
-    Route::delete('/deals/{deal}', [OfferController::class, 'destroy'])->name('deals.destroy');
-
-    // Cities (سيتم إضافتها لاحقاً)
-    // Route::resource('cities', CityController::class);
-
-    // Admins (سيتم إضافتها لاحقاً)
-    // Route::resource('admins', AdminController::class);
-
-    // Reports (سيتم إضافتها لاحقاً)
-    // Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 });

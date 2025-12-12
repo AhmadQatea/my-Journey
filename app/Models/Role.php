@@ -64,6 +64,13 @@ class Role extends Model
             'offers.update',
             'offers.delete',
             'settings.manage',
+            'manage_governorates',
+            'manage_tourist_spots',
+            'manage_trips',
+            'manage_deals',
+            'manage_bookings',
+            'manage_articles',
+            'view_users',
         ];
     }
 }
