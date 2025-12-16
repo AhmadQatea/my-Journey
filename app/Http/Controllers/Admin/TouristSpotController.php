@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Category;
 use App\Models\Governorate;
 use App\Models\TouristSpot;
 use Illuminate\Http\Request;
@@ -9,18 +10,38 @@ use Illuminate\Support\Facades\Storage;
 
 class TouristSpotController extends AdminController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $touristSpots = TouristSpot::with('governorate')->latest()->paginate(15);
+        $query = TouristSpot::with('governorate');
 
-        return view('admin.tourist-spots.index', compact('touristSpots'));
+        // فلترة حسب المحافظة
+        if ($request->filled('governorate_id')) {
+            $query->where('governorate_id', $request->governorate_id);
+        }
+
+        // فلترة حسب الفئة
+        if ($request->filled('category_id')) {
+            $query->whereJsonContains('category_ids', $request->category_id);
+        }
+
+        // البحث بالاسم
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%'.$request->search.'%');
+        }
+
+        $touristSpots = $query->latest()->paginate(15)->withQueryString();
+        $governorates = Governorate::all();
+        $categories = Category::all();
+
+        return view('admin.tourist-spots.index', compact('touristSpots', 'governorates', 'categories'));
     }
 
     public function create()
     {
         $governorates = Governorate::all();
+        $categories = Category::all();
 
-        return view('admin.tourist-spots.create', compact('governorates'));
+        return view('admin.tourist-spots.create', compact('governorates', 'categories'));
     }
 
     public function store(Request $request)
@@ -30,15 +51,26 @@ class TouristSpotController extends AdminController
             'name' => 'required|string|max:255',
             'description' => 'required|string|min:50',
             'location' => 'required|string|max:255',
-            'type' => 'required|string|max:255',
+            'coordinates' => [
+                'nullable',
+                'string',
+                'regex:/^-?\d+\.?\d*,\s*-?\d+\.?\d*$/',
+            ],
+            'category_ids' => 'required|array|min:1',
+            'category_ids.*' => 'required|exists:categories,id',
             'images' => 'required|array|min:1',
             'images.*' => 'image|max:2048',
             'entrance_fee' => 'nullable|numeric|min:0',
             'opening_hours' => 'nullable|string|max:255',
         ]);
 
-        $data = $request->except('images');
-        
+        $data = $request->except(['images', 'category_ids']);
+
+        // حفظ category_ids كـ JSON
+        if ($request->has('category_ids')) {
+            $data['category_ids'] = $request->category_ids;
+        }
+
         if ($request->hasFile('images')) {
             $imagePaths = [];
             foreach ($request->file('images') as $image) {
@@ -62,8 +94,9 @@ class TouristSpotController extends AdminController
     public function edit(TouristSpot $touristSpot)
     {
         $governorates = Governorate::all();
+        $categories = Category::all();
 
-        return view('admin.tourist-spots.edit', compact('touristSpot', 'governorates'));
+        return view('admin.tourist-spots.edit', compact('touristSpot', 'governorates', 'categories'));
     }
 
     public function update(Request $request, TouristSpot $touristSpot)
@@ -73,15 +106,26 @@ class TouristSpotController extends AdminController
             'name' => 'required|string|max:255',
             'description' => 'required|string|min:50',
             'location' => 'required|string|max:255',
-            'type' => 'required|string|max:255',
+            'coordinates' => [
+                'nullable',
+                'string',
+                'regex:/^-?\d+\.?\d*,\s*-?\d+\.?\d*$/',
+            ],
+            'category_ids' => 'required|array|min:1',
+            'category_ids.*' => 'required|exists:categories,id',
             'images' => 'sometimes|array',
             'images.*' => 'image|max:2048',
             'entrance_fee' => 'nullable|numeric|min:0',
             'opening_hours' => 'nullable|string|max:255',
         ]);
 
-        $data = $request->except('images');
-        
+        $data = $request->except(['images', 'category_ids']);
+
+        // حفظ category_ids كـ JSON
+        if ($request->has('category_ids')) {
+            $data['category_ids'] = $request->category_ids;
+        }
+
         if ($request->hasFile('images')) {
             // حذف الصور القديمة
             if ($touristSpot->images) {
@@ -128,4 +172,3 @@ class TouristSpotController extends AdminController
         return back()->with('success', 'تم إلغاء تفعيل المكان السياحي بنجاح');
     }
 }
-

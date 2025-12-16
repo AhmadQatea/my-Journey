@@ -1,171 +1,200 @@
+{{-- resources/views/admin/articles/create.blade.php --}}
 @extends('admin.layouts.admin')
 
-@section('title', 'Create Article')
-@section('page-title', 'Create New Article')
+@section('title', 'إضافة مقال جديد')
+@section('page-title', 'إضافة مقال جديد')
 
 @section('content')
-<x-card title="Article Information">
+<div class="container mx-auto px-4 py-4">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">إضافة مقال جديد</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">أنشئ مقالاً جديداً</p>
+        </div>
+        <a href="{{ route('admin.articles.index') }}"
+           class="btn btn-outline inline-flex items-center gap-2">
+            <i class="fas fa-arrow-right"></i>
+            <span>رجوع للقائمة</span>
+        </a>
+    </div>
+
     <form action="{{ route('admin.articles.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Main Content -->
             <div class="lg:col-span-2 space-y-6">
-                <x-form.input 
-                    name="title" 
-                    label="Article Title" 
-                    required 
-                    placeholder="Enter article title"
-                    value="{{ old('title') }}"
-                />
-                
-                <x-form.textarea 
-                    name="excerpt" 
-                    label="Excerpt" 
-                    rows="3"
-                    placeholder="Brief description of the article"
-                >{{ old('excerpt') }}</x-form.textarea>
-                
-                <div class="form-group">
-                    <label class="form-label">Content *</label>
-                    <textarea id="contentEditor" class="form-control @error('content') is-invalid @enderror" 
-                              name="content" rows="15">{{ old('content') }}</textarea>
-                    @error('content')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                <!-- Image Gallery -->
-                <div class="form-group">
-                    <label class="form-label">Article Images</label>
-                    <div class="multi-image-upload" data-preview="imagePreview">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p class="text-gray-500">Drag & drop images here or click to browse</p>
-                        <input type="file" multiple accept="image/*" class="hidden" name="images[]">
+                <!-- Basic Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">المعلومات الأساسية</h3>
                     </div>
-                    <div id="imagePreview" class="image-preview-container mt-3"></div>
+                    <div class="card-body space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">الرحلة أو العرض (اختياري)</label>
+                                <select name="trip_id"
+                                        class="form-control form-select @error('trip_id') is-invalid @enderror">
+                                    <option value="">عام (غير مرتبط برحلة أو عرض)</option>
+                                    @if($trips->count() > 0)
+                                        <optgroup label="الرحلات">
+                                            @foreach($trips as $trip)
+                                                <option value="{{ $trip->id }}" {{ old('trip_id') == $trip->id ? 'selected' : '' }}>
+                                                    {{ $trip->title }} - {{ $trip->governorate->name }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endif
+                                    @if($offers->count() > 0)
+                                        <optgroup label="العروض الخاصة">
+                                            @foreach($offers as $offer)
+                                                <option value="{{ $offer->trip_id }}" {{ old('trip_id') == $offer->trip_id ? 'selected' : '' }}>
+                                                    {{ $offer->title }} - {{ $offer->trip->governorate->name ?? 'N/A' }}
+                                                    @if($offer->discount_percentage > 0)
+                                                        - خصم {{ $offer->discount_percentage }}%
+                                                    @endif
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endif
+                                </select>
+                                @error('trip_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">عنوان المقال *</label>
+                            <input type="text"
+                                   name="title"
+                                   class="form-control @error('title') is-invalid @enderror"
+                                   value="{{ old('title') }}"
+                                   required>
+                            @error('title')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">الملخص (اختياري)</label>
+                            <textarea name="excerpt"
+                                      class="form-control @error('excerpt') is-invalid @enderror"
+                                      rows="3"
+                                      placeholder="ملخص قصير عن المقال...">{{ old('excerpt') }}</textarea>
+                            @error('excerpt')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">محتوى المقال *</label>
+                            <textarea id="contentEditor"
+                                      name="content"
+                                      class="form-control @error('content') is-invalid @enderror"
+                                      rows="15"
+                                      required>{{ old('content') }}</textarea>
+                            @error('content')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">التقييم (اختياري)</label>
+                            <select name="rating"
+                                    class="form-control form-select @error('rating') is-invalid @enderror">
+                                <option value="">بدون تقييم</option>
+                                @for($i = 5; $i >= 1; $i--)
+                                    <option value="{{ $i }}" {{ old('rating') == $i ? 'selected' : '' }}>
+                                        {{ $i }} {{ $i == 5 ? 'نجوم' : ($i == 4 ? 'نجوم' : ($i == 3 ? 'نجوم' : ($i == 2 ? 'نجوم' : 'نجمة'))) }}
+                                    </option>
+                                @endfor
+                            </select>
+                            @error('rating')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">الصور (اختياري)</label>
+                            <input type="file"
+                                   name="images[]"
+                                   class="form-control @error('images') is-invalid @enderror"
+                                   accept="image/*"
+                                   multiple>
+                            @error('images')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            @error('images.*')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <i class="fas fa-info-circle ml-1"></i>
+                                يمكن رفع حتى 10 صور
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Sidebar Settings -->
+
+            <!-- Sidebar -->
             <div class="space-y-6">
-                <!-- Featured Image -->
-                <div class="form-group">
-                    <label class="form-label">Featured Image *</label>
-                    <div class="featured-image-upload">
-                        <i class="fas fa-image"></i>
-                        <p class="text-gray-500 text-sm">Click to upload featured image</p>
-                        <input type="file" accept="image/*" class="hidden" name="featured_image">
-                    </div>
-                    <div class="featured-image-preview hidden mt-3">
-                        <img class="w-full h-48 object-cover rounded">
+                <!-- Submit Button -->
+                <div class="card">
+                    <div class="card-body p-4">
+                        <button type="submit" class="btn btn-primary w-full">
+                            <i class="fas fa-save ml-1"></i>
+                            حفظ المقال
+                        </button>
                     </div>
                 </div>
-                
-                <!-- Article Settings -->
-                <x-card title="Article Settings" class="!mb-0">
-                    <div class="space-y-4">
-                        <x-form.select 
-                            name="category_id" 
-                            label="Category" 
-                            :options="$categories->pluck('name', 'id')" 
-                            required 
-                            :selected="old('category_id')"
-                        />
-                        
-                        <x-form.input 
-                            name="tags" 
-                            label="Tags" 
-                            placeholder="tag1, tag2, tag3"
-                            value="{{ old('tags') }}"
-                        />
-                        
-                        <x-form.select 
-                            name="status" 
-                            label="Status" 
-                            :options="[
-                                'draft' => 'Draft',
-                                'published' => 'Published',
-                                'pending' => 'Pending Review'
-                            ]" 
-                            required 
-                            :selected="old('status')"
-                        />
-                        
-                        <x-form.checkbox 
-                            name="is_featured" 
-                            label="Featured Article" 
-                            :checked="old('is_featured')"
-                        />
-                        
-                        <x-form.checkbox 
-                            name="allow_comments" 
-                            label="Allow Comments" 
-                            :checked="old('allow_comments', true)"
-                        />
+
+                <!-- Info Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">معلومات</h3>
                     </div>
-                </x-card>
-                
-                <!-- SEO Settings -->
-                <x-card title="SEO Settings" class="!mb-0">
-                    <div class="space-y-4">
-                        <x-form.input 
-                            name="meta_title" 
-                            label="Meta Title" 
-                            placeholder="Meta title for SEO"
-                            value="{{ old('meta_title') }}"
-                        />
-                        
-                        <x-form.textarea 
-                            name="meta_description" 
-                            label="Meta Description" 
-                            rows="3"
-                            placeholder="Meta description for SEO"
-                        >{{ old('meta_description') }}</x-form.textarea>
-                        
-                        <x-form.input 
-                            name="slug" 
-                            label="Slug" 
-                            placeholder="URL-friendly slug"
-                            value="{{ old('slug') }}"
-                        />
+                    <div class="card-body p-4">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle ml-1"></i>
+                            <p class="text-sm">
+                                المقالات التي ينشئها المسؤولون تكون <strong>منشورة</strong> تلقائياً.
+                            </p>
+                            <p class="text-sm mt-2">
+                                يمكن للمسؤول إنشاء مقالات <strong>عامة</strong> للموقع (غير مرتبطة برحلة).
+                            </p>
+                        </div>
                     </div>
-                </x-card>
+                </div>
             </div>
-        </div>
-        
-        <div class="flex justify-end gap-3 mt-6">
-            <a href="{{ route('admin.articles.index') }}" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i> Create Article
-            </button>
         </div>
     </form>
-</x-card>
+</div>
 @endsection
 
 @push('scripts')
 <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
 <script>
-// Initialize CKEditor
-document.addEventListener('DOMContentLoaded', function() {
-    CKEDITOR.replace('contentEditor', {
-        toolbar: [
-            { name: 'document', items: ['Source'] },
-            { name: 'clipboard', items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'] },
-            { name: 'editing', items: ['Find', 'Replace', '-', 'SelectAll'] },
-            { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'] },
-            '/',
-            { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
-            { name: 'links', items: ['Link', 'Unlink'] },
-            { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
-            '/',
-            { name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize'] },
-            { name: 'colors', items: ['TextColor', 'BGColor'] },
-            { name: 'tools', items: ['Maximize', 'ShowBlocks'] }
-        ],
-        height: 400
+    // Initialize CKEditor
+    document.addEventListener('DOMContentLoaded', function() {
+        CKEDITOR.replace('contentEditor', {
+            toolbar: [
+                { name: 'document', items: ['Source'] },
+                { name: 'clipboard', items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'] },
+                { name: 'editing', items: ['Find', 'Replace', '-', 'SelectAll'] },
+                { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'] },
+                '/',
+                { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+                { name: 'links', items: ['Link', 'Unlink'] },
+                { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
+                '/',
+                { name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize'] },
+                { name: 'colors', items: ['TextColor', 'BGColor'] },
+                { name: 'tools', items: ['Maximize', 'ShowBlocks'] }
+            ],
+            height: 400
+        });
     });
-});
 </script>
 @endpush

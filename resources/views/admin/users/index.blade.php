@@ -1,206 +1,256 @@
-@extends('layouts.admin')
+{{-- resources/views/admin/users/index.blade.php --}}
+@extends('admin.layouts.admin')
 
-@section('title', 'User Details')
-@section('page-title', 'User Details: ' . $user->name)
+@section('title', 'إدارة المستخدمين')
+@section('page-title', 'إدارة المستخدمين')
 
 @section('content')
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- User Profile -->
-    <x-card title="Profile Information">
-        <div class="text-center mb-6">
-            <div class="w-24 h-24 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold mx-auto mb-3">
-                {{ substr($user->name, 0, 1) }}
+<div class="container mx-auto px-4 py-4">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">إدارة المستخدمين</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">إدارة جميع المستخدمين في النظام</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- إحصائيات سريعة -->
+            <div class="hidden sm:flex items-center gap-4 text-sm">
+                <div class="flex items-center gap-1">
+                    <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <span class="text-gray-600 dark:text-gray-400">زائر: {{ $stats['visitor'] }}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="text-gray-600 dark:text-gray-400">نشط: {{ $stats['active'] }}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <div class="w-3 h-3 rounded-full bg-purple-500"></div>
+                    <span class="text-gray-600 dark:text-gray-400">VIP: {{ $stats['vip'] }}</span>
             </div>
-            <h3 class="text-xl font-bold">{{ $user->name }}</h3>
-            <p class="text-gray-500">{{ $user->email }}</p>
-            <div class="mt-2">
-                <x-badge variant="{{ $user->is_active ? 'success' : 'danger' }}">
-                    {{ $user->is_active ? 'Active' : 'Inactive' }}
-                </x-badge>
-                @if($user->email_verified_at)
-                <x-badge variant="success">Verified</x-badge>
-                @else
-                <x-badge variant="warning">Unverified</x-badge>
-                @endif
+            </div>
+        </div>
+            </div>
+
+    <!-- Filters Section -->
+    <div class="card mb-6">
+        <div class="card-body p-4">
+            <form method="GET" action="{{ route('admin.users.index') }}" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <!-- Search -->
+                    <div class="form-group">
+                        <label class="form-label">بحث</label>
+                        <input type="text"
+                               name="search"
+                               value="{{ request('search') }}"
+                               class="form-control"
+                               placeholder="ابحث عن مستخدم...">
+            </div>
+
+                    <!-- Account Type Filter -->
+                    <div class="form-group">
+                        <label class="form-label">نوع الحساب</label>
+                        <select name="account_type" class="form-control form-select">
+                            <option value="all">جميع الأنواع</option>
+                            <option value="visitor" {{ request('account_type') == 'visitor' ? 'selected' : '' }}>زائر</option>
+                            <option value="active" {{ request('account_type') == 'active' ? 'selected' : '' }}>نشط</option>
+                            <option value="vip" {{ request('account_type') == 'vip' ? 'selected' : '' }}>VIP</option>
+                        </select>
+            </div>
+
+                    <!-- Role Filter -->
+                    <div class="form-group">
+                        <label class="form-label">الدور</label>
+                        <select name="role_id" class="form-control form-select">
+                            <option value="">جميع الأدوار</option>
+                            @foreach($roles as $role)
+                                <option value="{{ $role->id }}" {{ request('role_id') == $role->id ? 'selected' : '' }}>
+                                    {{ $role->name }}
+                                </option>
+                            @endforeach
+                        </select>
+            </div>
+
+                    <!-- Email Verified Filter -->
+                    <div class="form-group">
+                        <label class="form-label">البريد الإلكتروني</label>
+                        <select name="email_verified" class="form-control form-select">
+                            <option value="">الكل</option>
+                            <option value="yes" {{ request('email_verified') == 'yes' ? 'selected' : '' }}>متحقق</option>
+                            <option value="no" {{ request('email_verified') == 'no' ? 'selected' : '' }}>غير متحقق</option>
+                        </select>
             </div>
         </div>
 
-        <div class="space-y-3">
-            <div class="flex justify-between">
-                <span class="font-medium">Phone:</span>
-                <span>{{ $user->phone ?? 'N/A' }}</span>
-            </div>
-
-            <div class="flex justify-between">
-                <span class="font-medium">Member Since:</span>
-                <span>{{ $user->created_at->format('M d, Y') }}</span>
-            </div>
-
-            <div class="flex justify-between">
-                <span class="font-medium">Last Login:</span>
-                <span>{{ $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Never' }}</span>
-            </div>
-
-            <div class="flex justify-between">
-                <span class="font-medium">Total Bookings:</span>
-                <span class="font-semibold text-blue-600">{{ $user->bookings_count }}</span>
-            </div>
-
-            <div class="flex justify-between">
-                <span class="font-medium">Total Articles:</span>
-                <span class="font-semibold text-green-600">{{ $user->articles_count }}</span>
-            </div>
-        </div>
-
-        <div class="mt-6 flex gap-2">
-            @if(!$user->is_active)
-            <form action="{{ route('admin.users.activate', $user) }}" method="POST" class="flex-1">
-                @csrf
-                <x-button type="submit" variant="success" class="w-full">
-                    <i class="fas fa-check"></i> Activate User
-                </x-button>
-            </form>
-            @else
-            <form action="{{ route('admin.users.deactivate', $user) }}" method="POST" class="flex-1">
-                @csrf
-                <x-button type="submit" variant="warning" class="w-full">
-                    <i class="fas fa-pause"></i> Deactivate User
-                </x-button>
-            </form>
-            @endif
-
-            @if(!$user->email_verified_at)
-            <form action="{{ route('admin.users.verify', $user) }}" method="POST" class="flex-1">
-                @csrf
-                <x-button type="submit" variant="info" class="w-full">
-                    <i class="fas fa-envelope"></i> Verify Email
-                </x-button>
-            </form>
-            @endif
-        </div>
-    </x-card>
-
-    <!-- User Statistics -->
-    <x-card title="User Statistics" class="lg:col-span-2">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div class="stat-card text-center">
-                <div class="stat-number text-blue-600">{{ $user->bookings_count }}</div>
-                <div class="stat-label">Total Bookings</div>
-            </div>
-
-            <div class="stat-card text-center">
-                <div class="stat-number text-green-600">{{ $user->articles_count }}</div>
-                <div class="stat-label">Articles Written</div>
-            </div>
-
-            <div class="stat-card text-center">
-                <div class="stat-number text-purple-600">{{ $completedBookings }}</div>
-                <div class="stat-label">Completed Trips</div>
-            </div>
-
-            <div class="stat-card text-center">
-                <div class="stat-number text-orange-600">${{ number_format($totalSpent, 2) }}</div>
-                <div class="stat-label">Total Spent</div>
-            </div>
-        </div>
-
-        <!-- Recent Bookings -->
-        <h4 class="font-semibold mb-3">Recent Bookings</h4>
-        <div class="space-y-3">
-            @foreach($recentBookings as $booking)
-            <div class="flex items-center justify-between p-3 border rounded-lg">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset($booking->trip->images->first()->path ?? 'images/default-trip.jpg') }}"
-                         alt="{{ $booking->trip->title }}" class="w-12 h-12 rounded object-cover">
-                    <div>
-                        <h4 class="font-medium">{{ $booking->trip->title }}</h4>
-                        <p class="text-sm text-gray-500">{{ $booking->trip->city->name }}</p>
-                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter ml-1"></i>
+                        فلترة
+                    </button>
+                    <a href="{{ route('admin.users.index') }}" class="btn btn-outline">
+                        <i class="fas fa-sync ml-1"></i>
+                        إعادة تعيين
+                    </a>
                 </div>
-                <div class="text-right">
-                    <div class="font-semibold text-green-600">${{ number_format($booking->total_price, 2) }}</div>
-                    <x-badge variant="{{ $booking->status === 'confirmed' ? 'success' : 'warning' }}">
-                        {{ ucfirst($booking->status) }}
-                    </x-badge>
+            </form>
+        </div>
+            </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid mb-6">
+        <div class="stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="stat-label">إجمالي المستخدمين</p>
+                    <p class="stat-value">{{ $stats['total'] }}</p>
+                </div>
+                <div class="stat-icon bg-gradient-to-br from-blue-500 to-cyan-500">
+                    <i class="fas fa-users"></i>
                 </div>
             </div>
-            @endforeach
+            </div>
 
-            @if($user->bookings_count == 0)
-            <p class="text-gray-500 text-center py-4">No bookings yet.</p>
+        <div class="stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="stat-label">زائر</p>
+                    <p class="stat-value">{{ $stats['visitor'] }}</p>
+                </div>
+                <div class="stat-icon bg-gradient-to-br from-gray-500 to-gray-600">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="flex items-center justify-between">
+                    <div>
+                    <p class="stat-label">نشط</p>
+                    <p class="stat-value">{{ $stats['active'] }}</p>
+                </div>
+                <div class="stat-icon bg-gradient-to-br from-emerald-500 to-green-500">
+                    <i class="fas fa-user-check"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="stat-label">VIP</p>
+                    <p class="stat-value">{{ $stats['vip'] }}</p>
+        </div>
+                <div class="stat-icon bg-gradient-to-br from-purple-500 to-pink-500">
+                    <i class="fas fa-crown"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="card">
+        <div class="card-header">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <h3 class="card-title">قائمة المستخدمين</h3>
+                <span class="text-sm text-gray-600 dark:text-gray-400">
+                    عرض {{ $users->firstItem() ?? 0 }} - {{ $users->lastItem() ?? 0 }} من {{ $users->total() }}
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            @if($users->count() > 0)
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="w-16">#</th>
+                                <th>المستخدم</th>
+                                <th class="w-32">الدور</th>
+                                <th class="w-32">نوع الحساب</th>
+                                <th class="w-24">الحجوزات</th>
+                                <th class="w-24">المقالات</th>
+                                <th class="w-24">الحالة</th>
+                                <th class="w-32">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($users as $user)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                <td>{{ $loop->iteration }}</td>
+                                <td>
+                                    <div class="font-medium text-gray-900 dark:text-gray-200">{{ $user->full_name }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ $user->email }}</div>
+                                    @if($user->phone)
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ $user->phone }}</div>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($user->role)
+                                        <span class="badge badge-info">{{ $user->role->name }}</span>
+                                    @else
+                                        <span class="text-gray-500">-</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @php
+                                        $accountTypeColors = [
+                                            'visitor' => 'badge-secondary',
+                                            'active' => 'badge-success',
+                                            'vip' => 'badge-warning',
+                                        ];
+                                        $accountTypeLabels = [
+                                            'visitor' => 'زائر',
+                                            'active' => 'نشط',
+                                            'vip' => 'VIP',
+                                        ];
+                                    @endphp
+                                    <span class="badge {{ $accountTypeColors[$user->account_type] ?? 'badge-secondary' }}">
+                                        {{ $accountTypeLabels[$user->account_type] ?? $user->account_type }}
+                                    </span>
+                                </td>
+                                <td>{{ $user->bookings_count ?? 0 }}</td>
+                                <td>{{ $user->articles_count ?? 0 }}</td>
+                                <td>
+                                    @if($user->email_verified_at)
+                                        <span class="badge badge-success">متحقق</span>
+                                    @else
+                                        <span class="badge badge-warning">غير متحقق</span>
+    @endif
+                                </td>
+                                <td>
+                                    <div class="flex items-center gap-2">
+                                        <a href="{{ route('admin.users.show', $user) }}" class="btn btn-info btn-sm" title="عرض">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-warning btn-sm" title="تعديل">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4 class="empty-state-title">لا يوجد مستخدمين</h4>
+                    <p class="empty-state-description">
+                        لم يتم إضافة أي مستخدمين بعد.
+                    </p>
+                </div>
             @endif
         </div>
 
-        @if($user->bookings_count > 3)
-        <div class="mt-4 text-center">
-            <x-button href="{{ route('admin.bookings.index', ['user' => $user->id]) }}" variant="outline-primary" size="sm">
-                View All Bookings
-            </x-button>
-        </div>
+        @if($users->hasPages())
+            <div class="card-footer">
+                {{ $users->links() }}
+            </div>
         @endif
-    </x-card>
-</div>
-
-<!-- Recent Articles -->
-<x-card title="Recent Articles" class="mt-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @foreach($recentArticles as $article)
-        <div class="bg-white rounded-lg border overflow-hidden">
-            <img src="{{ asset($article->featured_image) }}" alt="{{ $article->title }}"
-                 class="w-full h-40 object-cover">
-            <div class="p-4">
-                <h4 class="font-bold text-lg mb-2">{{ Str::limit($article->title, 50) }}</h4>
-                <p class="text-gray-600 text-sm mb-3">{{ Str::limit($article->excerpt, 80) }}</p>
-                <div class="flex justify-between items-center">
-                    <x-badge variant="info">{{ $article->status }}</x-badge>
-                    <span class="text-sm text-gray-500">{{ $article->created_at->format('M d, Y') }}</span>
-                </div>
-            </div>
-        </div>
-        @endforeach
     </div>
-
-    @if($user->articles_count == 0)
-    <p class="text-gray-500 text-center py-8">No articles written yet.</p>
-    @endif
-
-    @if($user->articles_count > 3)
-    <div class="mt-4 text-center">
-        <x-button href="{{ route('admin.articles.index', ['author' => $user->id]) }}" variant="outline-primary" size="sm">
-            View All Articles
-        </x-button>
     </div>
-    @endif
-</x-card>
-
-<!-- Activity Timeline -->
-<x-card title="Activity Timeline" class="mt-6">
-    <div class="space-y-4">
-        @foreach($activities as $activity)
-        <div class="flex gap-4">
-            <div class="flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center">
-                    <i class="fas fa-{{ $activity->type_icon }} text-sm"></i>
-                </div>
-                <div class="w-0.5 h-full bg-gray-200 mt-2"></div>
-            </div>
-            <div class="flex-1 pb-4">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h4 class="font-medium">{{ $activity->description }}</h4>
-                        <p class="text-sm text-gray-500">{{ $activity->details }}</p>
-                    </div>
-                    <span class="text-sm text-gray-400">{{ $activity->created_at->diffForHumans() }}</span>
-                </div>
-            </div>
-        </div>
-        @endforeach
-    </div>
-
-    @if($activities->hasPages())
-    <div class="mt-4">
-        {{ $activities->links() }}
-    </div>
-    @endif
-</x-card>
 @endsection

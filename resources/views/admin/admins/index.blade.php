@@ -7,9 +7,14 @@
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">All Administrators</h3>
-        <a href="{{ route('admin.admins.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Add Admin
-        </a>
+        <div class="flex gap-3">
+            <a href="{{ route('admin.roles.create') }}" class="btn btn-success">
+                <i class="fas fa-user-tag"></i> Create Role
+            </a>
+            <a href="{{ route('admin.admins.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Admin
+            </a>
+        </div>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -18,11 +23,9 @@
                     <tr>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>Role Type</th>
-                        <th>Roles</th>
+                        <th>Role</th>
                         <th>Super Admin</th>
                         <th>Status</th>
-                        <th>Last Login</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -42,12 +45,11 @@
                         </td>
                         <td>{{ $admin->email }}</td>
                         <td>
-                            <span class="badge badge-info">{{ $admin->role_type }}</span>
-                        </td>
-                        <td>
-                            @foreach($admin->roles as $role)
-                                <span class="badge badge-primary">{{ $role->name }}</span>
-                            @endforeach
+                            @if($admin->role)
+                                <span class="badge badge-info">{{ $admin->role->name }}</span>
+                            @else
+                                <span class="badge badge-secondary">No Role</span>
+                            @endif
                         </td>
                         <td>
                             @if($admin->is_super_admin)
@@ -60,9 +62,6 @@
                             <span class="badge badge-{{ $admin->is_active ? 'success' : 'danger' }}">
                                 {{ $admin->is_active ? 'Active' : 'Inactive' }}
                             </span>
-                        </td>
-                        <td>
-                            {{ $admin->last_login_at ? $admin->last_login_at->format('M d, Y H:i') : 'Never' }}
                         </td>
                         <td>
                             <div class="action-buttons">
@@ -121,29 +120,12 @@
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon" style="background: #fce7f3; color: #ec4899;">
-            <i class="fas fa-clock"></i>
+        <div class="stat-icon" style="background: #fee2e2; color: #ef4444;">
+            <i class="fas fa-user-times"></i>
         </div>
-        <div class="stat-number">{{ $recentLogins }}</div>
-        <div class="stat-label">Recent Logins (7d)</div>
+        <div class="stat-number">{{ $inactiveAdmins }}</div>
+        <div class="stat-label">Inactive Admins</div>
     </div>
 </div>
 
-<!-- Roles Distribution Chart -->
-<div class="card mt-6">
-    <div class="card-header">
-        <h3 class="card-title">Roles Distribution</h3>
-    </div>
-    <div class="card-body">
-        <canvas id="rolesChart" height="100"></canvas>
-    </div>
-</div>
-
-@push('scripts')
-<script>
-    // Set chart data for global access
-    window.rolesChartLabels = @json($rolesDistribution->pluck('role'));
-    window.rolesChartData = @json($rolesDistribution->pluck('count'));
-</script>
-@endpush
 @endsection

@@ -1,13 +1,12 @@
 <?php
 
-use App\Http\Controllers\TwoFactorAuthController;
-use App\Http\Controllers\SocialiteController;
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
-use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\LoginEmailVerificationController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SocialiteController;
+use App\Http\Controllers\TwoFactorAuthController;
+use Illuminate\Support\Facades\Route;
 
 // Authentication routes
 Route::middleware(['auth'])->group(function () {
@@ -20,26 +19,25 @@ Route::middleware(['auth'])->group(function () {
         return view('auth.change-password');
     })->name('password.change');
 
-    // 2FA routes
-    Route::prefix('two-factor')->group(function () {
-        Route::get('/setup', [TwoFactorAuthController::class, 'showSetupForm'])
-            ->name('two-factor.setup');
+    // 2FA setup page
+    Route::get('/two-factor/setup', [TwoFactorAuthController::class, 'showSetupForm'])
+        ->name('two-factor.setup');
 
-        Route::post('/setup', [TwoFactorAuthController::class, 'enable'])
-            ->name('two-factor.enable');
+    // Verify password before enabling 2FA
+    Route::post('/two-factor/verify-password', [TwoFactorAuthController::class, 'verifyPassword'])
+        ->name('two-factor.verify-password');
 
-        Route::delete('/setup', [TwoFactorAuthController::class, 'disable'])
-            ->name('two-factor.disable');
+    // Enable 2FA (confirm with code) - custom route to avoid conflict with Fortify
+    Route::post('/two-factor/enable', [TwoFactorAuthController::class, 'enable'])
+        ->name('two-factor.enable-custom');
 
-        Route::get('/recovery-codes', [TwoFactorAuthController::class, 'showRecoveryCodes'])
-            ->name('two-factor.recovery-codes');
+    // 2FA recovery codes page
+    Route::get('/two-factor/recovery-codes', [\App\Http\Controllers\TwoFactorSetupController::class, 'showRecoveryCodes'])
+        ->name('two-factor.recovery-codes');
 
-        Route::post('/recovery-codes', [TwoFactorAuthController::class, 'generateNewRecoveryCodes'])
-            ->name('two-factor.generate-recovery-codes');
-
-        Route::post('/verify-for-password-change', [TwoFactorAuthController::class, 'verifyForPasswordChange'])
-            ->name('two-factor.verify-for-password-change');
-    });
+    // Keep verify-for-password-change for password change functionality
+    Route::post('/two-factor/verify-for-password-change', [TwoFactorAuthController::class, 'verifyForPasswordChange'])
+        ->name('two-factor.verify-for-password-change');
 
     // Google account linking
     Route::post('/auth/google/link', [SocialiteController::class, 'linkGoogleAccount'])
@@ -55,20 +53,14 @@ Route::get('/auth/google', [SocialiteController::class, 'redirectToGoogle'])
 
 Route::get('/auth/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
 
-// 2FA challenge during login
+// 2FA challenge is handled by Fortify automatically via FortifyServiceProvider
+// Fortify will redirect to /two-factor-challenge when needed
+
+// إرسال كود التحقق عبر الإيميل للتحقق بخطوتين (مخصص)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/two-factor-challenge', function () {
-        return view('auth.two-factor-challenge');
-    })->name('two-factor.challenge');
-
-    Route::post('/two-factor-challenge', [TwoFactorAuthController::class, 'verify'])
-        ->name('two-factor.verify');
-
-    // إرسال كود التحقق عبر الإيميل للتحقق بخطوتين
     Route::post('/two-factor/send-email-code', [TwoFactorAuthController::class, 'sendEmailCode'])
         ->name('two-factor.send-email-code');
 });
-
 
 // ========== Routes للتحقق من الإيميل عند تسجيل الدخول ==========
 Route::middleware('guest')->group(function () {

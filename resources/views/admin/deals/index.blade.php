@@ -1,186 +1,260 @@
-@extends('layouts.admin')
+{{-- resources/views/admin/deals/index.blade.php --}}
+@extends('admin.layouts.admin')
 
-@section('title', 'Deals Management')
-@section('page-title', 'Deals Management')
+@section('title', 'إدارة العروض')
+@section('page-title', 'إدارة العروض')
 
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Special Deals & Offers</h3>
-        <a href="{{ route('admin.deals.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Create Deal
-        </a>
+<div class="container mx-auto px-4 py-4">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">إدارة العروض</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">إدارة جميع العروض والصفقات الخاصة</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- إحصائيات سريعة -->
+            <div class="hidden sm:flex items-center gap-4 text-sm">
+                <div class="flex items-center gap-1">
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="text-gray-600 dark:text-gray-400">مفعل: {{ $stats['active'] }}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <span class="text-gray-600 dark:text-gray-400">منتهي: {{ $stats['expired'] }}</span>
+                </div>
+            </div>
+
+            <a href="{{ route('admin.deals.create') }}"
+               class="btn btn-primary inline-flex items-center gap-2">
+                <i class="fas fa-plus text-sm"></i>
+                <span>إضافة عرض جديد</span>
+            </a>
+        </div>
     </div>
-    <div class="card-body">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($deals as $deal)
-            <div class="deal-card bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="deal-image relative">
-                    <img src="{{ asset($deal->image) }}" alt="{{ $deal->title }}" class="w-full h-48 object-cover">
-                    <div class="deal-badge absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm">
-                        {{ $deal->discount_percentage }}% OFF
+
+    <!-- Filters Section -->
+    <div class="card mb-6">
+        <div class="card-body p-4">
+            <form method="GET" action="{{ route('admin.deals.index') }}" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Search -->
+                    <div class="form-group">
+                        <label class="form-label">بحث</label>
+                        <input type="text"
+                               name="search"
+                               value="{{ request('search') }}"
+                               class="form-control"
+                               placeholder="ابحث عن عرض...">
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div class="form-group">
+                        <label class="form-label">الحالة</label>
+                        <select name="status" class="form-control form-select">
+                            <option value="">جميع الحالات</option>
+                            <option value="مفعل" {{ request('status') == 'مفعل' ? 'selected' : '' }}>مفعل</option>
+                            <option value="منتهي" {{ request('status') == 'منتهي' ? 'selected' : '' }}>منتهي</option>
+                        </select>
+                    </div>
+
+                    <!-- Trip Filter -->
+                    <div class="form-group">
+                        <label class="form-label">الرحلة</label>
+                        <select name="trip_id" class="form-control form-select">
+                            <option value="">جميع الرحلات</option>
+                            @foreach($trips as $trip)
+                                <option value="{{ $trip->id }}" {{ request('trip_id') == $trip->id ? 'selected' : '' }}>
+                                    {{ $trip->title }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
-                <div class="p-4">
-                    <h4 class="font-bold text-lg mb-2">{{ $deal->title }}</h4>
-                    <p class="text-gray-600 text-sm mb-3">{{ Str::limit($deal->description, 80) }}</p>
-                    
-                    <div class="flex justify-between items-center mb-3">
-                        <div>
-                            <span class="text-2xl font-bold text-green-600">${{ number_format($deal->discounted_price, 2) }}</span>
-                            <span class="text-sm text-gray-500 line-through ml-2">${{ number_format($deal->original_price, 2) }}</span>
-                        </div>
-                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
-                            {{ $deal->trip->city->name }}
-                        </span>
+
+                <div class="flex items-center gap-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search ml-1"></i>
+                        بحث
+                    </button>
+                    <a href="{{ route('admin.deals.index') }}" class="btn btn-outline">
+                        <i class="fas fa-redo ml-1"></i>
+                        إعادة تعيين
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">إجمالي العروض</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-gray mt-1">{{ $stats['total'] }}</p>
                     </div>
-                    
-                    <div class="flex justify-between items-center text-sm text-gray-500 mb-3">
-                        <div>
-                            <i class="fas fa-calendar"></i>
-                            {{ $deal->start_date->format('M d') }} - {{ $deal->end_date->format('M d, Y') }}
-                        </div>
-                        <div>
-                            <i class="fas fa-users"></i>
-                            {{ $deal->bookings_count }}/{{ $deal->max_capacity }}
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-between items-center">
-                        <span class="badge badge-{{ $deal->is_active ? 'success' : 'danger' }}">
-                            {{ $deal->is_active ? 'Active' : 'Inactive' }}
-                        </span>
-                        <div class="action-buttons">
-                            <a href="{{ route('admin.deals.edit', $deal) }}" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <button class="btn btn-danger btn-sm" onclick="deleteDeal({{ $deal->id }})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+                    <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
+                        <i class="fas fa-tags text-blue-600 dark:text-blue-400"></i>
                     </div>
                 </div>
             </div>
-            @endforeach
         </div>
-        
-        <div class="mt-6">
-            {{ $deals->links() }}
+
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">عروض مفعلة</p>
+                        <p class="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">{{ $stats['active'] }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-600 dark:text-green-400"></i>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">عروض منتهية</p>
+                        <p class="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">{{ $stats['expired'] }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+                        <i class="fas fa-times-circle text-red-600 dark:text-red-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="card">
+        <div class="card-header">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <h3 class="card-title">قائمة العروض</h3>
+                <span class="text-sm text-gray-600 dark:text-gray-400">
+                    عرض {{ $offers->firstItem() ?? 0 }} - {{ $offers->lastItem() ?? 0 }} من {{ $offers->total() }}
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            @if($offers->count() > 0)
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>العنوان</th>
+                                <th class="w-48">الرحلة</th>
+                                <th class="w-24">الخصم</th>
+                                <th class="w-32">السعر النهائي</th>
+                                <th class="w-32">الفترة</th>
+                                <th class="w-24">الحالة</th>
+                                <th class="w-32">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($offers as $offer)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                <td>
+                                    <div class="font-medium text-gray-900 dark:text-gray">{{ $offer->title }}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        {{ Str::limit($offer->description, 50) }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-sm">
+                                        <div class="font-medium text-gray-900 dark:text-gray">{{ $offer->trip->title }}</div>
+                                        <div class="text-gray-500 dark:text-gray-400">{{ $offer->trip->governorate->name }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-danger">
+                                        {{ $offer->discount_percentage }}%
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="font-bold text-green-600 dark:text-green-400">
+                                        {{ number_format($offer->getFinalPrice(), 0) }} ل.س
+                                    </div>
+                                    @if($offer->custom_price)
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">سعر مخصص</div>
+                                    @else
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 line-through">
+                                            {{ number_format($offer->trip->price, 0) }} ل.س
+                                        </div>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="text-sm">
+                                        <div class="text-gray-900 dark:text-gray">{{ $offer->start_date->format('Y/m/d') }}</div>
+                                        <div class="text-gray-500 dark:text-gray-400">إلى {{ $offer->end_date->format('Y/m/d') }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge {{ $offer->status == 'مفعل' ? 'badge-success' : 'badge-danger' }}">
+                                        {{ $offer->status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="flex items-center gap-2">
+                                        <a href="{{ route('admin.deals.show', $offer) }}"
+                                           class="btn btn-sm btn-info"
+                                           title="عرض">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.deals.edit', $offer) }}"
+                                           class="btn btn-sm btn-warning"
+                                           title="تعديل">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('admin.deals.destroy', $offer) }}"
+                                              method="POST"
+                                              onsubmit="return confirm('هل أنت متأكد من حذف هذا العرض؟');"
+                                              class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-danger"
+                                                    title="حذف">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h4 class="empty-state-title">لا توجد عروض</h4>
+                    <p class="empty-state-description">
+                        لم يتم إضافة أي عروض بعد. ابدأ بإضافة أول عرض.
+                    </p>
+                    <a href="{{ route('admin.deals.create') }}"
+                       class="btn btn-primary inline-flex items-center gap-2">
+                        <i class="fas fa-plus"></i>
+                        <span>إضافة عرض جديد</span>
+                    </a>
+                </div>
+            @endif
+        </div>
+
+        @if($offers->hasPages())
+            <div class="card-footer">
+                {{ $offers->links() }}
+            </div>
+        @endif
     </div>
 </div>
-
-<!-- Deal Statistics -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #dbeafe; color: #3b82f6;">
-            <i class="fas fa-tags"></i>
-        </div>
-        <div class="stat-number">{{ $totalDeals }}</div>
-        <div class="stat-label">Total Deals</div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #dcfce7; color: #10b981;">
-            <i class="fas fa-bolt"></i>
-        </div>
-        <div class="stat-number">{{ $activeDeals }}</div>
-        <div class="stat-label">Active Deals</div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #fef3c7; color: #f59e0b;">
-            <i class="fas fa-users"></i>
-        </div>
-        <div class="stat-number">{{ $totalDealBookings }}</div>
-        <div class="stat-label">Deal Bookings</div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #fce7f3; color: #ec4899;">
-            <i class="fas fa-chart-line"></i>
-        </div>
-        <div class="stat-number">${{ number_format($totalDealRevenue, 2) }}</div>
-        <div class="stat-label">Deal Revenue</div>
-    </div>
-</div>
-
-<!-- Performance Chart -->
-<div class="card mt-6">
-    <div class="card-header">
-        <h3 class="card-title">Deals Performance</h3>
-    </div>
-    <div class="card-body">
-        <canvas id="dealsChart" height="100"></canvas>
-    </div>
-</div>
-
-@push('scripts')
-<script>
-const dealsCtx = document.getElementById('dealsChart').getContext('2d');
-const dealsChart = new Chart(dealsCtx, {
-    type: 'bar',
-    data: {
-        labels: @json($deals->pluck('title')),
-        datasets: [{
-            label: 'Bookings',
-            data: @json($deals->pluck('bookings_count')),
-            backgroundColor: '#3b82f6',
-            borderColor: '#2563eb',
-            borderWidth: 1
-        }, {
-            label: 'Revenue ($)',
-            data: @json($deals->pluck('revenue')),
-            backgroundColor: '#10b981',
-            borderColor: '#059669',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'top',
-            }
-        },
-        scales: {
-            x: {
-                ticks: {
-                    maxRotation: 45,
-                    minRotation: 45
-                }
-            }
-        }
-    }
-});
-
-function deleteDeal(dealId) {
-    if (confirm('Are you sure you want to delete this deal?')) {
-        // Implement delete deal
-        console.log('Delete deal:', dealId);
-    }
-}
-</script>
-
-<style>
-.deal-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.deal-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-.deal-badge {
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-</style>
-@endpush
 @endsection

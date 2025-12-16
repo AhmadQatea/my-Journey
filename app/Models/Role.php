@@ -9,7 +9,7 @@ class Role extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'permissions'];
+    protected $fillable = ['name', 'description', 'permissions'];
 
     protected $casts = [
         'permissions' => 'array',
@@ -19,6 +19,12 @@ class Role extends Model
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    // العلاقة مع المسؤولين
+    public function admins()
+    {
+        return $this->hasMany(Admin::class);
     }
 
     // التحقق من الصلاحية
@@ -71,6 +77,7 @@ class Role extends Model
             'manage_bookings',
             'manage_articles',
             'view_users',
+            'manage_admins',
         ];
     }
 }

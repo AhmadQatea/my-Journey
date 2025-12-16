@@ -6,11 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\PasswordResetCode;
 use App\Notifications\PasswordResetCodeNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Carbon;
 
 class ChangePasswordController extends Controller
 {
@@ -25,43 +24,87 @@ class ChangePasswordController extends Controller
     /**
      * إرسال كود التحقق لتغيير كلمة المرور
      */
-    public function sendChangeCode()
+    public function sendChangeCode(Request $request)
     {
-        $user = Auth::user();
-
-        if (!$user || !$user->email) {
-            return back()->withErrors(['error' => 'المستخدم غير موجود أو لا يحتوي على بريد إلكتروني.']);
-        }
-
-        // حذف أي رموز قديمة
-        PasswordResetCode::where('email', $user->email)->delete();
-
-        // إنشاء رمز جديد
-        $code = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
-
-        // تخزين الرمز
-        PasswordResetCode::create([
-            'email' => $user->email,
-            'code' => $code,
-            'purpose' => 'password_change',
-            'expires_at' => Carbon::now()->addMinutes(10),
-            'created_at' => Carbon::now(),
-        ]);
-
         try {
-            // إرسال البريد
-            $user->notify(new PasswordResetCodeNotification($code, 'تغيير كلمة المرور'));
+            $user = Auth::user();
+
+            if (! $user || ! $user->email) {
+                Log::warning('Password change code request failed: User not found or no email', [
+                    'user_id' => $user->id ?? null,
+                ]);
+
+                return back()->withErrors(['error' => 'المستخدم غير موجود أو لا يحتوي على بريد إلكتروني.']);
+            }
+
+            // حذف أي رموز قديمة لنفس الغرض
+            PasswordResetCode::where('email', $user->email)
+                ->where('purpose', 'password_change')
+                ->delete();
+
+            // إنشاء رمز جديد
+            $code = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
+            // تخزين الرمز
+            PasswordResetCode::create([
+                'email' => $user->email,
+                'code' => $code,
+                'purpose' => 'password_change',
+                'expires_at' => Carbon::now()->addMinutes(10),
+                'created_at' => Carbon::now(),
+            ]);
+
+            Log::info('Password change code created', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+            ]);
+
+            try {
+                // إرسال البريد
+                $user->notify(new PasswordResetCodeNotification($code, 'تغيير كلمة المرور'));
+                Log::info('Password change code notification sent', [
+                    'user_id' => $user->id,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send password change code notification', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+
+                // في بيئة التطوير، يمكن عرض الرمز مباشرة
+                if (app()->environment('local')) {
+                    // حفظ في الجلسة مع الرمز للعرض
+                    session(['password_change_verified' => false]);
+                    session(['password_change_code_sent' => true]);
+                    session(['password_change_code' => $code]); // حفظ الرمز للعرض في بيئة التطوير
+
+                    return redirect()->route('password.change.verify')
+                        ->with('warning', 'فشل إرسال البريد الإلكتروني. في بيئة التطوير، يمكنك استخدام الرمز التالي: '.$code)
+                        ->with('dev_code', $code);
+                }
+
+                // في بيئة الإنتاج، إرجاع خطأ
+                return back()->withErrors([
+                    'error' => 'فشل إرسال رمز التحقق. يرجى التحقق من إعدادات البريد الإلكتروني أو المحاولة مرة أخرى لاحقاً.',
+                    'mail_error' => 'خطأ في إعدادات البريد الإلكتروني: '.$e->getMessage(),
+                ]);
+            }
+
+            // حفظ في الجلسة
+            session(['password_change_verified' => false]);
+            session(['password_change_code_sent' => true]);
+
+            return redirect()->route('password.change.verify')
+                ->with('success', 'تم إرسال رمز التحقق إلى بريدك الإلكتروني.');
         } catch (\Exception $e) {
-            Log::error('Failed to send password change code notification: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'فشل إرسال رمز التحقق. يرجى المحاولة مرة أخرى.']);
+            Log::error('Password change code request error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()->withErrors(['error' => 'حدث خطأ أثناء إرسال رمز التحقق. يرجى المحاولة مرة أخرى.']);
         }
-
-        // حفظ في الجلسة
-        session(['password_change_verified' => false]);
-        session(['password_change_code_sent' => true]);
-
-        return redirect()->route('password.change.verify')
-            ->with('success', 'تم إرسال رمز التحقق إلى بريدك الإلكتروني.');
     }
 
     /**
@@ -69,7 +112,7 @@ class ChangePasswordController extends Controller
      */
     public function showVerifyChangeCodeForm()
     {
-        if (!session('password_change_code_sent')) {
+        if (! session('password_change_code_sent')) {
             return redirect()->route('password.change.request');
         }
 
@@ -94,7 +137,7 @@ class ChangePasswordController extends Controller
         // تجميع الكود من الحقول المنفصلة إذا كان موجوداً
         $code = $request->input('code');
 
-        if (!$code) {
+        if (! $code) {
             // محاولة تجميع الكود من الحقول المنفصلة
             $codeDigits = '';
             for ($i = 0; $i < 6; $i++) {
@@ -120,7 +163,7 @@ class ChangePasswordController extends Controller
             ->where('used', false)
             ->first();
 
-        if (!$resetCode) {
+        if (! $resetCode) {
             return back()->withErrors(['code' => 'رمز التحقق غير صحيح.']);
         }
 
@@ -157,7 +200,7 @@ class ChangePasswordController extends Controller
         // إذا تم التحقق بالكود، لا حاجة لكلمة المرور الحالية
         $isVerifiedByCode = session('password_change_verified');
 
-        if (!$isVerifiedByCode) {
+        if (! $isVerifiedByCode) {
             // إذا لم يتم التحقق بالكود، يجب إدخال كلمة المرور الحالية
             $request->validate([
                 'current_password' => 'required|current_password',
@@ -179,7 +222,7 @@ class ChangePasswordController extends Controller
         $user->save();
 
         // إرسال إشعار
-        $user->notify(new \App\Notifications\PasswordChangedNotification());
+        $user->notify(new \App\Notifications\PasswordChangedNotification);
 
         // تنظيف الجلسة
         session()->forget(['password_change_verified', 'password_change_code_sent', 'password_change_code']);

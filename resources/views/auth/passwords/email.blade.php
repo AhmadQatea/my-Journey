@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white text-center py-3">
+                <div class="card-header bg-primary text-black text-center py-3">
                     <h4 class="mb-0">
                         <i class="fas fa-key me-2"></i>استعادة كلمة المرور
                     </h4>

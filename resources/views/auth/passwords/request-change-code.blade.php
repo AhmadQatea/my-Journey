@@ -13,9 +13,22 @@
 
                 <div class="card-body p-4">
                     @if (session('success'))
-                        <div class="alert alert-success" role="alert">
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
                             <i class="fas fa-check-circle me-2"></i>
                             {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     @endif
 
@@ -23,7 +36,7 @@
                         سنرسل لك رمز تحقق مكون من 6 أرقام إلى بريدك الإلكتروني لتأكيد هويتك قبل تغيير كلمة المرور.
                     </p>
 
-                    <form method="POST" action="{{ route('password.change.send') }}">
+                    <form method="POST" action="{{ route('password.change.send') }}" id="sendCodeForm">
                         @csrf
 
                         <div class="mb-4">
@@ -34,9 +47,9 @@
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-warning btn-lg">
+                            <button type="submit" class="btn btn-warning btn-lg" id="submitBtn">
                                 <i class="fas fa-paper-plane me-2"></i>
-                                إرسال رمز التحقق
+                                <span>إرسال رمز التحقق</span>
                             </button>
 
                             <a href="{{ route('password.change.form') }}" class="btn btn-outline-secondary">
@@ -59,5 +72,24 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    const form = document.getElementById('sendCodeForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (form && submitBtn) {
+        form.addEventListener('submit', function(e) {
+            // Disable submit button to prevent double submission
+            submitBtn.disabled = true;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الإرسال...';
+
+            // Allow form to submit normally
+            return true;
+        });
+    }
+</script>
+@endpush
 @endsection
 

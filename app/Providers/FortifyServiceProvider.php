@@ -58,6 +58,11 @@ class FortifyServiceProvider extends ServiceProvider
             return view('auth.confirm-password');
         });
 
+        // تعريف صفحة تحدي المصادقة الثنائية
+        Fortify::twoFactorChallengeView(function () {
+            return view('auth.two-factor-challenge');
+        });
+
         // توجيه بعد تسجيل الدخول
         $this->app->singleton(\Laravel\Fortify\Contracts\LoginResponse::class, function () {
             return new class implements \Laravel\Fortify\Contracts\LoginResponse

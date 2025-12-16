@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Article;
 use App\Models\Booking;
+use App\Models\TouristSpot;
 use App\Models\User;
 
 class DashboardController extends AdminController
@@ -57,7 +58,7 @@ class DashboardController extends AdminController
         $totalUsers = User::count();
         $totalBookings = Booking::count();
         $totalArticles = Article::count();
-        $totalRevenue = Booking::where('status', 'مؤكدة')->sum('total_price') ?? 0;
+        $totalTouristSpots = TouristSpot::count();
 
         $recentUsers = User::latest()->take(5)->get();
         $recentBookings = Booking::with(['user', 'trip'])->latest()->take(5)->get();
@@ -66,7 +67,7 @@ class DashboardController extends AdminController
             'totalUsers',
             'totalBookings',
             'totalArticles',
-            'totalRevenue',
+            'totalTouristSpots',
             'recentUsers',
             'recentBookings'
         ));

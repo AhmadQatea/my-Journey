@@ -9,21 +9,22 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
-{
-    Schema::create('tourist_spots', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('governorate_id')->constrained()->onDelete('cascade');
-        $table->string('name');
-        $table->text('description');
-        $table->string('location');
-        $table->enum('type', ['بحري', 'تراثي', 'مناظر خلابة', 'تاریخي']);
-        $table->json('images')->nullable();
-        $table->decimal('entrance_fee', 10, 2)->default(0);
-        $table->string('opening_hours')->nullable();
-        $table->timestamps();
-    });
-}
+    public function up(): void
+    {
+        Schema::create('tourist_spots', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('governorate_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->text('description');
+            $table->string('location');
+            $table->string('coordinates')->nullable()->comment('الإحداثيات على الخريطة بصيغة: latitude,longitude');
+            $table->enum('type', ['تاريخي', 'طبيعي', 'منتزه', 'جبال ومرتفعات', 'مغامرات ومخاطر']);
+            $table->json('images')->nullable();
+            $table->decimal('entrance_fee', 10, 2)->nullable();
+            $table->string('opening_hours')->nullable();
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminsController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GovernorateController;
 use App\Http\Controllers\Admin\OfferController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TouristSpotController;
 use App\Http\Controllers\Admin\TripController;
 use App\Http\Controllers\Admin\UserController;
@@ -36,22 +39,32 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::post('/tourist-spots/{tourist_spot}/activate', [TouristSpotController::class, 'activate'])->name('tourist-spots.activate');
     Route::post('/tourist-spots/{tourist_spot}/deactivate', [TouristSpotController::class, 'deactivate'])->name('tourist-spots.deactivate');
 
+    // الفئات
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+
     // Users
     Route::resource('users', UserController::class)->except(['create', 'store']);
     Route::post('/users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
     Route::post('/users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
     Route::post('/users/{user}/verify', [UserController::class, 'verify'])->name('users.verify');
+    Route::post('/users/{user}/verify-identity', [UserController::class, 'verifyIdentity'])->name('users.verify-identity');
+    Route::post('/users/{user}/upgrade-to-vip', [UserController::class, 'upgradeToVip'])->name('users.upgrade-to-vip');
 
     // Trips
     Route::resource('trips', TripController::class);
+    Route::get('/trips/tourist-spots/by-governorates', [TripController::class, 'getTouristSpotsByGovernorates'])->name('trips.tourist-spots.by-governorates');
+    Route::post('/trips/{trip}/status', [TripController::class, 'changeStatus'])->name('trips.status');
+    Route::post('/trips/bulk-action', [TripController::class, 'bulkAction'])->name('trips.bulk-action');
+    Route::post('/trips/{trip}/feature', [TripController::class, 'toggleFeatured'])->name('trips.feature');
     Route::post('/trips/{trip}/activate', [TripController::class, 'activate'])->name('trips.activate');
     Route::post('/trips/{trip}/deactivate', [TripController::class, 'deactivate'])->name('trips.deactivate');
     Route::post('/trips/{trip}/disable-bookings', [TripController::class, 'disableBookings'])->name('trips.disable-bookings');
     Route::post('/trips/{trip}/enable-bookings', [TripController::class, 'enableBookings'])->name('trips.enable-bookings');
 
     // Bookings
-    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
-    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::resource('bookings', BookingController::class);
     Route::post('/bookings/{booking}/update-status', [BookingController::class, 'updateStatus'])->name('bookings.update-status');
 
     // Articles
@@ -61,4 +74,12 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
 
     // Deals/Offers
     Route::resource('deals', OfferController::class);
+    Route::post('/deals/{deal}/change-status', [OfferController::class, 'changeStatus'])->name('deals.changeStatus');
+    Route::get('/deals/get-trip-details', [OfferController::class, 'getTripDetails'])->name('deals.get-trip-details');
+
+    // Admins
+    Route::resource('admins', AdminsController::class);
+
+    // Roles
+    Route::resource('roles', RoleController::class);
 });

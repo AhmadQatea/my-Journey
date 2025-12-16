@@ -73,11 +73,11 @@
 
         <div class="flex justify-end gap-3 mt-6">
             <a href="{{ route('admin.governorates.index') }}"
-               class="px-6 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-all duration-300">
+               class="px-6 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-500 transition-all duration-300">
                 إلغاء
             </a>
             <button type="submit"
-                    class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white transition-all duration-300 shadow-lg hover:shadow-xl">
+                    class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-black transition-all duration-300 shadow-lg hover:shadow-xl">
                 <i class="fas fa-save ml-2"></i>
                 حفظ المحافظة
             </button>

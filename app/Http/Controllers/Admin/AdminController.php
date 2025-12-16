@@ -3,31 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Admin;
 
 abstract class AdminController extends Controller
 {
     /**
      * Get the authenticated admin user.
      */
-    protected function admin(): ?\App\Models\Admin
+    protected function admin(): ?Admin
     {
-        return Auth::guard('admin')->user();
-    }
-
-    /**
-     * Get the authenticated admin user ID.
-     */
-    protected function adminId(): ?int
-    {
-        return Auth::guard('admin')->id();
-    }
-
-    /**
-     * Check if an admin is authenticated.
-     */
-    protected function isAdminAuthenticated(): bool
-    {
-        return Auth::guard('admin')->check();
+        return auth('admin')->user();
     }
 }

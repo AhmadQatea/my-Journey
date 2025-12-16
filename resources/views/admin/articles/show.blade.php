@@ -1,257 +1,274 @@
+{{-- resources/views/admin/articles/show.blade.php --}}
 @extends('admin.layouts.admin')
 
-@section('title', 'Article Details')
-@section('page-title', 'Article Details: ' . $article->title)
+@section('title', 'تفاصيل المقال: ' . $article->title)
+@section('page-title', 'تفاصيل المقال: ' . $article->title)
 
 @section('content')
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Article Content -->
-    <div class="lg:col-span-2">
-        <x-card>
-            <!-- Featured Image -->
-            @if($article->featured_image)
-            <div class="mb-6">
-                <img src="{{ asset($article->featured_image) }}" alt="{{ $article->title }}" 
-                     class="w-full h-64 object-cover rounded-lg">
-            </div>
-            @endif
-            
-            <!-- Article Meta -->
-            <div class="flex flex-wrap items-center gap-4 mb-6 text-sm text-gray-500">
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-user"></i>
-                    <span>By {{ $article->author->name }}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-calendar"></i>
-                    <span>{{ $article->created_at->format('M d, Y') }}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-eye"></i>
-                    <span>{{ number_format($article->views) }} views</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-heart"></i>
-                    <span>{{ number_format($article->likes_count) }} likes</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-comments"></i>
-                    <span>{{ $article->comments_count }} comments</span>
-                </div>
-            </div>
-            
-            <!-- Article Content -->
-            <div class="prose max-w-none">
-                {!! $article->content !!}
-            </div>
-            
-            <!-- Tags -->
-            @if($article->tags)
-            <div class="mt-6">
-                <h4 class="font-semibold mb-2">Tags:</h4>
-                <div class="flex flex-wrap gap-2">
-                    @foreach(explode(',', $article->tags) as $tag)
-                    <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                        {{ trim($tag) }}
-                    </span>
-                    @endforeach
-                </div>
-            </div>
-            @endif
-            
-            <!-- Article Images Gallery -->
-            @if($article->images->count() > 0)
-            <div class="mt-6">
-                <h4 class="font-semibold mb-3">Article Images</h4>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    @foreach($article->images as $image)
-                    <img src="{{ asset($image->path) }}" alt="Article image" 
-                         class="w-full h-32 object-cover rounded-lg cursor-pointer" 
-                         onclick="openImageModal('{{ asset($image->path) }}')">
-                    @endforeach
-                </div>
-            </div>
-            @endif
-        </x-card>
-        
-        <!-- Comments Section -->
-        @if($article->allow_comments)
-        <x-card title="Comments ({{ $article->comments_count }})" class="mt-6">
-            <div class="space-y-4">
-                @foreach($article->comments()->with('user')->latest()->get() as $comment)
-                <div class="flex gap-3 p-3 border rounded-lg">
-                    <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">
-                        {{ substr($comment->user->name, 0, 1) }}
+<div class="container mx-auto px-4 py-4">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">{{ $article->title }}</h1>
+            <div class="flex items-center gap-3 mt-2 flex-wrap">
+                @php
+                    $statusColors = [
+                        'معلقة' => 'badge-warning',
+                        'منشورة' => 'badge-success',
+                        'مرفوضة' => 'badge-danger',
+                    ];
+                @endphp
+                <span class="badge {{ $statusColors[$article->status] ?? 'badge-secondary' }}">
+                    {{ $article->status }}
+                </span>
+                @if($article->rating)
+                    <div class="flex items-center gap-1">
+                        @for($i = 1; $i <= 5; $i++)
+                            <i class="fas fa-star {{ $i <= $article->rating ? 'text-yellow-400' : 'text-gray-300' }}"></i>
+                        @endfor
                     </div>
-                    <div class="flex-1">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-medium">{{ $comment->user->name }}</h4>
-                                <p class="text-gray-500 text-sm">{{ $comment->created_at->diffForHumans() }}</p>
-                            </div>
-                            <div class="action-buttons">
-                                <button class="btn btn-danger btn-sm delete-item" 
-                                        data-id="{{ $comment->id }}" 
-                                        data-type="comment"
-                                        data-url="{{ route('admin.comments.destroy', ':id') }}">
-                                    <i class="fas fa-trash"></i>
+                @endif
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.articles.edit', $article) }}"
+               class="btn btn-warning inline-flex items-center gap-2">
+                <i class="fas fa-edit"></i>
+                <span>تعديل</span>
+            </a>
+            <a href="{{ route('admin.articles.index') }}"
+               class="btn btn-outline inline-flex items-center gap-2">
+                <i class="fas fa-arrow-right"></i>
+                <span>رجوع للقائمة</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Article Images -->
+            @if($article->images && count($article->images) > 0)
+            <div class="card">
+                <div class="card-body p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray mb-4">صور المقال</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        @foreach($article->images as $index => $image)
+                        <div class="relative group">
+                            <img src="{{ Storage::url($image) }}"
+                                 alt="صورة المقال {{ $index + 1 }}"
+                                 class="w-full h-48 object-cover rounded-lg cursor-pointer"
+                                 onclick="openImageModal('{{ Storage::url($image) }}')">
+                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center">
+                                <button type="button"
+                                        onclick="openImageModal('{{ Storage::url($image) }}')"
+                                        class="btn btn-primary btn-sm">
+                                    <i class="fas fa-expand"></i>
                                 </button>
                             </div>
                         </div>
-                        <p class="mt-2">{{ $comment->content }}</p>
+                        @endforeach
                     </div>
                 </div>
-                @endforeach
-                
-                @if($article->comments_count == 0)
-                <p class="text-gray-500 text-center py-4">No comments yet.</p>
-                @endif
             </div>
-        </x-card>
-        @endif
-    </div>
-    
-    <!-- Sidebar -->
-    <div class="space-y-6">
-        <!-- Article Info -->
-        <x-card title="Article Information">
-            <div class="space-y-3">
-                <div class="flex justify-between">
-                    <span class="font-medium">Status:</span>
-                    @php
-                        $statusColors = [
-                            'published' => 'success',
-                            'draft' => 'secondary',
-                            'pending' => 'warning',
-                            'rejected' => 'danger'
-                        ];
-                    @endphp
-                    <span class="badge badge-{{ $statusColors[$article->status] }}">
-                        {{ ucfirst($article->status) }}
-                    </span>
-                </div>
-                
-                <div class="flex justify-between">
-                    <span class="font-medium">Category:</span>
-                    <span>{{ $article->category->name }}</span>
-                </div>
-                
-                <div class="flex justify-between">
-                    <span class="font-medium">Featured:</span>
-                    <span>
-                        @if($article->is_featured)
-                            <i class="fas fa-check text-green-500"></i>
-                        @else
-                            <i class="fas fa-times text-red-500"></i>
-                        @endif
-                    </span>
-                </div>
-                
-                <div class="flex justify-between">
-                    <span class="font-medium">Comments:</span>
-                    <span>
-                        @if($article->allow_comments)
-                            <i class="fas fa-check text-green-500"></i>
-                        @else
-                            <i class="fas fa-times text-red-500"></i>
-                        @endif
-                    </span>
-                </div>
-                
-                <div class="flex justify-between">
-                    <span class="font-medium">Last Updated:</span>
-                    <span>{{ $article->updated_at->format('M d, Y H:i') }}</span>
+            @endif
+
+            <!-- Article Excerpt -->
+            @if($article->excerpt)
+            <div class="card">
+                <div class="card-body p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray mb-4">الملخص</h3>
+                    <p class="text-gray-700 dark:text-gray-300">{{ $article->excerpt }}</p>
                 </div>
             </div>
-        </x-card>
-        
-        <!-- SEO Information -->
-        <x-card title="SEO Information">
-            <div class="space-y-3">
-                <div>
-                    <span class="font-medium block mb-1">Meta Title:</span>
-                    <p class="text-sm text-gray-600">{{ $article->meta_title ?: 'Not set' }}</p>
-                </div>
-                
-                <div>
-                    <span class="font-medium block mb-1">Meta Description:</span>
-                    <p class="text-sm text-gray-600">{{ $article->meta_description ?: 'Not set' }}</p>
-                </div>
-                
-                <div>
-                    <span class="font-medium block mb-1">Slug:</span>
-                    <p class="text-sm text-gray-600">{{ $article->slug }}</p>
+            @endif
+
+            <!-- Article Content -->
+            <div class="card">
+                <div class="card-body p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray mb-4">محتوى المقال</h3>
+                    <div class="prose max-w-none text-gray-700 dark:text-gray-300">
+                        {!! $article->content !!}
+                    </div>
                 </div>
             </div>
-        </x-card>
-        
-        <!-- Actions -->
-        <x-card title="Actions">
-            <div class="space-y-2">
-                <a href="{{ route('admin.articles.edit', $article) }}" class="btn btn-warning w-full">
-                    <i class="fas fa-edit"></i> Edit Article
-                </a>
-                
-                @if($article->status == 'pending')
-                <form action="{{ route('admin.articles.approve', $article) }}" method="POST" class="w-full">
-                    @csrf
-                    <button type="submit" class="btn btn-success w-full">
-                        <i class="fas fa-check"></i> Approve Article
+
+            <!-- Trip Information -->
+            @if($article->trip)
+            <div class="card">
+                <div class="card-body p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray mb-4">معلومات الرحلة المرتبطة</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">عنوان الرحلة</p>
+                            <a href="{{ route('admin.trips.show', $article->trip) }}" class="font-medium text-primary hover:underline">
+                                {{ $article->trip->title }}
+                            </a>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">المحافظة</p>
+                            <p class="font-medium text-gray-900 dark:text-gray">{{ $article->trip->governorate->name ?? 'N/A' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- Rejection Reason -->
+            @if($article->status === 'مرفوضة' && $article->rejection_reason)
+            <div class="card">
+                <div class="card-body p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray mb-4">سبب الرفض</h3>
+                    <p class="text-red-600 dark:text-red-400 whitespace-pre-line">{{ $article->rejection_reason }}</p>
+                </div>
+            </div>
+            @endif
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Article Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">معلومات المقال</h3>
+                </div>
+                <div class="card-body space-y-4">
+                    @if($article->user)
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-400">المؤلف:</span>
+                        <span class="font-medium text-gray-900 dark:text-gray">
+                            {{ $article->user->full_name }}
+                        </span>
+                    </div>
+                    @elseif($article->created_by_admin && $article->adminCreator)
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-400">المنشئ:</span>
+                        <span class="font-medium text-gray-900 dark:text-gray">
+                            {{ $article->adminCreator->name }} (مسؤول)
+                        </span>
+                    </div>
+                    @endif
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-400">المشاهدات:</span>
+                        <span class="font-medium text-gray-900 dark:text-gray">{{ number_format($article->views_count ?? 0) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-400">تاريخ الإنشاء:</span>
+                        <span class="font-medium text-gray-900 dark:text-gray">{{ $article->created_at->format('Y-m-d H:i') }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-400">آخر تحديث:</span>
+                        <span class="font-medium text-gray-900 dark:text-gray">{{ $article->updated_at->format('Y-m-d H:i') }}</span>
+                    </div>
+                    @if($article->created_by_admin && $article->adminCreator)
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-400">تم الإنشاء من قبل:</span>
+                        <span class="font-medium text-gray-900 dark:text-gray">{{ $article->adminCreator->name }}</span>
+                    </div>
+                    @endif
+                    @if($article->status === 'منشورة' && $article->adminConfirmer)
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-400">تم التأكيد من قبل:</span>
+                        <span class="font-medium text-gray-900 dark:text-gray">{{ $article->adminConfirmer->name }}</span>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Status Change -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">تغيير الحالة</h3>
+                </div>
+                <div class="card-body space-y-3">
+                    @if($article->status === 'معلقة')
+                    <form action="{{ route('admin.articles.approve', $article) }}" method="POST" class="mb-3">
+                        @csrf
+                        <button type="submit" class="btn btn-success w-full">
+                            <i class="fas fa-check ml-1"></i>
+                            الموافقة على المقال
+                        </button>
+                    </form>
+
+                    <form action="{{ route('admin.articles.reject', $article) }}" method="POST" id="rejectForm">
+                        @csrf
+                        <div class="form-group mb-3">
+                            <label class="form-label">سبب الرفض</label>
+                            <textarea name="rejection_reason"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="أدخل سبب رفض المقال..."
+                                      required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-full">
+                            <i class="fas fa-times ml-1"></i>
+                            رفض المقال
+                        </button>
+                    </form>
+                    @else
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle ml-1"></i>
+                        <p class="text-sm">المقال {{ $article->status }}</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">الإجراءات</h3>
+                </div>
+                <div class="card-body space-y-3">
+                    <a href="{{ route('admin.articles.edit', $article) }}" class="btn btn-warning w-full">
+                        <i class="fas fa-edit ml-1"></i>
+                        تعديل المقال
+                    </a>
+                    <button type="button" class="btn btn-danger w-full" onclick="confirmDelete({{ $article->id }})">
+                        <i class="fas fa-trash ml-1"></i>
+                        حذف المقال
                     </button>
-                </form>
-                
-                <form action="{{ route('admin.articles.reject', $article) }}" method="POST" class="w-full">
-                    @csrf
-                    <button type="submit" class="btn btn-danger w-full">
-                        <i class="fas fa-times"></i> Reject Article
-                    </button>
-                </form>
-                @endif
-                
-                <button type="button" class="btn btn-danger w-full delete-item" 
-                        data-id="{{ $article->id }}" 
-                        data-type="article"
-                        data-url="{{ route('admin.articles.destroy', $article) }}">
-                    <i class="fas fa-trash"></i> Delete Article
-                </button>
-            </div>
-        </x-card>
-        
-        <!-- Quick Stats -->
-        <div class="grid grid-cols-2 gap-4">
-            <div class="stat-card text-center">
-                <div class="stat-number text-blue-600">{{ number_format($article->views) }}</div>
-                <div class="stat-label">Views</div>
-            </div>
-            
-            <div class="stat-card text-center">
-                <div class="stat-number text-green-600">{{ number_format($article->likes_count) }}</div>
-                <div class="stat-label">Likes</div>
-            </div>
-            
-            <div class="stat-card text-center">
-                <div class="stat-number text-purple-600">{{ $article->comments_count }}</div>
-                <div class="stat-label">Comments</div>
-            </div>
-            
-            <div class="stat-card text-center">
-                <div class="stat-number text-orange-600">{{ $article->shares }}</div>
-                <div class="stat-label">Shares</div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Image Modal -->
-<div id="imageModal" class="modal">
-    <div class="modal-content" style="max-width: 90vw; max-height: 90vh;">
+<div id="imageModal" class="modal hidden">
+    <div class="modal-content max-w-4xl">
         <div class="modal-header">
+            <h3 class="modal-title">صورة المقال</h3>
             <button type="button" class="modal-close" data-modal-hide="imageModal">
                 <i class="fas fa-times"></i>
             </button>
         </div>
+        <div class="modal-body p-0">
+            <img id="modalImage" src="" alt="صورة المقال" class="w-full h-auto">
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal hidden">
+    <div class="modal-content max-w-sm">
+        <div class="modal-header">
+            <h3 class="modal-title">تأكيد الحذف</h3>
+            <button type="button" class="modal-close" data-modal-hide="deleteModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
         <div class="modal-body">
-            <img id="modalImage" src="" class="w-full h-auto max-h-[80vh] object-contain">
+            <p>هل أنت متأكد أنك تريد حذف هذا المقال؟ لا يمكن التراجع عن هذا الإجراء.</p>
+        </div>
+        <div class="modal-footer flex justify-end gap-3">
+            <button type="button" class="btn btn-outline" data-modal-hide="deleteModal">إلغاء</button>
+            <form id="deleteForm" method="POST" action="">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">حذف</button>
+            </form>
         </div>
     </div>
 </div>
@@ -259,9 +276,31 @@
 
 @push('scripts')
 <script>
-function openImageModal(imageSrc) {
-    document.getElementById('modalImage').src = imageSrc;
-    document.getElementById('imageModal').style.display = 'flex';
-}
+    function openImageModal(imageUrl) {
+        document.getElementById('modalImage').src = imageUrl;
+        document.getElementById('imageModal').classList.remove('hidden');
+        document.getElementById('imageModal').classList.add('flex');
+    }
+
+    document.querySelectorAll('[data-modal-hide="imageModal"]').forEach(button => {
+        button.addEventListener('click', () => {
+            document.getElementById('imageModal').classList.add('hidden');
+            document.getElementById('imageModal').classList.remove('flex');
+        });
+    });
+
+    function confirmDelete(articleId) {
+        const form = document.getElementById('deleteForm');
+        form.action = `{{ url('admin/articles') }}/${articleId}`;
+        document.getElementById('deleteModal').classList.remove('hidden');
+        document.getElementById('deleteModal').classList.add('flex');
+    }
+
+    document.querySelectorAll('[data-modal-hide="deleteModal"]').forEach(button => {
+        button.addEventListener('click', () => {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
+        });
+    });
 </script>
 @endpush

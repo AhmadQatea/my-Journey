@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white text-center py-4">
+                <div class="card-header bg-primary text-black text-center py-4">
                     <h3 class="mb-0">
                         <i class="fas fa-shield-alt me-2"></i>المصادقة الثنائية
                     </h3>
@@ -13,7 +13,7 @@
                 </div>
 
                 <div class="card-body p-5">
-                    <form method="POST" action="{{ route('two-factor.verify') }}">
+                    <form method="POST" action="/two-factor-challenge">
                         @csrf
 
                         <div class="text-center mb-4">
@@ -52,7 +52,7 @@
                                 <i class="fas fa-sign-in-alt me-2"></i>تأكيد وتسجيل الدخول
                             </button>
 
-                            <a href="{{ route('two-factor.recovery-codes') }}" class="btn btn-outline-secondary">
+                            <a href="/two-factor/recovery-codes" class="btn btn-outline-secondary">
                                 <i class="fas fa-key me-2"></i>استخدام كود استرجاع
                             </a>
                         </div>

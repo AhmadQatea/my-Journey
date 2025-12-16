@@ -433,6 +433,26 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     @enderror
+
+                    <!-- عرض الرمز في بيئة التطوير -->
+                    @if(session('dev_code') && app()->environment('local'))
+                        <div class="alert alert-warning alert-dismissible fade show text-center mt-3" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>بيئة التطوير:</strong> فشل إرسال البريد الإلكتروني. استخدم الرمز التالي:
+                            <div class="mt-2">
+                                <code class="fs-3 fw-bold text-dark" style="letter-spacing: 5px;">{{ session('dev_code') }}</code>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    @if(session('warning'))
+                        <div class="alert alert-warning alert-dismissible fade show text-center mt-3" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            {{ session('warning') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
                 </form>
 
                 <!-- أزرار التحكم -->

@@ -16,6 +16,7 @@ class Admin extends Authenticatable
         'email',
         'password',
         'role_id',
+        'permissions',
         'is_super_admin',
         'is_active',
     ];
@@ -29,6 +30,7 @@ class Admin extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'permissions' => 'array',
         'is_super_admin' => 'boolean',
         'is_active' => 'boolean',
     ];
@@ -45,9 +47,45 @@ class Admin extends Authenticatable
         return $this->role && $this->role->name === $role;
     }
 
-    public function hasPermission($permission)
+    public function hasPermission($permission): bool
     {
-        return $this->role && $this->role->hasPermission($permission);
+        // Super admin has all permissions
+        if ($this->is_super_admin) {
+            return true;
+        }
+
+        // Check individual permissions first
+        if ($this->permissions && in_array($permission, $this->permissions)) {
+            return true;
+        }
+
+        // Check role permissions
+        if ($this->role && $this->role->hasPermission($permission)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get all permissions for this admin (individual + role permissions).
+     */
+    public function getAllPermissions(): array
+    {
+        $permissions = [];
+
+        // Add individual permissions
+        if ($this->permissions) {
+            $permissions = array_merge($permissions, $this->permissions);
+        }
+
+        // Add role permissions
+        if ($this->role && $this->role->permissions) {
+            $permissions = array_merge($permissions, $this->role->permissions);
+        }
+
+        // Remove duplicates
+        return array_unique($permissions);
     }
 
     public function isSuperAdmin(): bool

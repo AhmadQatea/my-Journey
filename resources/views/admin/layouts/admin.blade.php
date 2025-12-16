@@ -54,7 +54,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3 space-x-reverse">
                     <div class="logo-icon w-10 h-10 bg-gradient-to-br from-blue-400 to-green-400 rounded-xl flex items-center justify-center shadow-lg">
-                        <i class="fas fa-route text-white text-lg animate-pulse"></i>
+                        <i class="fas fa-route text-black text-lg animate-pulse"></i>
                     </div>
                     <div class="logo-text">
                         <h3 class="logo text-xl font-bold">MyJourney</h3>
@@ -70,11 +70,15 @@
         <div class="sidebar-menu flex-1 overflow-y-auto p-4 space-y-2 pb-24">
             @php
                 $admin = auth('admin')->user();
+                // تحميل role إذا لم يكن محملاً
+                if ($admin && ! $admin->relationLoaded('role')) {
+                    $admin->load('role');
+                }
             @endphp
 
-            <!-- Dashboard -->
+            <!-- Dashboard - متاح للجميع -->
             <a href="{{ $adminRoleSlug ? route('admin.dashboard', ['role' => $adminRoleSlug]) : route('admin.dashboard.redirect') }}"
-               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-white transition-all duration-300 {{ request()->routeIs('admin.dashboard*') ? 'active' : '' }}"
+               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-black transition-all duration-300 {{ request()->routeIs('admin.dashboard*') ? 'active' : '' }}"
                data-tooltip="لوحة التحكم">
                 <i class="fas fa-tachometer-alt w-4 text-base"></i>
                 <span class="menu-text font-medium transition-all duration-300 text-sm">لوحة التحكم</span>
@@ -83,7 +87,7 @@
             <!-- المحافظات -->
             @if($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_governorates')))
             <a href="{{ route('admin.governorates.index') }}"
-               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-white transition-all duration-300 {{ request()->routeIs('admin.governorates.*') ? 'active' : '' }}"
+               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-black transition-all duration-300 {{ request()->routeIs('admin.governorates.*') ? 'active' : '' }}"
                data-tooltip="المحافظات">
                 <i class="fas fa-mountain w-4 text-base"></i>
                 <span class="menu-text font-medium transition-all duration-300 text-sm">المحافظات</span>
@@ -93,17 +97,27 @@
             <!-- الأماكن السياحية -->
             @if($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_tourist_spots')))
             <a href="{{ route('admin.tourist-spots.index') }}"
-               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-white transition-all duration-300 {{ request()->routeIs('admin.tourist-spots.*') ? 'active' : '' }}"
+               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-black transition-all duration-300 {{ request()->routeIs('admin.tourist-spots.*') ? 'active' : '' }}"
                data-tooltip="الأماكن السياحية">
                 <i class="fas fa-map-marker-alt w-4 text-base"></i>
                 <span class="menu-text font-medium transition-all duration-300 text-sm">الأماكن السياحية</span>
             </a>
             @endif
 
+            <!-- الفئات -->
+            @if($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_categories')))
+            <a href="{{ route('admin.categories.index') }}"
+               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-black transition-all duration-300 {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"
+               data-tooltip="الفئات">
+                <i class="fas fa-tags w-4 text-base"></i>
+                <span class="menu-text font-medium transition-all duration-300 text-sm">الفئات</span>
+            </a>
+            @endif
+
             <!-- الرحلات -->
             @if($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_trips')))
             <a href="{{ route('admin.trips.index') }}"
-               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-white transition-all duration-300 {{ request()->routeIs('admin.trips.*') ? 'active' : '' }}"
+               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-black transition-all duration-300 {{ request()->routeIs('admin.trips.*') ? 'active' : '' }}"
                data-tooltip="الرحلات">
                 <i class="fas fa-map-marked-alt w-4 text-base"></i>
                 <span class="menu-text font-medium transition-all duration-300 text-sm">الرحلات</span>
@@ -113,7 +127,7 @@
             <!-- العروض -->
             @if($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_deals')))
             <a href="{{ route('admin.deals.index') }}"
-               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-white transition-all duration-300 {{ request()->routeIs('admin.deals.*') ? 'active' : '' }}"
+               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-black transition-all duration-300 {{ request()->routeIs('admin.deals.*') ? 'active' : '' }}"
                data-tooltip="العروض">
                 <i class="fas fa-tag w-4 text-base"></i>
                 <span class="menu-text font-medium transition-all duration-300 text-sm">العروض</span>
@@ -123,7 +137,7 @@
             <!-- الحجوزات -->
             @if($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_bookings')))
             <a href="{{ route('admin.bookings.index') }}"
-               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-white transition-all duration-300 {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}"
+               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-black transition-all duration-300 {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}"
                data-tooltip="الحجوزات">
                 <i class="fas fa-calendar-check w-4 text-base"></i>
                 <span class="menu-text font-medium transition-all duration-300 text-sm">الحجوزات</span>
@@ -133,7 +147,7 @@
             <!-- المقالات -->
             @if($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_articles')))
             <a href="{{ route('admin.articles.index') }}"
-               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-white transition-all duration-300 {{ request()->routeIs('admin.articles.*') ? 'active' : '' }}"
+               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-black transition-all duration-300 {{ request()->routeIs('admin.articles.*') ? 'active' : '' }}"
                data-tooltip="المقالات">
                 <i class="fas fa-newspaper w-4 text-base"></i>
                 <span class="menu-text font-medium transition-all duration-300 text-sm">المقالات</span>
@@ -143,10 +157,30 @@
             <!-- المستخدمين -->
             @if($admin && ($admin->isSuperAdmin() || $admin->hasPermission('view_users')))
             <a href="{{ route('admin.users.index') }}"
-               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-white transition-all duration-300 {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
+               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-black transition-all duration-300 {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
                data-tooltip="المستخدمين">
                 <i class="fas fa-users w-4 text-base"></i>
                 <span class="menu-text font-medium transition-all duration-300 text-sm">المستخدمين</span>
+            </a>
+            @endif
+
+            <!-- المسؤولين -->
+            @if($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_admins')))
+            <a href="{{ route('admin.admins.index') }}"
+               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-black transition-all duration-300 {{ request()->routeIs('admin.admins.*') ? 'active' : '' }}"
+               data-tooltip="المسؤولين">
+                <i class="fas fa-user-shield w-4 text-base"></i>
+                <span class="menu-text font-medium transition-all duration-300 text-sm">المسؤولين</span>
+            </a>
+            @endif
+
+            <!-- الأدوار -->
+            @if($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_admins')))
+            <a href="{{ route('admin.roles.index') }}"
+               class="menu-item flex items-center space-x-3 space-x-reverse p-3 text-blue-100 hover:text-black transition-all duration-300 {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}"
+               data-tooltip="الأدوار">
+                <i class="fas fa-user-tag w-4 text-base"></i>
+                <span class="menu-text font-medium transition-all duration-300 text-sm">الأدوار</span>
             </a>
             @endif
         </div>
@@ -202,11 +236,11 @@
 
                     <!-- User Info -->
                     <div class="flex items-center space-x-3 space-x-reverse">
-                        <div class="user-avatar w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold shadow-lg transition-all duration-300">
+                        <div class="user-avatar w-10 h-10 rounded-xl flex items-center justify-center text-black font-bold shadow-lg transition-all duration-300">
                             {{ substr(auth()->guard('admin')->user()->name, 0, 1) }}
                         </div>
                         <div class="hidden sm:block">
-                            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">{{ auth()->guard('admin')->user()->name }}</span>
+                            <span class="text-sm font-bold text-gray-700 dark:text-gray-500">{{ auth()->guard('admin')->user()->name }}</span>
                             <p class="text-xs text-blue-600 dark:text-green-400">مدير النظام</p>
                         </div>
 
@@ -354,7 +388,7 @@
                 const notification = document.createElement('div');
                 notification.className = `fixed top-6 left-1/2 transform -translate-x-1/2 z-[10000] px-6 py-3 rounded-xl shadow-xl backdrop-blur-lg border ${
                     theme === 'dark'
-                    ? 'bg-gray-900/90 text-white border-gray-700'
+                    ? 'bg-gray-900/90 text-black border-gray-700'
                     : 'bg-white/90 text-gray-900 border-gray-200'
                 }`;
 

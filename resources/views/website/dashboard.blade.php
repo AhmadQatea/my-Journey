@@ -236,7 +236,7 @@
                                     <span>عرض أكواد الاسترجاع</span>
                                 </a>
 
-                                <form method="POST" action="{{ route('two-factor.generate-recovery-codes') }}" class="dropdown-form">
+                                <form method="POST" action="/user/two-factor-recovery-codes" class="dropdown-form">
                                     @csrf
                                     <button type="submit" class="dropdown-item">
                                         <i class="fas fa-redo"></i>

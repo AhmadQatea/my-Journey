@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\PasswordResetCode;
+use App\Models\User;
 use App\Notifications\PasswordResetCodeNotification;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use PragmaRX\Google2FALaravel\Facade as Google2FA;
 
 class TwoFactorAuthController extends Controller
@@ -20,17 +21,68 @@ class TwoFactorAuthController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        // Generate secret key if not exists
+        // If 2FA is already enabled and confirmed, redirect to dashboard
+        if ($user->two_factor_confirmed_at) {
+            return redirect()->route('dashboard')
+                ->with('info', 'المصادقة الثنائية مفعلة بالفعل.');
+        }
+
+        // Check if password is verified in this session
+        $passwordVerified = session('2fa_password_verified', false);
+
+        $qrCodeSvg = null;
+
+        // Only generate secret and QR code if password is verified
+        if ($passwordVerified) {
+            // Generate secret key if not exists
+            if (! $user->two_factor_secret) {
+                $user->update([
+                    'two_factor_secret' => Google2FA::generateSecretKey(),
+                ]);
+                $user->refresh();
+            }
+
+            // Generate QR Code using model method
+            $qrCodeSvg = $user->twoFactorQrCodeSvg();
+        }
+
+        return view('auth.two-factor-setup', compact('qrCodeSvg', 'user', 'passwordVerified'));
+    }
+
+    /**
+     * Verify password before enabling 2FA
+     */
+    public function verifyPassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|current_password',
+        ], [
+            'password.required' => 'الرجاء إدخال كلمة المرور',
+            'password.current_password' => 'كلمة المرور غير صحيحة',
+        ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Generate secret key if not exists (do this immediately after password verification)
         if (! $user->two_factor_secret) {
             $user->update([
                 'two_factor_secret' => Google2FA::generateSecretKey(),
             ]);
+            $user->refresh();
+
+            Log::info('2FA Secret Generated', [
+                'user_id' => $user->id,
+                'secret_length' => strlen($user->two_factor_secret),
+            ]);
         }
 
-        // Generate QR Code using model method
-        $qrCodeSvg = $user->twoFactorQrCodeSvg();
+        // Set session flag that password is verified
+        session(['2fa_password_verified' => true]);
+        session()->save();
 
-        return view('auth.two-factor-setup', compact('qrCodeSvg', 'user'));
+        return redirect()->route('two-factor.setup')
+            ->with('status', 'two-factor-authentication-enabled');
     }
 
     /**
@@ -38,32 +90,179 @@ class TwoFactorAuthController extends Controller
      */
     public function enable(Request $request)
     {
-        $request->validate([
-            'code' => 'required|string|size:6',
+        Log::info('2FA Enable Request Received', [
+            'user_id' => Auth::id(),
+            'has_code' => $request->has('code'),
+            'code_length' => $request->has('code') ? strlen($request->code) : 0,
+            'route' => $request->route()->getName(),
         ]);
 
-        /** @var User $user */
-        $user = Auth::user();
-        $secret = $user->two_factor_secret;
+        try {
+            /** @var User $user */
+            $user = Auth::user();
 
-        // Verify code
-        $valid = Google2FA::verifyKey($secret, $request->code);
+            if (! $user) {
+                Log::warning('2FA Enable: No authenticated user');
 
-        if ($valid) {
+                return redirect()->route('login')->withErrors(['code' => 'يجب تسجيل الدخول أولاً']);
+            }
+
+            // Check if password is verified
+            if (! session('2fa_password_verified', false)) {
+                Log::warning('2FA Enable: Password not verified', ['user_id' => $user->id]);
+
+                return redirect()->route('two-factor.setup')
+                    ->withErrors(['password' => 'يجب التحقق من كلمة المرور أولاً']);
+            }
+
+            // If 2FA is already enabled and confirmed, redirect to dashboard
+            if ($user->two_factor_confirmed_at) {
+                Log::info('2FA Enable: Already enabled', ['user_id' => $user->id]);
+
+                return redirect()->route('dashboard')
+                    ->with('info', 'المصادقة الثنائية مفعلة بالفعل.');
+            }
+
+            // Validate input - allow flexible input (string with min 6 chars, we'll clean it)
+            $validated = $request->validate([
+                'code' => 'required|string|min:6',
+            ], [
+                'code.required' => 'الرجاء إدخال رمز التحقق',
+                'code.min' => 'رمز التحقق يجب أن يكون 6 أرقام على الأقل',
+            ]);
+
+            $secret = $user->two_factor_secret;
+
+            if (! $secret) {
+                Log::error('2FA Enable: Secret not found', ['user_id' => $user->id]);
+
+                return redirect()->route('two-factor.setup')
+                    ->withErrors(['code' => 'المفتاح السري غير موجود. يرجى إعادة تحميل الصفحة']);
+            }
+
+            // Clean the code (remove any spaces or non-numeric characters)
+            $code = preg_replace('/[^0-9]/', '', $request->code);
+
+            if (strlen($code) !== 6 || ! ctype_digit($code)) {
+                Log::warning('2FA Enable: Invalid code format', [
+                    'user_id' => $user->id,
+                    'code_length' => strlen($code),
+                ]);
+
+                return back()->withInput()->withErrors(['code' => 'رمز التحقق يجب أن يكون 6 أرقام فقط']);
+            }
+
+            // First, verify that the secret key is valid
+            if (empty($secret) || strlen($secret) < 16) {
+                Log::error('2FA Secret Invalid', [
+                    'user_id' => $user->id,
+                    'secret_exists' => ! empty($secret),
+                    'secret_length' => $secret ? strlen($secret) : 0,
+                ]);
+
+                return back()->withInput()->withErrors(['code' => 'المفتاح السري غير صحيح. يرجى إعادة تحميل الصفحة']);
+            }
+
+            // Log before verification for debugging
+            Log::info('2FA Code Verification Attempt', [
+                'user_id' => $user->id,
+                'code' => $code,
+                'secret_length' => strlen($secret),
+                'secret_preview' => substr($secret, 0, 8).'...',
+            ]);
+
+            // Use verifyKey with window tolerance (default is 4, which allows ±2 time steps = ±60 seconds)
+            // This is the recommended way to verify 2FA codes
+            // Try with default window first, then with larger window if needed
+            $valid = Google2FA::verifyKey($secret, $code);
+
+            Log::info('2FA Verification Result (default window)', [
+                'user_id' => $user->id,
+                'valid' => $valid,
+            ]);
+
+            // If not valid with default window, try with larger window (8 = ±4 time steps = ±120 seconds)
+            if (! $valid) {
+                $google2fa = app('pragmarx.google2fa');
+                $valid = $google2fa->verifyKey($secret, $code, 8);
+
+                Log::info('2FA Verification Result (large window)', [
+                    'user_id' => $user->id,
+                    'valid' => $valid,
+                ]);
+            }
+
+            // If not valid, return error with logging for debugging
+            if (! $valid) {
+                Log::warning('2FA Code Verification Failed', [
+                    'user_id' => $user->id,
+                    'code' => $code,
+                    'code_length' => strlen($code),
+                    'secret_length' => strlen($secret),
+                    'secret_preview' => substr($secret, 0, 4).'...',
+                ]);
+
+                return back()
+                    ->withInput()
+                    ->withErrors(['code' => 'رمز التحقق غير صحيح. تأكد من: 1) أنك قمت بمسح QR Code بشكل صحيح 2) أن الوقت على هاتفك متزامن (Settings > Date & Time > Automatic) 3) أنك تدخل الكود الحالي من التطبيق (يتغير كل 30 ثانية)']);
+            }
+
+            Log::info('2FA Code Verified Successfully', [
+                'user_id' => $user->id,
+            ]);
+
             // Generate recovery codes
             $recoveryCodes = $this->generateRecoveryCodes();
 
+            // Update user with 2FA enabled FIRST
             $user->update([
                 'two_factor_confirmed_at' => now(),
                 'two_factor_recovery_codes' => json_encode($recoveryCodes),
             ]);
 
-            return redirect()->route('two-factor.recovery-codes')
-                ->with('recoveryCodes', $recoveryCodes)
-                ->with('status', 'تم تفعيل المصادقة الثنائية بنجاح!');
-        }
+            // Refresh user instance to get updated data
+            $user->refresh();
 
-        return back()->withErrors(['code' => 'رمز التحقق غير صحيح']);
+            // Set session flag AFTER updating database
+            // This ensures the session is set after the database update
+            session(['2fa_verified' => true]);
+            session()->save(); // Force save session immediately
+
+            Log::info('2FA Enabled Successfully', [
+                'user_id' => $user->id,
+                'two_factor_confirmed_at' => $user->two_factor_confirmed_at,
+                '2fa_verified_session' => session('2fa_verified'),
+            ]);
+
+            // Clear password verification session
+            session()->forget('2fa_password_verified');
+
+            // Redirect to dashboard with success message
+            // Use redirect()->intended() to respect any intended URL
+            $redirectUrl = session('intended_url', route('dashboard'));
+            session()->forget('intended_url');
+
+            return redirect($redirectUrl)
+                ->with('recoveryCodes', $recoveryCodes)
+                ->with('success', 'تم تفعيل المصادقة الثنائية بنجاح! احفظ أكواد الاسترجاع في مكان آمن.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('2FA Enable Validation Error', [
+                'user_id' => Auth::id(),
+                'errors' => $e->errors(),
+            ]);
+
+            return back()->withInput()->withErrors($e->errors());
+        } catch (\Exception $e) {
+            Log::error('2FA Enable Error: '.$e->getMessage(), [
+                'user_id' => Auth::id(),
+                'code' => $request->input('code'),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['code' => 'حدث خطأ أثناء تفعيل المصادقة الثنائية. يرجى المحاولة مرة أخرى.']);
+        }
     }
 
     /**
@@ -171,11 +370,19 @@ class TwoFactorAuthController extends Controller
         }
 
         if ($isValidCode || $isRecoveryCode || $isEmailCode) {
+            // Set session flag and force save
             session(['2fa_verified' => true]);
+            session()->save(); // Force save session immediately
 
             // Get intended URL from session or default to dashboard
             $intendedUrl = session('intended_url', route('dashboard'));
             session()->forget('intended_url');
+
+            Log::info('2FA Verified Successfully', [
+                'user_id' => $user->id,
+                'intended_url' => $intendedUrl,
+                '2fa_verified_session' => session('2fa_verified'),
+            ]);
 
             return redirect($intendedUrl);
         }
@@ -195,6 +402,7 @@ class TwoFactorAuthController extends Controller
 
         return $codes;
     }
+
     /**
      * إرسال كود التحقق عبر الإيميل للتحقق بخطوتين
      */
