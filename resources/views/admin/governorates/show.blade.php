@@ -48,9 +48,17 @@
                             <h4 class="font-bold text-gray-900 dark:text-black">{{ $spot->name }}</h4>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ Str::limit($spot->description, 60) }}</p>
                             <div class="flex items-center gap-2 mt-2">
-                                <span class="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
-                                    {{ $spot->type }}
-                                </span>
+                                @if(is_array($spot->type) && count($spot->type) > 0)
+                                    @foreach($spot->type as $type)
+                                        <span class="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+                                            {{ $type }}
+                                        </span>
+                                    @endforeach
+                                @elseif(is_string($spot->type))
+                                    <span class="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+                                        {{ $spot->type }}
+                                    </span>
+                                @endif
                             </div>
                         </div>
                     </div>

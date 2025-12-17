@@ -214,35 +214,7 @@
 
         @if($governorates->hasPages())
             <div class="card-footer">
-                <div class="pagination">
-                    @if($governorates->onFirstPage())
-                        <span class="pagination-link disabled">
-                            <i class="fas fa-chevron-right"></i>
-                        </span>
-                    @else
-                        <a href="{{ $governorates->previousPageUrl() }}" class="pagination-link">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                    @endif
-
-                    @foreach(range(1, $governorates->lastPage()) as $page)
-                        @if($page == $governorates->currentPage())
-                            <span class="pagination-link active">{{ $page }}</span>
-                        @else
-                            <a href="{{ $governorates->url($page) }}" class="pagination-link">{{ $page }}</a>
-                        @endif
-                    @endforeach
-
-                    @if($governorates->hasMorePages())
-                        <a href="{{ $governorates->nextPageUrl() }}" class="pagination-link">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                    @else
-                        <span class="pagination-link disabled">
-                            <i class="fas fa-chevron-left"></i>
-                        </span>
-                    @endif
-                </div>
+                {{ $governorates->links('vendor.pagination.custom') }}
             </div>
         @endif
     </div>

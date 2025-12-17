@@ -56,6 +56,7 @@ class DashboardController extends AdminController
         }
 
         $totalUsers = User::count();
+
         $totalBookings = Booking::count();
         $totalArticles = Article::count();
         $totalTouristSpots = TouristSpot::count();

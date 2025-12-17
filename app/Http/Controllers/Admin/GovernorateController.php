@@ -8,9 +8,10 @@ use Illuminate\Support\Facades\Storage;
 
 class GovernorateController extends AdminController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $governorates = Governorate::withCount(['touristSpots', 'trips'])->latest()->paginate(15);
+        $perPage = $request->get('per_page', 5); // تقليل عدد العناصر في كل صفحة للاختبار
+        $governorates = Governorate::withCount(['touristSpots', 'trips'])->latest()->paginate($perPage)->withQueryString();
 
         return view('admin.governorates.index', compact('governorates'));
     }

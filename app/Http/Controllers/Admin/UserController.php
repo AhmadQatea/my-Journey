@@ -37,7 +37,8 @@ class UserController extends AdminController
             }
         }
 
-        $users = $query->latest()->paginate(20)->withQueryString();
+        $perPage = $request->get('per_page', 5);
+        $users = $query->latest()->paginate($perPage)->withQueryString();
 
         // Stats
         $stats = [

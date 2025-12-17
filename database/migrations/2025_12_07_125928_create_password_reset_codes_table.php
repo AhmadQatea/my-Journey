@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('email')->index();
             $table->string('code');
+            $table->string('purpose')->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->boolean('used')->default(false);

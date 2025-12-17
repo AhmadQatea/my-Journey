@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description');
             $table->string('location');
             $table->string('coordinates')->nullable()->comment('الإحداثيات على الخريطة بصيغة: latitude,longitude');
-            $table->enum('type', ['تاريخي', 'طبيعي', 'منتزه', 'جبال ومرتفعات', 'مغامرات ومخاطر']);
+            $table->json('category_ids')->nullable();
             $table->json('images')->nullable();
             $table->decimal('entrance_fee', 10, 2)->nullable();
             $table->string('opening_hours')->nullable();

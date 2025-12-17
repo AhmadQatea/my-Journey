@@ -29,7 +29,8 @@ class TouristSpotController extends AdminController
             $query->where('name', 'like', '%'.$request->search.'%');
         }
 
-        $touristSpots = $query->latest()->paginate(15)->withQueryString();
+        $perPage = $request->get('per_page', 5);
+        $touristSpots = $query->latest()->paginate($perPage)->withQueryString();
         $governorates = Governorate::all();
         $categories = Category::all();
 

@@ -301,35 +301,7 @@
 
         @if($touristSpots->hasPages())
             <div class="card-footer">
-                <div class="pagination">
-                    @if($touristSpots->onFirstPage())
-                        <span class="pagination-link disabled">
-                            <i class="fas fa-chevron-right"></i>
-                        </span>
-                    @else
-                        <a href="{{ $touristSpots->previousPageUrl() }}" class="pagination-link">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                    @endif
-
-                    @foreach(range(1, $touristSpots->lastPage()) as $page)
-                        @if($page == $touristSpots->currentPage())
-                            <span class="pagination-link active">{{ $page }}</span>
-                        @else
-                            <a href="{{ $touristSpots->url($page) }}" class="pagination-link">{{ $page }}</a>
-                        @endif
-                    @endforeach
-
-                    @if($touristSpots->hasMorePages())
-                        <a href="{{ $touristSpots->nextPageUrl() }}" class="pagination-link">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                    @else
-                        <span class="pagination-link disabled">
-                            <i class="fas fa-chevron-left"></i>
-                        </span>
-                    @endif
-                </div>
+                {{ $touristSpots->links('vendor.pagination.custom') }}
             </div>
         @endif
     </div>

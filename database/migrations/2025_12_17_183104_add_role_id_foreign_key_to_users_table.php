@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table): void {
-            $table->string('google_id')->nullable();
-            $table->string('avatar')->nullable();
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('set null');
         });
     }
 
@@ -22,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table): void {
-            $table->dropColumn('google_id');
-            $table->dropColumn('avatar');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['role_id']);
         });
     }
 };

@@ -9,12 +9,13 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->enum('name', ['big_boss', 'site_admin', 'booking_admin', 'users_admin']);
+            $table->string('name');
             $table->text('description')->nullable();
+            $table->json('permissions')->nullable();
             $table->timestamps();
         });
     }

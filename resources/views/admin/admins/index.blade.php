@@ -88,7 +88,7 @@
         </div>
         
         <div class="mt-4">
-            {{ $admins->links() }}
+            {{ $admins->links('vendor.pagination.custom') }}
         </div>
     </div>
 </div>

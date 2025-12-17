@@ -35,7 +35,8 @@ class OfferController extends AdminController
             });
         }
 
-        $offers = $query->latest()->paginate(15)->withQueryString();
+        $perPage = $request->get('per_page', 5);
+        $offers = $query->latest()->paginate($perPage)->withQueryString();
         $trips = Trip::where('status', 'مقبولة')->orWhere('status', 'قيد التفعيل')->get();
 
         // إحصائيات

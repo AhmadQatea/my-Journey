@@ -270,7 +270,7 @@
 
         @if($bookings->hasPages())
             <div class="card-footer">
-                {{ $bookings->links() }}
+                {{ $bookings->links('vendor.pagination.custom') }}
             </div>
         @endif
     </div>

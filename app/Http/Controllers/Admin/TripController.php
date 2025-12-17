@@ -68,7 +68,8 @@ class TripController extends Controller
             'vip_trips' => Trip::where('source_type', 'vip_user')->count(),
         ];
 
-        $trips = $query->latest()->paginate(20);
+        $perPage = $request->get('per_page', 5);
+        $trips = $query->latest()->paginate($perPage)->withQueryString();
         $governorates = Governorate::all();
         $categories = Category::all();
 

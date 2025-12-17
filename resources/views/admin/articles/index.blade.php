@@ -275,7 +275,7 @@
 
         @if($articles->hasPages())
             <div class="card-footer">
-                {{ $articles->links() }}
+                {{ $articles->links('vendor.pagination.custom') }}
             </div>
         @endif
     </div>
