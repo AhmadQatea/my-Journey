@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -50,6 +51,9 @@ class SocialiteController extends Controller
                     'role_id' => $userRole?->id,
                     'account_type' => 'visitor',
                 ]);
+
+                // إرسال إشعار للمسؤولين
+                NotificationService::notifyNewUser($user);
             } else {
                 // تحديث بيانات المستخدم الحالي برابط جوجل
                 $user->update([

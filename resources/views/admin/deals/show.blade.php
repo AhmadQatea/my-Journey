@@ -343,8 +343,8 @@
                 </div>
             </div>
 
-            <!-- Creator Info -->
-            @if($deal->creator)
+            <!-- Creator Info (VIP Users) -->
+            @if($deal->creator && !$deal->created_by_admin)
             <div class="card">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray mb-4">معلومات المنشئ</h3>
                 <div class="card-body p-4">
@@ -353,8 +353,29 @@
                             <i class="fas fa-user text-primary"></i>
                         </div>
                         <div>
-                            <h4 class="font-medium text-gray-900 dark:text-gray">{{ $deal->creator->name }}</h4>
+                            <h4 class="font-medium text-gray-900 dark:text-gray">{{ $deal->creator->full_name ?? $deal->creator->name }}</h4>
                             <p class="text-sm text-gray-600 dark:text-gray-400">{{ $deal->created_at->format('Y/m/d') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- Creator Info (Admin) -->
+            @if($deal->created_by_admin && $deal->adminCreator)
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray mb-4">معلومات المنشئ</h3>
+                <div class="card-body p-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                            <i class="fas fa-user-shield text-emerald-600"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900 dark:text-gray">{{ $deal->adminCreator->name }}</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $deal->adminCreator->email }}</p>
+                            <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                                <i class="fas fa-shield-alt ml-1"></i> مسؤول
+                            </p>
                         </div>
                     </div>
                 </div>

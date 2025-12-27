@@ -7,8 +7,10 @@ use App\Models\Booking;
 use App\Models\Offer;
 use App\Models\Trip;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends AdminController
 {
@@ -76,11 +78,31 @@ class BookingController extends AdminController
     public function create()
     {
         $trips = Trip::where('status', 'مقبولة')->orWhere('status', 'قيد التفعيل')->with('governorate')->get();
+
+        // جلب العروض المفعلة والمرتبطة برحلات مقبولة أو قيد التفعيل
         $offers = Offer::where('status', 'مفعل')
-            ->whereDate('start_date', '<=', now())
-            ->whereDate('end_date', '>=', now())
+            ->whereHas('trip', function ($query) {
+                $query->whereIn('status', ['مقبولة', 'قيد التفعيل']);
+            })
             ->with(['trip.governorate'])
             ->get();
+
+        // تسجيل للتحقق (يمكن حذفه لاحقاً)
+        Log::info('Booking Create - Offers Count', [
+            'total_offers' => $offers->count(),
+            'offers' => $offers->map(function ($offer) {
+                return [
+                    'id' => $offer->id,
+                    'title' => $offer->title,
+                    'status' => $offer->status,
+                    'start_date' => $offer->start_date?->format('Y-m-d'),
+                    'end_date' => $offer->end_date?->format('Y-m-d'),
+                    'trip_id' => $offer->trip_id,
+                    'trip_status' => $offer->trip?->status,
+                ];
+            })->toArray(),
+        ]);
+
         $users = User::all();
 
         return view('admin.bookings.create', compact('trips', 'offers', 'users'));
@@ -100,6 +122,20 @@ class BookingController extends AdminController
         $data['confirmed_by_admin_id'] = Auth::id(); // عند الإنشاء من المسؤول، يعتبر مؤكد تلقائياً
 
         $booking = Booking::create($data);
+
+        // إرسال إشعار للمسؤول الكبير
+        NotificationService::notifyAdminAction(
+            Auth::guard('admin')->user(),
+            'create',
+            'booking',
+            $booking->id,
+            route('admin.bookings.show', $booking)
+        );
+
+        // إرسال إشعار للمستخدم بأنه تم إنشاء حجز له
+        if ($booking->user_id) {
+            NotificationService::notifyBookingConfirmed($booking);
+        }
 
         return redirect()->route('admin.bookings.index')
             ->with('success', 'تم إنشاء الحجز بنجاح.');
@@ -145,7 +181,35 @@ class BookingController extends AdminController
                 ->withInput();
         }
 
+        $oldData = $booking->toArray();
         $booking->update($data);
+
+        // إرسال إشعار للمسؤول الكبير
+        NotificationService::notifyAdminAction(
+            Auth::guard('admin')->user(),
+            'update',
+            'booking',
+            $booking->id,
+            route('admin.bookings.show', $booking)
+        );
+
+        // إرسال إشعار للمستخدم عند التغييرات
+        if ($booking->user_id) {
+            $changes = [];
+            if (isset($data['guest_count']) && $oldData['guest_count'] != $data['guest_count']) {
+                $changes['guest_count'] = $data['guest_count'];
+            }
+            if (isset($data['booking_date']) && $oldData['booking_date'] != $data['booking_date']) {
+                $changes['booking_date'] = $data['booking_date'];
+            }
+            if (isset($data['total_price']) && $oldData['total_price'] != $data['total_price']) {
+                $changes['total_price'] = $data['total_price'];
+            }
+
+            if (! empty($changes)) {
+                NotificationService::notifyBookingUpdated($booking, $changes);
+            }
+        }
 
         return redirect()->route('admin.bookings.index')
             ->with('success', 'تم تحديث الحجز بنجاح.');
@@ -156,7 +220,17 @@ class BookingController extends AdminController
      */
     public function destroy(Booking $booking)
     {
+        $bookingId = $booking->id;
         $booking->delete();
+
+        // إرسال إشعار للمسؤول الكبير
+        NotificationService::notifyAdminAction(
+            Auth::guard('admin')->user(),
+            'delete',
+            'booking',
+            $bookingId,
+            route('admin.bookings.index')
+        );
 
         return redirect()->route('admin.bookings.index')
             ->with('success', 'تم حذف الحجز بنجاح.');
@@ -186,7 +260,19 @@ class BookingController extends AdminController
             $data['confirmed_by_admin_id'] = Auth::id();
         }
 
+        $oldStatus = $booking->status;
+        $oldData = $booking->toArray();
         $booking->update($data);
+        $booking->refresh();
+
+        // إرسال إشعار للمستخدم عند تغيير الحالة
+        if ($oldStatus !== $request->status && $booking->user_id) {
+            if ($request->status === 'مؤكدة') {
+                NotificationService::notifyBookingConfirmed($booking);
+            } elseif ($request->status === 'مرفوضة') {
+                NotificationService::notifyBookingRejected($booking, $request->rejection_reason ?? null);
+            }
+        }
 
         return redirect()->back()
             ->with('success', 'تم تحديث حالة الحجز بنجاح.');

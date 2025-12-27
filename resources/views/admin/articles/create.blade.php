@@ -1,36 +1,17 @@
-{{-- resources/views/admin/articles/create.blade.php --}}
-@extends('admin.layouts.admin')
-
-@section('title', 'إضافة مقال جديد')
-@section('page-title', 'إضافة مقال جديد')
-
-@section('content')
-<div class="container mx-auto px-4 py-4">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">إضافة مقال جديد</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">أنشئ مقالاً جديداً</p>
+<x-admin.create-form
+    title="إضافة مقال جديد"
+    :action="route('admin.articles.store')"
+    :back-route="route('admin.articles.index')"
+    submit-text="حفظ المقال"
+    :enctype="true"
+    layout="grid"
+>
+    <!-- Basic Information -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">المعلومات الأساسية</h3>
         </div>
-        <a href="{{ route('admin.articles.index') }}"
-           class="btn btn-outline inline-flex items-center gap-2">
-            <i class="fas fa-arrow-right"></i>
-            <span>رجوع للقائمة</span>
-        </a>
-    </div>
-
-    <form action="{{ route('admin.articles.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Basic Information -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">المعلومات الأساسية</h3>
-                    </div>
-                    <div class="card-body space-y-4">
+        <div class="card-body space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="form-group">
                                 <label class="form-label">الرحلة أو العرض (اختياري)</label>
@@ -134,44 +115,29 @@
                                 يمكن رفع حتى 10 صور
                             </p>
                         </div>
-                    </div>
-                </div>
+        </div>
+    </div>
+
+    <x-slot name="sidebar">
+        <!-- Info Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">معلومات</h3>
             </div>
-
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Submit Button -->
-                <div class="card">
-                    <div class="card-body p-4">
-                        <button type="submit" class="btn btn-primary w-full">
-                            <i class="fas fa-save ml-1"></i>
-                            حفظ المقال
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Info Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">معلومات</h3>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle ml-1"></i>
-                            <p class="text-sm">
-                                المقالات التي ينشئها المسؤولون تكون <strong>منشورة</strong> تلقائياً.
-                            </p>
-                            <p class="text-sm mt-2">
-                                يمكن للمسؤول إنشاء مقالات <strong>عامة</strong> للموقع (غير مرتبطة برحلة).
-                            </p>
-                        </div>
-                    </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle ml-1"></i>
+                    <p class="text-sm">
+                        المقالات التي ينشئها المسؤولون تكون <strong>منشورة</strong> تلقائياً.
+                    </p>
+                    <p class="text-sm mt-2">
+                        يمكن للمسؤول إنشاء مقالات <strong>عامة</strong> للموقع (غير مرتبطة برحلة).
+                    </p>
                 </div>
             </div>
         </div>
-    </form>
-</div>
-@endsection
+    </x-slot>
+</x-admin.create-form>
 
 @push('scripts')
 <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>

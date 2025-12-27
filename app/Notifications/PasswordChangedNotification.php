@@ -3,8 +3,8 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class PasswordChangedNotification extends Notification
 {
@@ -17,21 +17,21 @@ class PasswordChangedNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail'];
     }
 
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('تم تغيير كلمة مرور حسابك - ' . config('app.name'))
-            ->greeting('مرحباً ' . $notifiable->name . '!')
+            ->subject('تم تغيير كلمة مرور حسابك - '.config('app.name'))
+            ->greeting('مرحباً '.$notifiable->name.'!')
             ->line('تم تغيير كلمة مرور حسابك بنجاح.')
-            ->line('**الوقت:** ' . now()->format('Y/m/d H:i'))
-            ->line('**عنوان IP:** ' . request()->ip())
-            ->line('**المتصفح:** ' . request()->header('User-Agent'))
+            ->line('**الوقت:** '.now()->format('Y/m/d H:i'))
+            ->line('**عنوان IP:** '.request()->ip())
+            ->line('**المتصفح:** '.request()->header('User-Agent'))
             ->action('عرض الحساب', url('/dashboard'))
             ->line('إذا لم تقم بهذا التغيير، يرجى التواصل مع الدعم فوراً.')
-            ->salutation('مع التحية، فريق ' . config('app.name'));
+            ->salutation('مع التحية، فريق '.config('app.name'));
     }
 
     public function toArray($notifiable)

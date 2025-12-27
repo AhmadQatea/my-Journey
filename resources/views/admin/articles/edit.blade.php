@@ -1,37 +1,19 @@
-{{-- resources/views/admin/articles/edit.blade.php --}}
-@extends('admin.layouts.admin')
-
-@section('title', 'تعديل المقال: ' . $article->title)
-@section('page-title', 'تعديل المقال: ' . $article->title)
-
-@section('content')
-<div class="container mx-auto px-4 py-4">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">تعديل المقال</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ Str::limit($article->title, 50) }}</p>
+<x-admin.edit-form
+    title="تعديل المقال"
+    :page-title="'تعديل المقال: ' . $article->title"
+    :action="route('admin.articles.update', $article)"
+    :model="$article"
+    :back-route="route('admin.articles.index')"
+    submit-text="حفظ التعديلات"
+    :enctype="true"
+    layout="grid"
+>
+    <!-- Basic Information -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">المعلومات الأساسية</h3>
         </div>
-        <a href="{{ route('admin.articles.index') }}"
-           class="btn btn-outline inline-flex items-center gap-2">
-            <i class="fas fa-arrow-right"></i>
-            <span>رجوع للقائمة</span>
-        </a>
-    </div>
-
-    <form action="{{ route('admin.articles.update', $article) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Basic Information -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">المعلومات الأساسية</h3>
-                    </div>
-                    <div class="card-body space-y-4">
+        <div class="card-body space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="form-group">
                                 <label class="form-label">الرحلة أو العرض (اختياري)</label>
@@ -183,26 +165,9 @@
                                 يمكن رفع حتى 10 صور
                             </p>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Submit Button -->
-                <div class="card">
-                    <div class="card-body p-4">
-                        <button type="submit" class="btn btn-primary w-full">
-                            <i class="fas fa-save ml-1"></i>
-                            حفظ التعديلات
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
-    </form>
-</div>
-@endsection
+    </div>
+</x-admin.edit-form>
 
 @push('scripts')
 <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>

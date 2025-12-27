@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PasswordResetCode;
 use App\Models\User;
 use App\Notifications\PasswordResetCodeNotification;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -237,6 +238,9 @@ class TwoFactorAuthController extends Controller
             // Clear password verification session
             session()->forget('2fa_password_verified');
 
+            // إرسال إشعار للمسؤولين
+            NotificationService::notifyTwoFactorEnabled($user);
+
             // Redirect to dashboard with success message
             // Use redirect()->intended() to respect any intended URL
             $redirectUrl = session('intended_url', route('dashboard'));
@@ -304,11 +308,23 @@ class TwoFactorAuthController extends Controller
         /** @var User $user */
         $user = Auth::user();
         $recoveryCodes = $this->generateRecoveryCodes();
+
+        // Save as plain JSON (not encrypted) to avoid Fortify decryption issues
+        // We'll read them directly from database in showRecoveryCodes()
         $user->update([
             'two_factor_recovery_codes' => json_encode($recoveryCodes),
         ]);
 
-        return redirect()->route('two-factor.recovery-codes')
+        // Refresh user to get updated data
+        $user->refresh();
+
+        Log::info('New Recovery Codes Generated', [
+            'user_id' => $user->id,
+            'codes_count' => count($recoveryCodes),
+        ]);
+
+        // Redirect to recovery codes page
+        return redirect()->route('two-factor.recovery-codes.show')
             ->with('recoveryCodes', $recoveryCodes)
             ->with('status', 'تم إنشاء أكواد استرجاع جديدة');
     }

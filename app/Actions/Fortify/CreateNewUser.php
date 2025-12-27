@@ -4,6 +4,7 @@ namespace App\Actions\Fortify;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -47,6 +48,11 @@ class CreateNewUser implements CreatesNewUsers
             $userData['identity_back_image'] = $input['identity_back_image']->store('identities', 'public');
         }
 
-        return User::create($userData);
+        $user = User::create($userData);
+
+        // إرسال إشعار للمسؤولين
+        NotificationService::notifyNewUser($user);
+
+        return $user;
     }
 }

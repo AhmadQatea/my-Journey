@@ -18,6 +18,8 @@ class Offer extends Model
         'end_date',
         'status',
         'created_by',
+        'created_by_admin',
+        'created_by_admin_id',
         'custom_price',
         'custom_included_places',
         'custom_features',
@@ -38,6 +40,7 @@ class Offer extends Model
         'custom_start_time' => 'datetime:H:i',
         'custom_duration_hours' => 'integer',
         'custom_max_persons' => 'integer',
+        'created_by_admin' => 'boolean',
     ];
 
     // العلاقة مع الرحلة
@@ -46,10 +49,16 @@ class Offer extends Model
         return $this->belongsTo(Trip::class);
     }
 
-    // العلاقة مع منشئ العرض
+    // العلاقة مع منشئ العرض (لـ VIP users)
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    // العلاقة مع المسؤول الذي أنشأ العرض
+    public function adminCreator()
+    {
+        return $this->belongsTo(\App\Models\Admin::class, 'created_by_admin_id');
     }
 
     // العلاقة مع محافظة الانطلاق المخصصة

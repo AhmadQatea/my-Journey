@@ -13,6 +13,7 @@ Route::middleware(['auth'])->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     // Password change
     Route::get('/password/change', function () {
@@ -31,9 +32,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/two-factor/enable', [TwoFactorAuthController::class, 'enable'])
         ->name('two-factor.enable-custom');
 
-    // 2FA recovery codes page
+    // 2FA recovery codes page (custom route to avoid conflict with Fortify)
     Route::get('/two-factor/recovery-codes', [\App\Http\Controllers\TwoFactorSetupController::class, 'showRecoveryCodes'])
-        ->name('two-factor.recovery-codes');
+        ->name('two-factor.recovery-codes.show');
+
+    // Generate new recovery codes
+    Route::post('/user/two-factor-recovery-codes', [TwoFactorAuthController::class, 'generateNewRecoveryCodes'])
+        ->name('two-factor.generate-recovery-codes');
 
     // Keep verify-for-password-change for password change functionality
     Route::post('/two-factor/verify-for-password-change', [TwoFactorAuthController::class, 'verifyForPasswordChange'])
@@ -131,4 +136,30 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/password/change', [ChangePasswordController::class, 'changePassword'])
         ->name('password.change');
+
+    // Email Verification routes
+    Route::post('/email/send-verification', [\App\Http\Controllers\EmailVerificationController::class, 'sendVerificationCode'])
+        ->name('email.send');
+    Route::get('/email/verify', [\App\Http\Controllers\EmailVerificationController::class, 'showVerifyForm'])
+        ->name('email.verify');
+    Route::post('/email/verify', [\App\Http\Controllers\EmailVerificationController::class, 'verifyCode'])
+        ->name('email.verify.post');
+    Route::post('/email/resend', [\App\Http\Controllers\EmailVerificationController::class, 'resendCode'])
+        ->name('email.resend');
+
+    // Identity Verification routes
+    Route::get('/identity-verification', [\App\Http\Controllers\IdentityVerificationController::class, 'create'])
+        ->name('identity-verification.create');
+    Route::post('/identity-verification', [\App\Http\Controllers\IdentityVerificationController::class, 'store'])
+        ->name('identity-verification.store');
+
+    // Notifications routes
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])
+        ->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])
+        ->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])
+        ->name('notifications.mark-all-read');
+    Route::delete('/notifications/{notification}', [\App\Http\Controllers\NotificationController::class, 'destroy'])
+        ->name('notifications.destroy');
 });

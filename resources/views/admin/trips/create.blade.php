@@ -700,4 +700,3 @@ function removeFeature(button) {
 }
 </script>
 @endpush
-

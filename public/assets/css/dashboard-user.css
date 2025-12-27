@@ -223,13 +223,15 @@ p {
     align-items: center;
     flex: 1;
     justify-content: center;
+    margin-top: 30px !important;
+
 }
 
 .nav-menu {
     display: flex;
     list-style: none;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.2rem;
     margin: 0;
     padding: 0;
 }
@@ -241,15 +243,59 @@ p {
 .nav-menu-link {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1rem;
+    gap: 0.375rem;
+    padding: 0.5rem 0.75rem;
     color: var(--gray-600);
     text-decoration: none;
     border-radius: var(--radius-md);
     transition: var(--transition-fast);
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 500;
     white-space: nowrap;
+}
+
+/* إخفاء النص في القائمة المدمجة */
+.nav-menu.compact .nav-menu-text {
+    display: none;
+}
+
+.nav-menu.compact .nav-menu-link {
+    padding: 0.5rem;
+    justify-content: center;
+    min-width: 40px;
+}
+
+.nav-menu.compact .nav-menu-item {
+    position: relative;
+}
+
+.nav-menu.compact .nav-menu-item:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    right: 50%;
+    transform: translateX(50%);
+    background: var(--gray-900);
+    color: var(--white);
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    white-space: nowrap;
+    margin-bottom: 0.5rem;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+    pointer-events: none;
+}
+
+.nav-menu.compact .nav-menu-item:hover::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% - 4px);
+    right: 50%;
+    transform: translateX(50%);
+    border: 4px solid transparent;
+    border-top-color: var(--gray-900);
+    z-index: 1000;
 }
 
 .nav-menu-link:hover {
@@ -755,6 +801,110 @@ p {
     font-size: 0.875rem;
 }
 
+/* Activity List */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    transition: var(--transition-fast);
+}
+
+.activity-item:hover {
+    background: var(--gray-100);
+}
+
+.activity-item-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--primary);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.activity-item-content {
+    flex: 1;
+}
+
+.activity-item-content h5 {
+    font-size: 0.9375rem;
+    color: var(--gray-900);
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.activity-item-content p {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.status-confirmed,
+.status-badge.status-published {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+}
+
+.status-badge.status-pending {
+    background: rgba(251, 191, 36, 0.1);
+    color: #d97706;
+}
+
+.status-badge.status-rejected {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+/* Activity Footer */
+.activity-footer {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--gray-200);
+    text-align: center;
+}
+
+.btn-view-all {
+    background: var(--white);
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+    transition: var(--transition-fast);
+}
+
+.btn-view-all:hover {
+    background: var(--primary);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
 /* ========== MAIN FOOTER ========== */
 .main-footer {
     background: var(--white);
@@ -942,65 +1092,6 @@ p {
         font-size: 2rem;
     }
 }
-
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --white: #0f172a;
-        --gray-50: #1e293b;
-        --gray-100: #334155;
-        --gray-200: #475569;
-        --gray-300: #64748b;
-        --gray-400: #94a3b8;
-        --gray-500: #cbd5e1;
-        --gray-600: #e2e8f0;
-        --gray-700: #f1f5f9;
-        --gray-800: #f8fafc;
-        --gray-900: #ffffff;
-    }
-
-    body {
-        background: var(--white);
-        color: var(--gray-600);
-    }
-
-    .dashboard-header,
-    .main-nav,
-    .stat-card,
-    .activity-card,
-    .main-footer {
-        background: var(--gray-50);
-        border-color: var(--gray-100);
-    }
-
-    .nav-link.active {
-        background: var(--primary);
-        color: var(--white);
-    }
-
-    .btn-site,
-    .btn-logout,
-    .btn-filter {
-        background: var(--gray-100);
-        color: var(--gray-500);
-    }
-
-    .btn-site:hover,
-    .btn-logout:hover {
-        background: var(--primary);
-        color: var(--white);
-    }
-
-    .card-link {
-        color: var(--primary-light);
-    }
-
-    .footer-link {
-        color: var(--gray-400);
-    }
-
-    .footer-link:hover {
-        color: var(--primary-light);
     }
 }
 
@@ -1220,6 +1311,7 @@ p {
     transform: rotate(180deg);
 }
 
+/* ========== USER DROPDOWN CONTENT - مع سكرول ========== */
 .user-dropdown-content {
     position: absolute;
     top: 100%;
@@ -1235,6 +1327,9 @@ p {
     transition: var(--transition-base);
     border: 1px solid var(--gray-200);
     margin-top: 0.5rem;
+    max-height: 500px; /* ارتفاع أقصى */
+    display: flex;
+    flex-direction: column;
 }
 
 .user-dropdown-content.show {
@@ -1243,11 +1338,84 @@ p {
     transform: translateY(0);
 }
 
+/* محتوى القائمة مع سكرول */
+.dropdown-content-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 400px; /* ارتفاع السكرول */
+    padding-bottom: 0.5rem;
+}
+
+/* تخصيص سكرول احترافي */
+.dropdown-content-scrollable::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dropdown-content-scrollable::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: var(--radius-full);
+    margin: 8px 0;
+}
+
+.dropdown-content-scrollable::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: var(--radius-full);
+    transition: var(--transition-fast);
+}
+
+.dropdown-content-scrollable::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+}
+
+.dropdown-content-scrollable::-webkit-scrollbar-button {
+    display: none;
+}
+
+/* ظل في الأعلى والأسفل للإشارة للمحتوى الإضافي */
+.dropdown-scroll-shadow {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 20px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.dropdown-scroll-shadow.top {
+    top: 0;
+    background: linear-gradient(to bottom, var(--white) 0%, transparent 100%);
+}
+
+.dropdown-scroll-shadow.bottom {
+    bottom: 0;
+    background: linear-gradient(to top, var(--white) 0%, transparent 100%);
+}
+
+/* تحديث التنسيقات السابقة */
 .dropdown-user-info {
     padding: 1.25rem;
     background: var(--gradient-primary);
     color: var(--white);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0; /* منع التقلص */
+}
+
+.dropdown-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--gray-200);
+    background: var(--white);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    flex-shrink: 0; /* منع التقلص */
+    position: relative;
+    z-index: 2;
+}
+
+.dropdown-user-avatar-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 0.75rem;
 }
 
 .dropdown-user-avatar {
@@ -1258,7 +1426,6 @@ p {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 0.75rem;
     font-size: 2rem;
     color: var(--white);
     overflow: hidden;
@@ -1269,6 +1436,37 @@ p {
     height: 100%;
     object-fit: cover;
     border-radius: var(--radius-full);
+}
+
+.dropdown-user-status {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    color: var(--white);
+    white-space: nowrap;
+}
+
+.dropdown-user-status i {
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: var(--radius-full);
+    display: block;
+    flex-shrink: 0;
+}
+
+.user-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .dropdown-user-details h4 {
@@ -1285,13 +1483,14 @@ p {
 
 .google-badge,
 .twofa-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     background: rgba(255, 255, 255, 0.2);
     color: var(--white);
     padding: 0.25rem 0.5rem;
     border-radius: var(--radius-full);
     font-size: 0.75rem;
-    margin-left: 0.5rem;
 }
 
 .dropdown-divider {
@@ -1322,6 +1521,7 @@ p {
     transition: var(--transition-fast);
     border-right: 3px solid transparent;
     font-size: 0.875rem;
+    position: relative;
 }
 
 .dropdown-item:hover {
@@ -1330,15 +1530,33 @@ p {
     border-right-color: var(--primary);
 }
 
-.dropdown-item.danger:hover {
+.dropdown-item.danger:hover,
+.dropdown-item.logout:hover {
     color: var(--danger);
     border-right-color: var(--danger);
 }
 
-.dropdown-item i {
+.dropdown-icon {
     width: 20px;
     text-align: center;
     font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.dropdown-item .arrow {
+    margin-right: auto;
+    font-size: 0.75rem;
+    color: var(--gray-400);
+    transition: var(--transition-fast);
+}
+
+.dropdown-item:hover .arrow {
+    color: var(--primary);
+}
+
+.dropdown-item.danger:hover .arrow,
+.dropdown-item.logout:hover .arrow {
+    color: var(--danger);
 }
 
 .dropdown-badge {
@@ -1424,36 +1642,6 @@ p {
     }
 }
 
-/* ========== DARK MODE SUPPORT ========== */
-@media (prefers-color-scheme: dark) {
-    .notification-dropdown-content,
-    .user-dropdown-content {
-        background: var(--gray-50);
-        border-color: var(--gray-100);
-    }
-
-    .notification-item:hover,
-    .dropdown-item:hover {
-        background: var(--gray-100);
-    }
-
-    .notification-item.unread {
-        background: rgba(67, 97, 238, 0.1);
-    }
-
-    .dropdown-user-info {
-        background: var(--gradient-primary);
-    }
-
-    .dropdown-divider {
-        background: var(--gray-100);
-    }
-
-    .dropdown-badge.inactive {
-        background: var(--gray-100);
-        color: var(--gray-400);
-    }
-}
 
 /* ========== ANIMATIONS ========== */
 @keyframes fadeIn {
@@ -1481,3 +1669,4 @@ p {
     object-fit: cover;
     border-radius: var(--radius-full);
 }
+

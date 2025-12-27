@@ -3,16 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\PasswordResetCode;
+use App\Models\User;
 use App\Notifications\PasswordResetCodeNotification;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 
 class PasswordResetController extends Controller
 {
@@ -78,7 +77,7 @@ class PasswordResetController extends Controller
      */
     public function showVerifyCodeForm()
     {
-        if (!session('password_reset_email')) {
+        if (! session('password_reset_email')) {
             return redirect()->route('password.request');
         }
 
@@ -103,7 +102,7 @@ class PasswordResetController extends Controller
         // تجميع الكود من الحقول المنفصلة إذا كان موجوداً
         $code = $request->input('code');
 
-        if (!$code) {
+        if (! $code) {
             // محاولة تجميع الكود من الحقول المنفصلة
             $codeDigits = '';
             for ($i = 0; $i < 6; $i++) {
@@ -123,7 +122,7 @@ class PasswordResetController extends Controller
 
         $email = session('password_reset_email');
 
-        if (!$email) {
+        if (! $email) {
             return redirect()->route('password.request')
                 ->with('error', 'انتهت الجلسة. يرجى البدء من جديد.');
         }
@@ -135,7 +134,7 @@ class PasswordResetController extends Controller
             ->where('used', false)
             ->first();
 
-        if (!$resetCode) {
+        if (! $resetCode) {
             return back()->withErrors(['code' => 'رمز التحقق غير صحيح أو منتهي الصلاحية.']);
         }
 
@@ -161,7 +160,7 @@ class PasswordResetController extends Controller
     {
         $email = session('password_reset_email');
 
-        if (!$email) {
+        if (! $email) {
             return redirect()->route('password.request');
         }
 
@@ -191,7 +190,7 @@ class PasswordResetController extends Controller
      */
     public function showResetForm()
     {
-        if (!session('password_reset_email') || !session('password_reset_token')) {
+        if (! session('password_reset_email') || ! session('password_reset_token')) {
             return redirect()->route('password.request');
         }
 
@@ -211,7 +210,7 @@ class PasswordResetController extends Controller
         $email = session('password_reset_email');
         $token = session('password_reset_token');
 
-        if (!$email || !$token) {
+        if (! $email || ! $token) {
             return redirect()->route('password.request')
                 ->with('error', 'انتهت الجلسة. يرجى البدء من جديد.');
         }
@@ -219,7 +218,7 @@ class PasswordResetController extends Controller
         // البحث عن المستخدم
         $user = User::where('email', $email)->first();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('password.request')
                 ->with('error', 'المستخدم غير موجود.');
         }
@@ -229,7 +228,8 @@ class PasswordResetController extends Controller
         $user->save();
 
         // إرسال إشعار تغيير كلمة المرور
-        $user->notify(new \App\Notifications\PasswordChangedNotification());
+        $user->notify(new \App\Notifications\PasswordChangedNotification);
+        NotificationService::notifyPasswordChanged($user);
 
         // تنظيف الجلسة
         session()->forget(['password_reset_email', 'password_reset_token']);

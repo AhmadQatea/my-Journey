@@ -20,6 +20,29 @@
     <x-card title="">
         <div class="flex items-center justify-between">
             <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">إجمالي المستخدمين الموثقين</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-black">{{ $totalVerifiedUsers }}</p>
+            </div>
+            <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center">
+                <i class="fas fa-user-check text-indigo-600 dark:text-indigo-400 text-xl"></i>
+            </div>
+        </div>
+    </x-card>
+    <x-card title="">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">إجمالي العروض</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-black">{{ $totalOffers }}</p>
+            </div>
+            <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center">
+                <i class="fas fa-gift text-indigo-600 dark:text-indigo-400 text-xl"></i>
+            </div>
+        </div>
+    </x-card>
+
+    <x-card title="">
+        <div class="flex items-center justify-between">
+            <div>
                 <p class="text-sm text-gray-600 mb-1">إجمالي الحجوزات</p>
                 <p class="text-2xl font-bold text-gray-900">{{ $totalBookings }}</p>
             </div>
@@ -139,15 +162,23 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // بيانات الحجوزات من قاعدة البيانات
+    const bookingsLabels = @json($bookingsData['labels']);
+    const bookingsData = @json($bookingsData['data']);
+
+    // بيانات الإيرادات من قاعدة البيانات
+    const revenueLabels = @json($revenueData['labels']);
+    const revenueData = @json($revenueData['data']);
+
     // Bookings Chart
     const bookingsCtx = document.getElementById('bookingsChart').getContext('2d');
     const bookingsChart = new Chart(bookingsCtx, {
         type: 'line',
         data: {
-            labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+            labels: bookingsLabels,
             datasets: [{
                 label: 'الحجوزات',
-                data: [12, 19, 3, 5, 2, 3],
+                data: bookingsData,
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 tension: 0.4,
@@ -161,6 +192,14 @@
                 legend: {
                     position: 'top',
                 }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
             }
         }
     });
@@ -170,10 +209,10 @@
     const revenueChart = new Chart(revenueCtx, {
         type: 'bar',
         data: {
-            labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+            labels: revenueLabels,
             datasets: [{
                 label: 'الإيرادات (ل.س)',
-                data: [1200, 1900, 300, 500, 200, 300],
+                data: revenueData,
                 backgroundColor: '#10b981',
                 borderColor: '#059669',
                 borderWidth: 1
@@ -185,6 +224,23 @@
             plugins: {
                 legend: {
                     position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'الإيرادات: ' + new Intl.NumberFormat('ar-SY').format(context.parsed.y) + ' ل.س';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return new Intl.NumberFormat('ar-SY').format(value) + ' ل.س';
+                        }
+                    }
                 }
             }
         }

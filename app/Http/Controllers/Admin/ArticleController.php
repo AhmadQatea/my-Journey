@@ -7,6 +7,7 @@ use App\Models\Article;
 use App\Models\Offer;
 use App\Models\Trip;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -176,7 +177,23 @@ class ArticleController extends AdminController
             $data['images'] = $article->images;
         }
 
+        $oldData = $article->toArray();
         $article->update($data);
+
+        // إرسال إشعار للمستخدم عند التغييرات
+        if ($article->user_id) {
+            $changes = [];
+            if (isset($data['title']) && $oldData['title'] != $data['title']) {
+                $changes['title'] = $data['title'];
+            }
+            if (isset($data['status']) && $oldData['status'] != $data['status']) {
+                $changes['status'] = $data['status'];
+            }
+
+            if (! empty($changes)) {
+                NotificationService::notifyArticleUpdated($article, $changes);
+            }
+        }
 
         return redirect()->route('admin.articles.index')
             ->with('success', 'تم تحديث المقال بنجاح.');
@@ -211,6 +228,11 @@ class ArticleController extends AdminController
             'confirmed_by_admin_id' => Auth::id(),
         ]);
 
+        // إرسال إشعار للمستخدم إذا كان المقال من مستخدم
+        if ($article->user_id) {
+            NotificationService::notifyArticleApproved($article);
+        }
+
         return redirect()->back()
             ->with('success', 'تم الموافقة على المقال بنجاح.');
     }
@@ -228,6 +250,11 @@ class ArticleController extends AdminController
             'status' => 'مرفوضة',
             'rejection_reason' => $request->rejection_reason,
         ]);
+
+        // إرسال إشعار للمستخدم إذا كان المقال من مستخدم
+        if ($article->user_id) {
+            NotificationService::notifyArticleRejected($article, $request->rejection_reason);
+        }
 
         return redirect()->back()
             ->with('success', 'تم رفض المقال بنجاح.');

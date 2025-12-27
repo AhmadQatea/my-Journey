@@ -7,7 +7,9 @@ use App\Http\Requests\StoreAdminRequest;
 use App\Http\Requests\UpdateAdminRequest;
 use App\Models\Admin;
 use App\Models\Role;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AdminsController extends Controller
@@ -91,6 +93,15 @@ class AdminsController extends Controller
 
         $admin = Admin::create($data);
 
+        // إرسال إشعار للمسؤول الكبير
+        NotificationService::notifyAdminAction(
+            Auth::guard('admin')->user(),
+            'create',
+            'admin',
+            $admin->id,
+            route('admin.admins.show', $admin)
+        );
+
         return redirect()->route('admin.admins.index')
             ->with('success', 'تم إنشاء المسؤول بنجاح');
     }
@@ -146,6 +157,15 @@ class AdminsController extends Controller
         // Update only this specific admin
         $adminToUpdate->update($data);
 
+        // إرسال إشعار للمسؤول الكبير
+        NotificationService::notifyAdminAction(
+            Auth::guard('admin')->user(),
+            'update',
+            'admin',
+            $adminToUpdate->id,
+            route('admin.admins.show', $adminToUpdate)
+        );
+
         return redirect()->route('admin.admins.index')
             ->with('success', 'تم تحديث المسؤول بنجاح');
     }
@@ -161,7 +181,17 @@ class AdminsController extends Controller
                 ->with('error', 'لا يمكنك حذف حسابك الخاص');
         }
 
+        $adminId = $admin->id;
         $admin->delete();
+
+        // إرسال إشعار للمسؤول الكبير
+        NotificationService::notifyAdminAction(
+            Auth::guard('admin')->user(),
+            'delete',
+            'admin',
+            $adminId,
+            route('admin.admins.index')
+        );
 
         return redirect()->route('admin.admins.index')
             ->with('success', 'تم حذف المسؤول بنجاح');

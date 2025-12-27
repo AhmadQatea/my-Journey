@@ -1,16 +1,12 @@
-@extends('admin.layouts.admin')
-
-@section('title', 'إضافة مكان سياحي جديد')
-@section('page-title', 'إضافة مكان سياحي جديد')
-
-@section('content')
-<x-card title="معلومات المكان السياحي">
-    <form action="{{ route('admin.tourist-spots.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-6">
+<x-admin.create-form
+    title="إضافة مكان سياحي جديد"
+    :action="route('admin.tourist-spots.store')"
+    :back-route="route('admin.tourist-spots.index')"
+    submit-text="حفظ المكان السياحي"
+    :enctype="true"
+    layout="grid"
+>
+    <x-slot name="main">
                 <div class="form-group">
                     <label class="form-label">المحافظة *</label>
                     <select name="governorate_id"
@@ -130,58 +126,43 @@
                         value="{{ old('opening_hours') }}"
                     />
                 </div>
-            </div>
+    </x-slot>
 
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Images Upload -->
-                <x-card title="صور المكان السياحي" class="!mb-0">
-                    <div class="space-y-4">
-                        <div class="form-group">
-                            <label class="form-label">صور المكان السياحي *</label>
-                            <div class="image-upload-container">
-                                <input type="file"
-                                       name="images[]"
-                                       id="images"
-                                       accept="image/*"
-                                       multiple
-                                       class="form-control @error('images') is-invalid @enderror"
-                                       onchange="previewImages(this, 'imagesPreview')"
-                                       required>
-                                @error('images')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                @error('images.*')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div class="grid grid-cols-2 gap-4 mt-4" id="imagesPreview">
-                                    <div class="image-preview col-span-2">
-                                        <div class="preview-placeholder">
-                                            <i class="fas fa-images text-gray-400 text-4xl"></i>
-                                            <p class="text-gray-500 mt-2">معاينة الصور</p>
-                                        </div>
-                                    </div>
+    <x-slot name="sidebar">
+        <!-- Images Upload -->
+        <x-card title="صور المكان السياحي" class="!mb-0">
+            <div class="space-y-4">
+                <div class="form-group">
+                    <label class="form-label">صور المكان السياحي *</label>
+                    <div class="image-upload-container">
+                        <input type="file"
+                               name="images[]"
+                               id="images"
+                               accept="image/*"
+                               multiple
+                               class="form-control @error('images') is-invalid @enderror"
+                               onchange="previewImages(this, 'imagesPreview')"
+                               required>
+                        @error('images')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        @error('images.*')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div class="grid grid-cols-2 gap-4 mt-4" id="imagesPreview">
+                            <div class="image-preview col-span-2">
+                                <div class="preview-placeholder">
+                                    <i class="fas fa-images text-gray-400 text-4xl"></i>
+                                    <p class="text-gray-500 mt-2">معاينة الصور</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </x-card>
+                </div>
             </div>
-        </div>
-
-        <div class="flex justify-end gap-3 mt-6">
-            <a href="{{ route('admin.tourist-spots.index') }}"
-               class="px-6 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-500 transition-all duration-300">
-                إلغاء
-            </a>
-            <button type="submit"
-                    class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-black transition-all duration-300 shadow-lg hover:shadow-xl">
-                <i class="fas fa-save ml-2"></i>
-                حفظ المكان السياحي
-            </button>
-        </div>
-    </form>
-</x-card>
+        </x-card>
+    </x-slot>
+</x-admin.create-form>
 
 @push('scripts')
 <script>

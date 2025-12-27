@@ -12,3 +12,4 @@ Schedule::command('2fa:cleanup')->monthly();
 
 Schedule::command('inspire')->everyMinute();
 Schedule::command('passwords:cleanup')->daily();
+Schedule::command('notifications:clean')->hourly();

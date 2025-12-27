@@ -38,6 +38,11 @@
         </div>
 
         <div class="flex items-center gap-3">
+            <a href="{{ route('admin.users.contact', $user) }}"
+               class="btn btn-primary inline-flex items-center gap-2">
+                <i class="fas fa-envelope"></i>
+                <span>التواصل</span>
+            </a>
             <a href="{{ route('admin.users.edit', $user) }}"
                class="btn btn-warning inline-flex items-center gap-2">
                 <i class="fas fa-edit"></i>

@@ -5,7 +5,9 @@ use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\GovernorateController;
 use App\Http\Controllers\Admin\OfferController;
 use App\Http\Controllers\Admin\RoleController;
@@ -46,6 +48,8 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
 
     // Users
     Route::resource('users', UserController::class)->except(['create', 'store']);
+    Route::get('/users/{user}/contact', [UserController::class, 'showContactForm'])->name('users.contact');
+    Route::post('/users/{user}/contact', [UserController::class, 'sendContactMessage'])->name('users.contact.send');
     Route::post('/users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
     Route::post('/users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
     Route::post('/users/{user}/verify', [UserController::class, 'verify'])->name('users.verify');
@@ -80,6 +84,43 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     // Admins
     Route::resource('admins', AdminsController::class);
 
+    // Contact Messages & Feedback from users
+    Route::resource('contact-messages', ContactMessageController::class)->only(['index', 'show', 'destroy']);
+    Route::post('contact-messages/{contact_message}/reply', [ContactMessageController::class, 'reply'])
+        ->name('contact-messages.reply');
+
+    Route::resource('feedback', FeedbackController::class)->only(['index', 'show', 'destroy']);
+    Route::post('feedback/{feedback}/reply', [FeedbackController::class, 'reply'])
+        ->name('feedback.reply');
+
+    // Site Settings
+    Route::get('/site', [\App\Http\Controllers\Admin\SiteController::class, 'index'])
+        ->name('site.index');
+    Route::get('/site/edit', [\App\Http\Controllers\Admin\SiteController::class, 'edit'])
+        ->name('site.edit');
+    Route::put('/site', [\App\Http\Controllers\Admin\SiteController::class, 'update'])
+        ->name('site.update');
+
     // Roles
     Route::resource('roles', RoleController::class);
+
+    // Identity Verifications
+    Route::get('/identity-verifications', [\App\Http\Controllers\Admin\IdentityVerificationController::class, 'index'])
+        ->name('identity-verifications.index');
+    Route::get('/identity-verifications/{identityVerification}', [\App\Http\Controllers\Admin\IdentityVerificationController::class, 'show'])
+        ->name('identity-verifications.show');
+    Route::post('/identity-verifications/{identityVerification}/approve', [\App\Http\Controllers\Admin\IdentityVerificationController::class, 'approve'])
+        ->name('identity-verifications.approve');
+    Route::post('/identity-verifications/{identityVerification}/reject', [\App\Http\Controllers\Admin\IdentityVerificationController::class, 'reject'])
+        ->name('identity-verifications.reject');
+
+    // Notifications
+    Route::get('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])
+        ->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])
+        ->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])
+        ->name('notifications.mark-all-read');
+    Route::delete('/notifications/{notification}', [\App\Http\Controllers\Admin\NotificationController::class, 'destroy'])
+        ->name('notifications.destroy');
 });

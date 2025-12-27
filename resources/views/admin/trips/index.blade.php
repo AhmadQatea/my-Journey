@@ -351,11 +351,18 @@
                                             <p class="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 max-w-[200px]">
                                                 {{ Str::limit(strip_tags($trip->description), 60) }}
                                             </p>
-                                            @if($trip->source_type == 'vip_user')
+                                            @if($trip->source_type == 'vip_user' && $trip->creator)
                                                 <div class="flex items-center gap-1 mt-1">
                                                     <i class="fas fa-crown text-purple-500 text-xs"></i>
                                                     <span class="text-[10px] text-purple-600 dark:text-purple-400 font-medium">
                                                         {{ $trip->creator?->full_name ?? 'مستخدم VIP' }}
+                                                    </span>
+                                                </div>
+                                            @elseif($trip->created_by_admin && $trip->adminCreator)
+                                                <div class="flex items-center gap-1 mt-1">
+                                                    <i class="fas fa-user-shield text-emerald-500 text-xs"></i>
+                                                    <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                                                        {{ $trip->adminCreator->name }}
                                                     </span>
                                                 </div>
                                             @endif

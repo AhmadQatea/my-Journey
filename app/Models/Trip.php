@@ -33,6 +33,8 @@ class Trip extends Model
         'vip_commission',
         'source_type',
         'created_by',
+        'created_by_admin',
+        'created_by_admin_id',
         'status',
         'rejection_reason',
         'is_featured',
@@ -50,6 +52,7 @@ class Trip extends Model
         'price' => 'decimal:2',
         'vip_commission' => 'decimal:2',
         'is_featured' => 'boolean',
+        'created_by_admin' => 'boolean',
         'start_date' => 'date',
         'end_date' => 'date',
         'start_time' => 'datetime:H:i',
@@ -73,6 +76,12 @@ class Trip extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    // العلاقة مع المسؤول الذي أنشأ الرحلة
+    public function adminCreator()
+    {
+        return $this->belongsTo(\App\Models\Admin::class, 'created_by_admin_id');
     }
 
     // العلاقة مع الحجوزات

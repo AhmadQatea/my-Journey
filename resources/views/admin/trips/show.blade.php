@@ -401,6 +401,25 @@
                 </div>
             </div>
             @endif
+
+            <!-- Creator Info (Admin Trips) -->
+            @if($trip->created_by_admin && $trip->adminCreator)
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray mb-4">معلومات المنشئ</h3>
+                <div class="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                    <div class="w-12 h-12 rounded-full bg-emerald-500 text-gray flex items-center justify-center">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900 dark:text-gray">{{ $trip->adminCreator->name }}</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $trip->adminCreator->email }}</p>
+                        <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                            <i class="fas fa-shield-alt ml-1"></i> مسؤول
+                        </p>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </div>

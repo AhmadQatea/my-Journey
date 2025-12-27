@@ -38,6 +38,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'two_factor_confirmed_at' => 'datetime',
         'identity_verified' => 'boolean',
     ];
 
@@ -45,6 +46,20 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    // العلاقة مع الإشعارات
+    public function notifications()
+    {
+        return $this->hasMany(UserNotification::class);
+    }
+
+    /**
+     * الحصول على عدد الإشعارات غير المقروءة
+     */
+    public function getUnreadNotificationsCount(): int
+    {
+        return $this->notifications()->unread()->count();
     }
 
     // العلاقة مع المقالات
@@ -57,6 +72,12 @@ class User extends Authenticatable
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    // العلاقة مع طلبات توثيق الهوية
+    public function identityVerifications()
+    {
+        return $this->hasMany(IdentityVerification::class);
     }
 
     // التحقق من الصلاحيات

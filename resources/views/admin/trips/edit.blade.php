@@ -1,36 +1,19 @@
-{{-- resources/views/admin/trips/edit.blade.php --}}
-@extends('admin.layouts.admin')
-
-@section('title', 'تعديل الرحلة: ' . $trip->title)
-@section('page-title', 'تعديل الرحلة: ' . $trip->title)
-
-@section('content')
-<div class="container mx-auto px-4 py-4">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">تعديل الرحلة</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $trip->title }}</p>
+<x-admin.edit-form
+    title="تعديل الرحلة"
+    :page-title="'تعديل الرحلة: ' . $trip->title"
+    :action="route('admin.trips.update', $trip)"
+    :model="$trip"
+    :back-route="route('admin.trips.index')"
+    submit-text="حفظ التعديلات"
+    :enctype="true"
+    layout="grid"
+>
+    <!-- Basic Information -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">المعلومات الأساسية</h3>
         </div>
-        <a href="{{ route('admin.trips.index') }}" class="btn btn-outline inline-flex items-center gap-2">
-            <i class="fas fa-arrow-right"></i>
-            <span>رجوع للقائمة</span>
-        </a>
-    </div>
-
-    <form action="{{ route('admin.trips.update', $trip) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Basic Information -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">المعلومات الأساسية</h3>
-                    </div>
-                    <div class="card-body space-y-4">
+        <div class="card-body space-y-4">
                         <div class="form-group">
                             <label class="form-label">عنوان الرحلة *</label>
                             <input type="text" name="title" class="form-control @error('title') is-invalid @enderror"
@@ -442,18 +425,8 @@
                         <button type="submit" class="btn btn-primary w-full">
                             <i class="fas fa-save ml-1"></i>
                             حفظ التعديلات
-                        </button>
-                        <a href="{{ route('admin.trips.index') }}" class="btn btn-outline w-full">
-                            <i class="fas fa-times ml-1"></i>
-                            إلغاء
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
-@endsection
+    </div>
+</x-admin.edit-form>
 
 @push('scripts')
 <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>

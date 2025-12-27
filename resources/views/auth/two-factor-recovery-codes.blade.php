@@ -35,10 +35,10 @@
                         <h5 class="text-dark mb-3">أكواد الاسترجاع:</h5>
                         <div class="row g-2">
                             @php
-                                // Get recovery codes from session or from user model using Fortify
-                                $codes = session('recoveryCodes') ?? (is_array($recoveryCodes) ? $recoveryCodes : []) ?? Auth::user()->recoveryCodes() ?? [];
+                                // Get recovery codes from session first, then from controller
+                                $codes = session('recoveryCodes') ?? (is_array($recoveryCodes) ? $recoveryCodes : []);
                             @endphp
-                            @if(count($codes) > 0)
+                            @if(!empty($codes) && count($codes) > 0)
                                 @foreach($codes as $index => $code)
                                     <div class="col-md-6">
                                         <div class="card bg-light">
@@ -58,7 +58,7 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <form method="POST" action="/user/two-factor-recovery-codes" class="mb-2">
+                        <form method="POST" action="{{ route('two-factor.generate-recovery-codes') }}" class="mb-2">
                             @csrf
                             <button type="submit" class="btn btn-warning w-100" onclick="return confirm('هل أنت متأكد؟ سيتم استبدال جميع أكواد الاسترجاع الحالية بأكواد جديدة.')">
                                 <i class="fas fa-redo me-2"></i>إنشاء أكواد استرجاع جديدة

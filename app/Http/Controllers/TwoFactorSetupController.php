@@ -31,24 +31,24 @@ class TwoFactorSetupController extends Controller
     }
 
     /**
-     * Show recovery codes using Fortify
+     * Show recovery codes
+     * Reads directly from database to avoid Fortify encryption/decryption issues
      */
     public function showRecoveryCodes()
     {
         $user = Auth::user();
+        $recoveryCodes = [];
 
-        // Get recovery codes using Fortify method
-        // Fortify stores recovery codes in two_factor_recovery_codes as JSON
-        $recoveryCodes = $user->recoveryCodes();
-
-        // If recovery codes are stored as JSON string, decode them
-        if (is_string($recoveryCodes)) {
-            $recoveryCodes = json_decode($recoveryCodes, true) ?? [];
-        }
-
-        // If still empty, check if they exist in the database
-        if (empty($recoveryCodes) && $user->two_factor_recovery_codes) {
-            $recoveryCodes = json_decode($user->two_factor_recovery_codes, true) ?? [];
+        // Always read directly from database (stored as plain JSON)
+        // This avoids "The payload is invalid" error from Fortify
+        if ($user->two_factor_recovery_codes) {
+            $decoded = json_decode($user->two_factor_recovery_codes, true);
+            if (is_array($decoded)) {
+                $recoveryCodes = $decoded;
+            } elseif (is_string($user->two_factor_recovery_codes)) {
+                // If it's a string, try to decode it
+                $recoveryCodes = json_decode($user->two_factor_recovery_codes, true) ?? [];
+            }
         }
 
         return view('auth.two-factor-recovery-codes', compact('recoveryCodes'));

@@ -7,6 +7,7 @@ use App\Models\Governorate;
 use App\Models\Offer;
 use App\Models\Trip;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OfferController extends AdminController
 {
@@ -15,7 +16,7 @@ class OfferController extends AdminController
      */
     public function index(Request $request)
     {
-        $query = Offer::with(['trip.governorate', 'trip.departureGovernorate', 'creator']);
+        $query = Offer::with(['trip.governorate', 'trip.departureGovernorate', 'creator', 'adminCreator']);
 
         // فلترة حسب الحالة
         if ($request->filled('status')) {
@@ -66,7 +67,13 @@ class OfferController extends AdminController
     public function store(OfferRequest $request)
     {
         $data = $request->validated();
-        $data['created_by'] = auth()->id();
+        // إزالة created_by من البيانات إذا كان موجوداً (من الطلب)
+        unset($data['created_by']);
+        // المسؤولون ليسوا في جدول users، لذا نضع null
+        $data['created_by'] = null;
+        // حفظ معلومات المسؤول الذي أنشأ العرض
+        $data['created_by_admin'] = true;
+        $data['created_by_admin_id'] = Auth::guard('admin')->id();
 
         // معالجة الأماكن المضمنة - تصفية القيم الفارغة
         if ($request->filled('custom_included_places')) {
@@ -99,7 +106,7 @@ class OfferController extends AdminController
      */
     public function show(Offer $deal)
     {
-        $deal->load(['trip.governorate', 'trip.departureGovernorate', 'creator', 'customDepartureGovernorate']);
+        $deal->load(['trip.governorate', 'trip.departureGovernorate', 'creator', 'adminCreator', 'customDepartureGovernorate']);
 
         return view('admin.deals.show', compact('deal'));
     }

@@ -1,37 +1,18 @@
-{{-- resources/views/admin/bookings/edit.blade.php --}}
-@extends('admin.layouts.admin')
-
-@section('title', 'تعديل الحجز: #' . $booking->id)
-@section('page-title', 'تعديل الحجز: #' . $booking->id)
-
-@section('content')
-<div class="container mx-auto px-4 py-4">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">تعديل الحجز</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">الحجز #{{ $booking->id }}</p>
+<x-admin.edit-form
+    title="تعديل الحجز"
+    :page-title="'تعديل الحجز: #' . $booking->id"
+    :action="route('admin.bookings.update', $booking)"
+    :model="$booking"
+    :back-route="route('admin.bookings.index')"
+    submit-text="حفظ التعديلات"
+    layout="grid"
+>
+    <!-- Basic Information -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">المعلومات الأساسية</h3>
         </div>
-        <a href="{{ route('admin.bookings.index') }}"
-           class="btn btn-outline inline-flex items-center gap-2">
-            <i class="fas fa-arrow-right"></i>
-            <span>رجوع للقائمة</span>
-        </a>
-    </div>
-
-    <form action="{{ route('admin.bookings.update', $booking) }}" method="POST">
-        @csrf
-        @method('PUT')
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Basic Information -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">المعلومات الأساسية</h3>
-                    </div>
-                    <div class="card-body space-y-4">
+        <div class="card-body space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="form-group">
                                 <label class="form-label">المستخدم *</label>
@@ -193,26 +174,9 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Submit Button -->
-                <div class="card">
-                    <div class="card-body p-4">
-                        <button type="submit" class="btn btn-primary w-full">
-                            <i class="fas fa-save ml-1"></i>
-                            حفظ التعديلات
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
-    </form>
-</div>
-@endsection
+    </div>
+</x-admin.edit-form>
 
 @push('scripts')
 <script>

@@ -41,6 +41,20 @@ class Admin extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    // العلاقة مع الإشعارات
+    public function notifications()
+    {
+        return $this->hasMany(AdminNotification::class);
+    }
+
+    /**
+     * الحصول على عدد الإشعارات غير المقروءة
+     */
+    public function getUnreadNotificationsCount(): int
+    {
+        return $this->notifications()->unread()->count();
+    }
+
     // التحقق من الصلاحيات
     public function hasRole($role)
     {

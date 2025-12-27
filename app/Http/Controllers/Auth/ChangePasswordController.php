@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\PasswordResetCode;
 use App\Notifications\PasswordResetCodeNotification;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -223,6 +224,7 @@ class ChangePasswordController extends Controller
 
         // إرسال إشعار
         $user->notify(new \App\Notifications\PasswordChangedNotification);
+        NotificationService::notifyPasswordChanged($user);
 
         // تنظيف الجلسة
         session()->forget(['password_change_verified', 'password_change_code_sent', 'password_change_code']);

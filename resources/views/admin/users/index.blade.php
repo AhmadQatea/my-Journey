@@ -226,7 +226,10 @@
                                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-warning btn-sm" title="تعديل">
                                             <i class="fas fa-edit"></i>
                                         </a>
-    </div>
+                                        <a href="{{ route('admin.users.contact', $user) }}" class="btn btn-primary btn-sm" title="التواصل">
+                                            <i class="fas fa-envelope"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach

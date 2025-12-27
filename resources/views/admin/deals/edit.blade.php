@@ -1,37 +1,18 @@
-{{-- resources/views/admin/deals/edit.blade.php --}}
-@extends('admin.layouts.admin')
-
-@section('title', 'تعديل العرض: ' . $deal->title)
-@section('page-title', 'تعديل العرض: ' . $deal->title)
-
-@section('content')
-<div class="container mx-auto px-4 py-4">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">تعديل العرض</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $deal->title }}</p>
+<x-admin.edit-form
+    title="تعديل العرض"
+    :page-title="'تعديل العرض: ' . $deal->title"
+    :action="route('admin.deals.update', $deal)"
+    :model="$deal"
+    :back-route="route('admin.deals.index')"
+    submit-text="حفظ التعديلات"
+    layout="grid"
+>
+    <!-- Basic Information -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">المعلومات الأساسية</h3>
         </div>
-        <a href="{{ route('admin.deals.index') }}"
-           class="btn btn-outline inline-flex items-center gap-2">
-            <i class="fas fa-arrow-right"></i>
-            <span>رجوع للقائمة</span>
-        </a>
-    </div>
-
-    <form action="{{ route('admin.deals.update', $deal) }}" method="POST">
-        @csrf
-        @method('PUT')
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Basic Information -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">المعلومات الأساسية</h3>
-                    </div>
-                    <div class="card-body space-y-4">
+        <div class="card-body space-y-4">
                         <div class="form-group">
                             <label class="form-label">عنوان العرض *</label>
                             <input type="text"
@@ -328,39 +309,25 @@
                         </div>
                     </div>
                 </div>
+    </div>
+
+    <x-slot name="sidebar">
+        <!-- Trip Info -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">معلومات الرحلة المرتبطة</h3>
             </div>
-
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Submit Button -->
-                <div class="card">
-                    <div class="card-body p-4">
-                        <button type="submit" class="btn btn-primary w-full">
-                            <i class="fas fa-save ml-1"></i>
-                            حفظ التعديلات
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Trip Info -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">معلومات الرحلة المرتبطة</h3>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="space-y-2 text-sm">
-                            <div><strong>العنوان:</strong> {{ $deal->trip->title }}</div>
-                            <div><strong>المحافظة:</strong> {{ $deal->trip->governorate->name }}</div>
-                            <div><strong>السعر الأصلي:</strong> {{ number_format($deal->trip->price, 0) }} ل.س</div>
-                            <div><strong>المدة:</strong> {{ $deal->trip->duration_hours }} ساعة</div>
-                        </div>
-                    </div>
+            <div class="card-body p-4">
+                <div class="space-y-2 text-sm">
+                    <div><strong>العنوان:</strong> {{ $deal->trip->title }}</div>
+                    <div><strong>المحافظة:</strong> {{ $deal->trip->governorate->name }}</div>
+                    <div><strong>السعر الأصلي:</strong> {{ number_format($deal->trip->price, 0) }} ل.س</div>
+                    <div><strong>المدة:</strong> {{ $deal->trip->duration_hours }} ساعة</div>
                 </div>
             </div>
         </div>
-    </form>
-</div>
-@endsection
+    </x-slot>
+</x-admin.edit-form>
 
 @push('scripts')
 <script>

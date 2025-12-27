@@ -1,21 +1,18 @@
-@extends('admin.layouts.admin')
-
 @php
     use Illuminate\Support\Facades\Storage;
 @endphp
 
-@section('title', 'تعديل المكان السياحي')
-@section('page-title', 'تعديل المكان السياحي: ' . $touristSpot->name)
-
-@section('content')
-<x-card title="معلومات المكان السياحي">
-    <form action="{{ route('admin.tourist-spots.update', $touristSpot) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-6">
+<x-admin.edit-form
+    title="تعديل المكان السياحي"
+    :page-title="'تعديل المكان السياحي: ' . $touristSpot->name"
+    :action="route('admin.tourist-spots.update', $touristSpot)"
+    :model="$touristSpot"
+    :back-route="route('admin.tourist-spots.index')"
+    submit-text="حفظ التغييرات"
+    :enctype="true"
+    layout="grid"
+>
+    <x-slot name="main">
                 <div class="form-group">
                     <label class="form-label">المحافظة *</label>
                     <select name="governorate_id"
@@ -135,92 +132,77 @@
                         value="{{ old('opening_hours', $touristSpot->opening_hours) }}"
                     />
                 </div>
+    </x-slot>
+
+    <x-slot name="sidebar">
+        <!-- Current Images -->
+        @if($touristSpot->images && count($touristSpot->images) > 0)
+        <x-card title="الصور الحالية" class="!mb-0">
+            <div class="grid grid-cols-2 gap-3">
+                @foreach($touristSpot->images as $image)
+                <div class="relative group">
+                    <img src="{{ Storage::url($image) }}"
+                         alt="{{ $touristSpot->name }}"
+                         class="w-full h-24 object-cover rounded-lg shadow-md">
+                </div>
+                @endforeach
             </div>
+        </x-card>
+        @endif
 
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Current Images -->
-                @if($touristSpot->images && count($touristSpot->images) > 0)
-                <x-card title="الصور الحالية" class="!mb-0">
-                    <div class="grid grid-cols-2 gap-3">
-                        @foreach($touristSpot->images as $image)
-                        <div class="relative group">
-                            <img src="{{ Storage::url($image) }}"
-                                 alt="{{ $touristSpot->name }}"
-                                 class="w-full h-24 object-cover rounded-lg shadow-md">
-                        </div>
-                        @endforeach
-                    </div>
-                </x-card>
-                @endif
-
-                <!-- New Images Upload -->
-                <x-card title="{{ $touristSpot->images && count($touristSpot->images) > 0 ? 'إضافة صور جديدة' : 'صور المكان السياحي' }}" class="!mb-0">
-                    <div class="space-y-4">
-                        <div class="form-group">
-                            <label class="form-label">{{ $touristSpot->images && count($touristSpot->images) > 0 ? 'صور إضافية' : 'صور المكان السياحي' }}</label>
-                            <div class="image-upload-container">
-                                <input type="file"
-                                       name="images[]"
-                                       id="images"
-                                       accept="image/*"
-                                       multiple
-                                       class="form-control @error('images') is-invalid @enderror"
-                                       onchange="previewImages(this, 'imagesPreview')">
-                                @error('images')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                @error('images.*')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div class="grid grid-cols-2 gap-4 mt-4" id="imagesPreview">
-                                    @if(!$touristSpot->images || count($touristSpot->images) == 0)
-                                    <div class="image-preview col-span-2">
-                                        <div class="preview-placeholder">
-                                            <i class="fas fa-images text-gray-400 text-4xl"></i>
-                                            <p class="text-gray-500 mt-2">معاينة الصور</p>
-                                        </div>
-                                    </div>
-                                    @endif
+        <!-- New Images Upload -->
+        <x-card title="{{ $touristSpot->images && count($touristSpot->images) > 0 ? 'إضافة صور جديدة' : 'صور المكان السياحي' }}" class="!mb-0">
+            <div class="space-y-4">
+                <div class="form-group">
+                    <label class="form-label">{{ $touristSpot->images && count($touristSpot->images) > 0 ? 'صور إضافية' : 'صور المكان السياحي' }}</label>
+                    <div class="image-upload-container">
+                        <input type="file"
+                               name="images[]"
+                               id="images"
+                               accept="image/*"
+                               multiple
+                               class="form-control @error('images') is-invalid @enderror"
+                               onchange="previewImages(this, 'imagesPreview')">
+                        @error('images')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        @error('images.*')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div class="grid grid-cols-2 gap-4 mt-4" id="imagesPreview">
+                            @if(!$touristSpot->images || count($touristSpot->images) == 0)
+                            <div class="image-preview col-span-2">
+                                <div class="preview-placeholder">
+                                    <i class="fas fa-images text-gray-400 text-4xl"></i>
+                                    <p class="text-gray-500 mt-2">معاينة الصور</p>
                                 </div>
                             </div>
+                            @endif
                         </div>
                     </div>
-                </x-card>
-
-                <!-- Statistics -->
-                <x-card title="معلومات إضافية" class="!mb-0">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">عدد الصور</span>
-                            <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ $touristSpot->images ? count($touristSpot->images) : 0 }}</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">المحافظة</span>
-                            <span class="font-bold text-indigo-600 dark:text-indigo-400">{{ $touristSpot->governorate->name }}</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">تاريخ الإنشاء</span>
-                            <span class="font-bold text-gray-700 dark:text-gray-500">{{ $touristSpot->created_at->format('Y/m/d') }}</span>
-                        </div>
-                    </div>
-                </x-card>
+                </div>
             </div>
-        </div>
+        </x-card>
 
-        <div class="flex justify-end gap-3 mt-6">
-            <a href="{{ route('admin.tourist-spots.index') }}"
-               class="px-6 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-500 transition-all duration-300">
-                إلغاء
-            </a>
-            <button type="submit"
-                    class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-black transition-all duration-300 shadow-lg hover:shadow-xl">
-                <i class="fas fa-save ml-2"></i>
-                حفظ التغييرات
-            </button>
-        </div>
-    </form>
-</x-card>
+        <!-- Statistics -->
+        <x-card title="معلومات إضافية" class="!mb-0">
+            <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">عدد الصور</span>
+                    <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ $touristSpot->images ? count($touristSpot->images) : 0 }}</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">المحافظة</span>
+                    <span class="font-bold text-indigo-600 dark:text-indigo-400">{{ $touristSpot->governorate->name }}</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">تاريخ الإنشاء</span>
+                    <span class="font-bold text-gray-700 dark:text-gray-500">{{ $touristSpot->created_at->format('Y/m/d') }}</span>
+                </div>
+            </div>
+        </x-card>
+    </x-slot>
+</x-admin.edit-form>
 
 @push('scripts')
 <script>

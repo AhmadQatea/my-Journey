@@ -1,36 +1,16 @@
-{{-- resources/views/admin/deals/create.blade.php --}}
-@extends('admin.layouts.admin')
-
-@section('title', 'إضافة عرض جديد')
-@section('page-title', 'إضافة عرض جديد')
-
-@section('content')
-<div class="container mx-auto px-4 py-4">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">إضافة عرض جديد</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">أنشئ عرضاً خاصاً بناءً على رحلة موجودة</p>
+<x-admin.create-form
+    title="إضافة عرض جديد"
+    :action="route('admin.deals.store')"
+    :back-route="route('admin.deals.index')"
+    submit-text="حفظ العرض"
+    layout="grid"
+>
+    <!-- Basic Information -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">المعلومات الأساسية</h3>
         </div>
-        <a href="{{ route('admin.deals.index') }}"
-           class="btn btn-outline inline-flex items-center gap-2">
-            <i class="fas fa-arrow-right"></i>
-            <span>رجوع للقائمة</span>
-        </a>
-    </div>
-
-    <form action="{{ route('admin.deals.store') }}" method="POST">
-        @csrf
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Basic Information -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">المعلومات الأساسية</h3>
-                    </div>
-                    <div class="card-body space-y-4">
+        <div class="card-body space-y-4">
                         <div class="form-group">
                             <label class="form-label">عنوان العرض *</label>
                             <input type="text"
@@ -331,36 +311,22 @@
                         </div>
                     </div>
                 </div>
+    </div>
+
+    <x-slot name="sidebar">
+        <!-- Trip Info Preview -->
+        <div class="card" id="tripInfoPreview" style="display: none;">
+            <div class="card-header">
+                <h3 class="card-title">معلومات الرحلة المختارة</h3>
             </div>
-
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Submit Button -->
-                <div class="card">
-                    <div class="card-body p-4">
-                        <button type="submit" class="btn btn-primary w-full">
-                            <i class="fas fa-save ml-1"></i>
-                            حفظ العرض
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Trip Info Preview -->
-                <div class="card" id="tripInfoPreview" style="display: none;">
-                    <div class="card-header">
-                        <h3 class="card-title">معلومات الرحلة المختارة</h3>
-                    </div>
-                    <div class="card-body p-4">
-                        <div id="tripInfoContent">
-                            <!-- سيتم ملؤها بـ JavaScript -->
-                        </div>
-                    </div>
+            <div class="card-body p-4">
+                <div id="tripInfoContent">
+                    <!-- سيتم ملؤها بـ JavaScript -->
                 </div>
             </div>
         </div>
-    </form>
-</div>
-@endsection
+    </x-slot>
+</x-admin.create-form>
 
 @push('scripts')
 <script>

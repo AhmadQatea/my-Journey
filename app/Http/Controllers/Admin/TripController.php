@@ -15,6 +15,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
@@ -30,7 +31,7 @@ class TripController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Trip::with(['governorate', 'creator'])
+        $query = Trip::with(['governorate', 'creator', 'adminCreator'])
             ->when($request->filled('search'), function ($q) use ($request) {
                 $q->where('title', 'like', '%'.$request->search.'%')
                     ->orWhere('description', 'like', '%'.$request->search.'%');
@@ -97,7 +98,11 @@ class TripController extends Controller
         try {
             $data = $request->validated();
             $data['source_type'] = 'admin';
-            $data['created_by'] = Auth::id();
+            // المسؤولون ليسوا في جدول users، لذا نضع null
+            $data['created_by'] = null;
+            // حفظ معلومات المسؤول الذي أنشأ الرحلة
+            $data['created_by_admin'] = true;
+            $data['created_by_admin_id'] = Auth::guard('admin')->id();
             $data['status'] = 'مقبولة'; // الرحلات التي ينشئها المسؤولون مقبولة (مفعلة) تلقائياً
             $data['available_seats'] = $data['max_persons']; // عند الإنشاء، المقاعد المتاحة = العدد الأقصى
 
@@ -154,7 +159,7 @@ class TripController extends Controller
      */
     public function show(Trip $trip)
     {
-        $trip->load(['governorate', 'creator', 'bookings.user']);
+        $trip->load(['governorate', 'creator', 'adminCreator', 'bookings.user']);
 
         return view('admin.trips.show', compact('trip'));
     }
@@ -479,46 +484,83 @@ class TripController extends Controller
      */
     public function getTouristSpotsByGovernorates(Request $request)
     {
-        $governorateIds = [];
+        try {
+            $governorateIds = [];
 
-        // جلب المحافظات من query parameters
-        if ($request->has('governorate_ids')) {
-            $ids = is_array($request->governorate_ids)
-                ? $request->governorate_ids
-                : explode(',', $request->governorate_ids);
-            $governorateIds = array_merge($governorateIds, $ids);
-        }
+            // جلب المحافظات من query parameters (array format)
+            if ($request->has('governorate_ids')) {
+                $ids = $request->input('governorate_ids', []);
 
-        // إضافة المحافظة الرئيسية إذا كانت موجودة
-        if ($request->filled('main_governorate_id')) {
-            $governorateIds[] = $request->main_governorate_id;
-        }
+                // إذا كان string، نحوله إلى array
+                if (is_string($ids)) {
+                    $ids = explode(',', $ids);
+                }
 
-        // إزالة التكرار والقيم الفارغة
-        $governorateIds = array_filter(array_unique(array_map('intval', $governorateIds)));
+                // التأكد من أنه array
+                if (is_array($ids)) {
+                    $governorateIds = array_merge($governorateIds, $ids);
+                }
+            }
 
-        if (empty($governorateIds)) {
+            // إضافة المحافظة الرئيسية إذا كانت موجودة
+            if ($request->filled('main_governorate_id')) {
+                $mainId = $request->input('main_governorate_id');
+                if (!in_array($mainId, $governorateIds)) {
+                    $governorateIds[] = $mainId;
+                }
+            }
+
+            // إزالة التكرار والقيم الفارغة وتحويل إلى integers
+            $governorateIds = array_filter(
+                array_unique(
+                    array_map('intval', $governorateIds)
+                ),
+                function ($id) {
+                    return $id > 0;
+                }
+            );
+
+            if (empty($governorateIds)) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'لا توجد محافظات محددة',
+                    'tourist_spots' => [],
+                    'count' => 0,
+                ], 200);
+            }
+
+            // جلب الأماكن السياحية
+            $touristSpots = TouristSpot::whereIn('governorate_id', $governorateIds)
+                ->with('governorate')
+                ->orderBy('name')
+                ->get()
+                ->map(function ($spot) {
+                    return [
+                        'id' => $spot->id,
+                        'name' => $spot->name,
+                        'governorate_id' => $spot->governorate_id,
+                        'governorate_name' => $spot->governorate->name ?? 'غير محدد',
+                    ];
+                });
+
             return response()->json([
                 'success' => true,
+                'message' => 'تم جلب الأماكن السياحية بنجاح',
+                'tourist_spots' => $touristSpots,
+                'count' => $touristSpots->count(),
+                'governorate_ids' => $governorateIds,
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching tourist spots: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء جلب الأماكن السياحية',
+                'error' => config('app.debug') ? $e->getMessage() : null,
                 'tourist_spots' => [],
-            ]);
+                'count' => 0,
+            ], 500);
         }
-
-        $touristSpots = TouristSpot::whereIn('governorate_id', $governorateIds)
-            ->with('governorate')
-            ->orderBy('name')
-            ->get()
-            ->map(function ($spot) {
-                return [
-                    'id' => $spot->id,
-                    'name' => $spot->name,
-                    'governorate_name' => $spot->governorate->name,
-                ];
-            });
-
-        return response()->json([
-            'success' => true,
-            'tourist_spots' => $touristSpots,
-        ]);
     }
 }

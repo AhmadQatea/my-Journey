@@ -52,7 +52,7 @@
                                 <i class="fas fa-sign-in-alt me-2"></i>تأكيد وتسجيل الدخول
                             </button>
 
-                            <a href="/two-factor/recovery-codes" class="btn btn-outline-secondary">
+                            <a href="{{ route('two-factor.recovery-codes.show') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-key me-2"></i>استخدام كود استرجاع
                             </a>
                         </div>
