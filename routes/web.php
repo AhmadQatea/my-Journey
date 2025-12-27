@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Website\AboutController;
 use App\Http\Controllers\Website\ArticlesController;
 use App\Http\Controllers\Website\ContactController;
@@ -8,6 +9,9 @@ use App\Http\Controllers\Website\LegalController;
 use App\Http\Controllers\Website\ProvincesController;
 use App\Http\Controllers\Website\TripsController;
 use Illuminate\Support\Facades\Route;
+
+// تبديل اللغة
+Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 
 // الصفحة الرئيسية للزوار
 Route::get('/', [HomeController::class, 'index'])->name('home');

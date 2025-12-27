@@ -1,15 +1,15 @@
 @extends('website.pages.layouts.app')
 
-@section('title', 'الرحلات والعروض - MyJourney')
+@section('title', __('messages.trips') . ' - MyJourney')
 
 @section('content')
     <!-- ========== TRIPS HERO ========== -->
     <section class="hero-section" style="background: var(--gradient-primary);">
         <div class="container">
             <div class="hero-content">
-                <h1 class="hero-title">الرحلات والعروض</h1>
+                <h1 class="hero-title">{{ __('messages.trips') }}</h1>
                 <p class="hero-subtitle">
-                    اكتشف مجموعة واسعة من الرحلات السياحية في جميع أنحاء سوريا
+                    {{ app()->getLocale() === 'ar' ? 'اكتشف مجموعة واسعة من الرحلات السياحية في جميع أنحاء سوريا' : 'Discover a wide range of tourist trips throughout Syria' }}
                 </p>
             </div>
         </div>
@@ -25,9 +25,9 @@
                         <div class="filters-grid">
                             <!-- Province Filter -->
                             <div class="filter-group">
-                                <label for="province"><i class="fas fa-map-marker-alt"></i> المحافظة</label>
+                                <label for="province"><i class="fas fa-map-marker-alt"></i> {{ __('messages.province_filter') }}</label>
                                 <select name="province" id="province" class="form-select" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md);">
-                                    <option value="">جميع المحافظات</option>
+                                    <option value="">{{ __('messages.all_provinces') }}</option>
                                     @foreach($governorates as $governorate)
                                         <option value="{{ $governorate->id }}" {{ request('province') == $governorate->id ? 'selected' : '' }}>
                                             {{ $governorate->name }}
@@ -38,9 +38,9 @@
 
                             <!-- Trip Type Filter -->
                             <div class="filter-group">
-                                <label for="type"><i class="fas fa-tags"></i> نوع الرحلة</label>
+                                <label for="type"><i class="fas fa-tags"></i> {{ __('messages.type_filter') }}</label>
                                 <select name="type" id="type" class="form-select">
-                                    <option value="">جميع الأنواع</option>
+                                    <option value="">{{ __('messages.all_types') }}</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->name }}" {{ request('type') == $category->name ? 'selected' : '' }}>
                                             {{ $category->name }}
@@ -51,9 +51,9 @@
 
                             <!-- Price Range -->
                             <div class="filter-group">
-                                <label for="price"><i class="fas fa-money-bill-wave"></i> نطاق السعر</label>
+                                <label for="price"><i class="fas fa-money-bill-wave"></i> {{ __('messages.price_range') }}</label>
                                 <select name="price" id="price" class="form-select">
-                                    <option value="">جميع الأسعار</option>
+                                    <option value="">{{ __('messages.all_prices') }}</option>
                                     <option value="0-5000" {{ request('price') == '0-5000' ? 'selected' : '' }}>أقل من 5000 ل.س</option>
                                     <option value="5000-10000" {{ request('price') == '5000-10000' ? 'selected' : '' }}>5000 - 10000 ل.س</option>
                                     <option value="10000-20000" {{ request('price') == '10000-20000' ? 'selected' : '' }}>10000 - 20000 ل.س</option>
@@ -63,9 +63,9 @@
 
                             <!-- Duration -->
                             <div class="filter-group">
-                                <label for="duration"><i class="fas fa-clock"></i> المدة</label>
+                                <label for="duration"><i class="fas fa-clock"></i> {{ __('messages.duration_filter') }}</label>
                                 <select name="duration" id="duration" class="form-select">
-                                    <option value="">جميع المدد</option>
+                                    <option value="">{{ __('messages.all_durations') }}</option>
                                     <option value="1-3" {{ request('duration') == '1-3' ? 'selected' : '' }}>1-3 ساعات</option>
                                     <option value="3-6" {{ request('duration') == '3-6' ? 'selected' : '' }}>3-6 ساعات</option>
                                     <option value="6-12" {{ request('duration') == '6-12' ? 'selected' : '' }}>6-12 ساعة</option>
@@ -78,7 +78,7 @@
                                 <label style="visibility: hidden;">بحث</label>
                                 <button type="submit" class="btn btn-primary" style="width: 100%;">
                                     <i class="fas fa-search"></i>
-                                    بحث
+                                    {{ __('messages.search') }}
                                 </button>
                             </div>
                         </div>
@@ -93,8 +93,8 @@
     <section class="section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">عروض خاصة</h2>
-                <p class="section-subtitle">استفد من أفضل العروض المميزة</p>
+                <h2 class="section-title">{{ __('messages.special_offers') }}</h2>
+                <p class="section-subtitle">{{ app()->getLocale() === 'ar' ? 'استفد من أفضل العروض المميزة' : 'Take advantage of the best exclusive offers' }}</p>
             </div>
 
             <!-- Offers Slider -->
@@ -164,12 +164,12 @@
                                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                                         <a href="{{ route('trips.show', $offer->trip) }}" class="btn btn-outline btn-sm" style="border-color: var(--primary); color: var(--primary);">
                                             <i class="fas fa-eye"></i>
-                                            عرض الرحلة
+                                            {{ __('messages.view_trip') }}
                                         </a>
                                         @auth
                                             <a href="{{ route('bookings.create', ['trip_id' => $offer->trip->id, 'offer_id' => $offer->id]) }}" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-calendar-check"></i>
-                                                احجز
+                                                {{ __('messages.book') }}
                                             </a>
                                         @else
                                             <a href="{{ route('login') }}" class="btn btn-primary btn-sm">
@@ -204,8 +204,8 @@
     <section class="section" style="background: var(--gray-50);">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">جميع الرحلات</h2>
-                <p class="section-subtitle">اختر رحلتك المفضلة من بين مجموعة واسعة من الخيارات</p>
+                <h2 class="section-title">{{ __('messages.all_trips') }}</h2>
+                <p class="section-subtitle">{{ app()->getLocale() === 'ar' ? 'اختر رحلتك المفضلة من بين مجموعة واسعة من الخيارات' : 'Choose your favorite trip from a wide range of options' }}</p>
             </div>
 
             <!-- Trips Grid -->
@@ -272,12 +272,12 @@
                                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                                         <a href="{{ route('trips.show', $trip) }}" class="btn btn-outline btn-sm" style="border-color: var(--primary); color: var(--primary);">
                                             <i class="fas fa-eye"></i>
-                                            عرض الرحلة
+                                            {{ __('messages.view_trip') }}
                                         </a>
                                         @auth
                                             <a href="{{ route('bookings.create', ['trip_id' => $trip->id]) }}" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-calendar-check"></i>
-                                                احجز
+                                                {{ __('messages.book') }}
                                             </a>
                                         @else
                                             <a href="{{ route('login') }}" class="btn btn-primary btn-sm">

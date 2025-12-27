@@ -1,16 +1,16 @@
 {{-- resources/views/admin/bookings/index.blade.php --}}
 @extends('admin.layouts.admin')
 
-@section('title', 'إدارة الحجوزات')
-@section('page-title', 'إدارة الحجوزات')
+@section('title', __('messages.manage_bookings'))
+@section('page-title', __('messages.manage_bookings'))
 
 @section('content')
 <div class="container mx-auto px-4 py-4">
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">إدارة الحجوزات</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">إدارة جميع الحجوزات في النظام</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">{{ __('messages.manage_bookings') }}</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ __('messages.manage_all_bookings') }}</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -18,22 +18,22 @@
             <div class="hidden sm:flex items-center gap-4 text-sm">
                 <div class="flex items-center gap-1">
                     <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                    <span class="text-gray-600 dark:text-gray-400">مؤكدة: {{ $stats['confirmed'] }}</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ __('messages.confirmed') }}: {{ $stats['confirmed'] }}</span>
                 </div>
                 <div class="flex items-center gap-1">
                     <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <span class="text-gray-600 dark:text-gray-400">معلقة: {{ $stats['pending'] }}</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ __('messages.pending') }}: {{ $stats['pending'] }}</span>
                 </div>
                 <div class="flex items-center gap-1">
                     <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                    <span class="text-gray-600 dark:text-gray-400">مرفوضة: {{ $stats['rejected'] }}</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ __('messages.rejected') }}: {{ $stats['rejected'] }}</span>
                 </div>
             </div>
 
             <a href="{{ route('admin.bookings.create') }}"
                class="btn btn-primary inline-flex items-center gap-2">
                 <i class="fas fa-plus text-sm"></i>
-                <span>إضافة حجز جديد</span>
+                <span>{{ __('messages.add_new_booking') }}</span>
             </a>
         </div>
     </div>
@@ -45,31 +45,31 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     <!-- Search -->
                     <div class="form-group">
-                        <label class="form-label">بحث</label>
+                        <label class="form-label">{{ __('messages.search') }}</label>
                         <input type="text"
                                name="search"
                                value="{{ request('search') }}"
                                class="form-control"
-                               placeholder="ابحث عن حجز...">
+                               placeholder="{{ __('messages.search_booking') }}">
                     </div>
 
                     <!-- Status Filter -->
                     <div class="form-group">
-                        <label class="form-label">الحالة</label>
+                        <label class="form-label">{{ __('messages.status') }}</label>
                         <select name="status" class="form-control form-select">
-                            <option value="all">جميع الحالات</option>
-                            <option value="معلقة" {{ request('status') == 'معلقة' ? 'selected' : '' }}>معلقة</option>
-                            <option value="مؤكدة" {{ request('status') == 'مؤكدة' ? 'selected' : '' }}>مؤكدة</option>
-                            <option value="مرفوضة" {{ request('status') == 'مرفوضة' ? 'selected' : '' }}>مرفوضة</option>
-                            <option value="ملغاة" {{ request('status') == 'ملغاة' ? 'selected' : '' }}>ملغاة</option>
+                            <option value="all">{{ __('messages.all_statuses') }}</option>
+                            <option value="معلقة" {{ request('status') == 'معلقة' ? 'selected' : '' }}>{{ __('messages.pending') }}</option>
+                            <option value="مؤكدة" {{ request('status') == 'مؤكدة' ? 'selected' : '' }}>{{ __('messages.confirmed') }}</option>
+                            <option value="مرفوضة" {{ request('status') == 'مرفوضة' ? 'selected' : '' }}>{{ __('messages.rejected') }}</option>
+                            <option value="ملغاة" {{ request('status') == 'ملغاة' ? 'selected' : '' }}>{{ __('messages.cancelled') }}</option>
                         </select>
                     </div>
 
                     <!-- Trip Filter -->
                     <div class="form-group">
-                        <label class="form-label">الرحلة</label>
+                        <label class="form-label">{{ __('messages.trip') }}</label>
                         <select name="trip_id" class="form-control form-select">
-                            <option value="">جميع الرحلات</option>
+                            <option value="">{{ __('messages.all_trips') }}</option>
                             @foreach($trips as $trip)
                                 <option value="{{ $trip->id }}" {{ request('trip_id') == $trip->id ? 'selected' : '' }}>
                                     {{ $trip->title }}
@@ -80,9 +80,9 @@
 
                     <!-- User Filter -->
                     <div class="form-group">
-                        <label class="form-label">المستخدم</label>
+                        <label class="form-label">{{ __('messages.users') }}</label>
                         <select name="user_id" class="form-control form-select">
-                            <option value="">جميع المستخدمين</option>
+                            <option value="">{{ __('messages.all_users') }}</option>
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
                                     {{ $user->full_name }}
@@ -93,7 +93,7 @@
 
                     <!-- Date From -->
                     <div class="form-group">
-                        <label class="form-label">من تاريخ</label>
+                        <label class="form-label">{{ __('messages.from_date') }}</label>
                         <input type="date"
                                name="date_from"
                                value="{{ request('date_from') }}"
@@ -104,7 +104,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Date To -->
                     <div class="form-group">
-                        <label class="form-label">إلى تاريخ</label>
+                        <label class="form-label">{{ __('messages.to_date') }}</label>
                         <input type="date"
                                name="date_to"
                                value="{{ request('date_to') }}"
@@ -114,11 +114,11 @@
                     <div class="flex items-end gap-2">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-filter ml-1"></i>
-                            فلترة
+                            {{ __('messages.filter') }}
                         </button>
                         <a href="{{ route('admin.bookings.index') }}" class="btn btn-outline">
                             <i class="fas fa-sync ml-1"></i>
-                            إعادة تعيين
+                            {{ __('messages.reset') }}
                         </a>
                     </div>
                 </div>
@@ -181,9 +181,9 @@
     <div class="card">
         <div class="card-header">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <h3 class="card-title">قائمة الحجوزات</h3>
+                <h3 class="card-title">{{ __('messages.bookings_list') }}</h3>
                 <span class="text-sm text-gray-600 dark:text-gray-400">
-                    عرض {{ $bookings->firstItem() ?? 0 }} - {{ $bookings->lastItem() ?? 0 }} من {{ $bookings->total() }}
+                    {{ __('messages.showing') }} {{ $bookings->firstItem() ?? 0 }} {{ __('messages.to') }} {{ $bookings->lastItem() ?? 0 }} {{ __('messages.of') }} {{ $bookings->total() }}
                 </span>
             </div>
         </div>

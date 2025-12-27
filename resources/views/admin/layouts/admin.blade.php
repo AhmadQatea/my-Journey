@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,7 +61,7 @@
                     </div>
                     <div class="logo-text">
                         <h3 class="logo text-xl font-bold">MyJourney</h3>
-                        <p class="text-xs text-blue-100 mt-1">Admin Panel</p>
+                        <p class="text-xs text-blue-100 mt-1">{{ __('messages.admin_panel') }}</p>
                     </div>
                 </div>
                 <button class="toggle-sidebar p-2 rounded-xl hover:bg-white/10 transition-all duration-300 ripple" id="toggleSidebar">
@@ -95,7 +95,7 @@
                 </div>
                 <div class="flex items-center space-x-2 space-x-reverse text-xs text-blue-200 transition-all duration-300">
                     <i class="fas fa-shield-alt text-green-300 animate-pulse"></i>
-                    <span class="animate-shimmer">الإصدار 1.0</span>
+                    <span class="animate-shimmer">{{ __('messages.version') }} 1.0</span>
                 </div>
             </div>
         </div>
@@ -111,11 +111,14 @@
                         <i class="fas fa-bars text-blue-600 dark:text-green-400 text-xl"></i>
                     </button>
                     <h4 class="text-2xl font-bold animated-gradient-text">
-                        @yield('page-title', 'مرحباً بعودتك! 👋')
+                        @yield('page-title', __('messages.welcome_back') . ' 👋')
                     </h4>
                 </div>
 
                 <div class="flex items-center space-x-4 space-x-reverse">
+                    <!-- Language Switcher -->
+                    <x-language-switcher />
+
                     <!-- Theme Toggle for Mobile -->
                     <div class="lg:hidden">
                         <button class="theme-toggle-mobile p-3 rounded-xl hover:bg-blue-500/10 dark:hover:bg-green-500/10 transition-all duration-300 text-blue-600 dark:text-green-400 ripple">
@@ -133,7 +136,7 @@
                         </div>
                         <div class="hidden sm:block">
                             <span class="text-sm font-bold text-gray-700 dark:text-gray-500">{{ auth()->guard('admin')->user()->name }}</span>
-                            <p class="text-xs text-blue-600 dark:text-green-400">مدير النظام</p>
+                            <p class="text-xs text-blue-600 dark:text-green-400">{{ __('messages.system_admin') }}</p>
                         </div>
 
                         <!-- Logout -->
@@ -141,7 +144,7 @@
                             @csrf
                             <button type="submit" class="btn-primary flex items-center space-x-2 space-x-reverse shadow-lg">
                                 <i class="fas fa-sign-out-alt"></i>
-                                <span>تسجيل الخروج</span>
+                                <span>{{ __('messages.logout') }}</span>
                             </button>
                         </form>
                     </div>

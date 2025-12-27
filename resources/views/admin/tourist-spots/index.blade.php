@@ -5,16 +5,16 @@
     use Illuminate\Support\Facades\Storage;
 @endphp
 
-@section('title', 'إدارة الأماكن السياحية')
-@section('page-title', 'الأماكن السياحية')
+@section('title', __('messages.manage_tourist_spots'))
+@section('page-title', __('messages.tourist_spots'))
 
 @section('content')
 <div class="container mx-auto px-4 py-4">
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-black">الأماكن السياحية</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">إدارة جميع الأماكن السياحية في النظام</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-black">{{ __('messages.tourist_spots') }}</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ __('messages.manage_all_tourist_spots') }}</p>
         </div>
 
         <a href="{{ route('admin.tourist-spots.create') }}"
@@ -31,13 +31,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <!-- Search -->
                     <div class="form-group">
-                        <label class="form-label">بحث</label>
+                        <label class="form-label">{{ __('messages.search') }}</label>
                         <div class="search-box">
                             <input type="text"
                                    name="search"
                                    value="{{ request('search') }}"
                                    class="search-input"
-                                   placeholder="ابحث عن مكان سياحي..."
+                                   placeholder="{{ __('messages.search_tourist_spot') }}"
                                    autocomplete="off">
                             <i class="fas fa-search search-icon"></i>
                         </div>
@@ -45,11 +45,11 @@
 
                     <!-- Governorate Filter -->
                     <div class="form-group">
-                        <label class="form-label">المحافظة</label>
+                        <label class="form-label">{{ __('messages.governorate') }}</label>
                         <select name="governorate_id"
                                 class="form-control form-select"
                                 onchange="this.form.submit()">
-                            <option value="">جميع المحافظات</option>
+                            <option value="">{{ __('messages.all_provinces') }}</option>
                             @foreach($governorates as $gov)
                                 <option value="{{ $gov->id }}" {{ request('governorate_id') == $gov->id ? 'selected' : '' }}>
                                     {{ $gov->name }}
@@ -60,11 +60,11 @@
 
                     <!-- Category Filter -->
                     <div class="form-group">
-                        <label class="form-label">الفئة</label>
+                        <label class="form-label">{{ __('messages.category') }}</label>
                         <select name="category_id"
                                 class="form-control form-select"
                                 onchange="this.form.submit()">
-                            <option value="">جميع الفئات</option>
+                            <option value="">{{ __('messages.all_categories') }}</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
@@ -76,7 +76,7 @@
 
                 @if(request('search') || request('governorate_id') || request('category_id'))
                     <div class="flex items-center gap-2 pt-2">
-                        <span class="text-xs text-gray-600 dark:text-gray-400">فلتر مفعل:</span>
+                        <span class="text-xs text-gray-600 dark:text-gray-400">{{ __('messages.filter_active') }}:</span>
                         @if(request('search'))
                             <span class="badge badge-outline text-xs">{{ request('search') }}</span>
                         @endif
@@ -95,7 +95,7 @@
                         <a href="{{ route('admin.tourist-spots.index') }}"
                            class="text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 flex items-center gap-1 ml-2">
                             <i class="fas fa-times text-xs"></i>
-                            إزالة الفلترة
+                            {{ __('messages.remove_filter') }}
                         </a>
                     </div>
                 @endif
@@ -293,7 +293,7 @@
                     <a href="{{ route('admin.tourist-spots.create') }}"
                        class="btn btn-primary inline-flex items-center gap-2">
                         <i class="fas fa-plus"></i>
-                        <span>إضافة مكان جديد</span>
+                        <span>{{ __('messages.add_new_tourist_spot') }}</span>
                     </a>
                 </div>
             @endif

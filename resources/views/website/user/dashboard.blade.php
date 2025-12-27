@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - MyJourney</title>
+    <title>{{ __('messages.user_dashboard') }} - MyJourney</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -29,38 +29,38 @@
                     </div>
                     <div class="logo-text">
                         <h1 class="logo-title">MyJourney</h1>
-                        <span class="logo-subtitle">منصة السفر المميزة</span>
+                        <span class="logo-subtitle">{{ __('messages.travel_platform') }}</span>
                     </div>
                 </div>
 
                 <!-- Navigation Menu -->
                 <nav class="main-nav" id="mainNav">
                     <ul class="nav-menu">
-                        <li class="nav-menu-item" data-tooltip="الرئيسية">
+                        <li class="nav-menu-item" data-tooltip="{{ __('messages.home') }}">
                             <a href="{{ route('dashboard') }}" class="nav-menu-link active">
                                 <i class="fas fa-home"></i>
-                                <span class="nav-menu-text">الرئيسية</span>
+                                <span class="nav-menu-text">{{ __('messages.home') }}</span>
                             </a>
                         </li>
-                        <li class="nav-menu-item" data-tooltip="الملف الشخصي">
+                        <li class="nav-menu-item" data-tooltip="{{ __('messages.profile') }}">
                             <a href="{{ route('profile.show') }}" class="nav-menu-link">
                                 <i class="fas fa-user-circle"></i>
-                                <span class="nav-menu-text">الملف الشخصي</span>
+                                <span class="nav-menu-text">{{ __('messages.profile') }}</span>
                             </a>
                         </li>
-                        <li class="nav-menu-item" data-tooltip="الحجوزات">
+                        <li class="nav-menu-item" data-tooltip="{{ __('messages.bookings') }}">
                             <a href="{{ route('my-bookings') }}" class="nav-menu-link">
                                 <i class="fas fa-calendar-check"></i>
-                                <span class="nav-menu-text">الحجوزات</span>
+                                <span class="nav-menu-text">{{ __('messages.bookings') }}</span>
                                 @if($activeBookingsCount > 0)
                                     <span class="nav-menu-badge">{{ $activeBookingsCount }}</span>
                                 @endif
                             </a>
                         </li>
-                        <li class="nav-menu-item" data-tooltip="المقالات">
+                        <li class="nav-menu-item" data-tooltip="{{ __('messages.articles') }}">
                             <a href="{{ route('my-articles') }}" class="nav-menu-link">
                                 <i class="fas fa-newspaper"></i>
-                                <span class="nav-menu-text">المقالات</span>
+                                <span class="nav-menu-text">{{ __('messages.articles') }}</span>
                                 @if($publishedArticlesCount > 0)
                                     <span class="nav-menu-badge">{{ $publishedArticlesCount }}</span>
                                 @endif
@@ -71,7 +71,8 @@
 
                 <!-- User Actions with Dropdown -->
                 <div class="user-actions">
-                    <!-- Theme Toggle -->
+                    <!-- Language Switcher -->
+                    <x-language-switcher />
 
                     <!-- Notification Bell -->
                     @include('notifications.dropdown')
@@ -89,7 +90,7 @@
                                 </div>
                                 <div class="user-details">
                                     <span class="user-name">{{ Auth::user()->full_name }}</span>
-                                    <span class="user-status active">نشط الآن</span>
+                                    <span class="user-status active">{{ __('messages.active_now') }}</span>
                                 </div>
                                 <i class="fas fa-chevron-down dropdown-arrow"></i>
                             </div>
@@ -107,7 +108,7 @@
                                         @endif
                                     </div>
                                     <div class="dropdown-user-status">
-                                        <i class="fas fa-circle"></i> نشط الآن
+                                        <i class="fas fa-circle"></i> {{ __('messages.active_now') }}
                                     </div>
                                 </div>
                                 <div class="dropdown-user-details">
@@ -116,12 +117,12 @@
                                     <div class="user-badges">
                                         @if(Auth::user()->google_id)
                                             <span class="google-badge">
-                                                <i class="fab fa-google"></i> مرتبط بجوجل
+                                                <i class="fab fa-google"></i> {{ __('messages.linked_to_google') }}
                                             </span>
                                         @endif
                                         @if(Auth::user()->two_factor_confirmed_at)
                                             <span class="twofa-badge">
-                                                <i class="fas fa-shield-alt"></i> 2FA مفعل
+                                                <i class="fas fa-shield-alt"></i> 2FA {{ __('messages.enabled') }}
                                             </span>
                                         @endif
                                     </div>
@@ -140,7 +141,7 @@
                                     <div class="dropdown-icon">
                                         <i class="fas fa-user"></i>
                                     </div>
-                                    <span>الملف الشخصي</span>
+                                    <span>{{ __('messages.profile') }}</span>
                                     <i class="fas fa-chevron-left arrow"></i>
                                 </a>
 
@@ -148,25 +149,25 @@
                                     <div class="dropdown-icon">
                                         <i class="fas fa-cog"></i>
                                     </div>
-                                    <span>إعدادات الحساب</span>
+                                    <span>{{ __('messages.account_settings') }}</span>
                                     <i class="fas fa-chevron-left arrow"></i>
                                 </a>
 
                                 <!-- Security Settings -->
                                 <div class="dropdown-subheader">
                                     <i class="fas fa-shield-alt"></i>
-                                    <span>الأمان</span>
+                                    <span>{{ __('messages.security') }}</span>
                                 </div>
 
                                 <a href="{{ route('two-factor.setup') }}" class="dropdown-item">
                                     <div class="dropdown-icon">
                                         <i class="fas fa-key"></i>
                                     </div>
-                                    <span>المصادقة الثنائية (2FA)</span>
+                                    <span>{{ __('messages.two_factor_auth') }}</span>
                                     @if(Auth::user()->two_factor_confirmed_at)
-                                        <span class="dropdown-badge active">مفعل</span>
+                                        <span class="dropdown-badge active">{{ __('messages.enabled') }}</span>
                                     @else
-                                        <span class="dropdown-badge inactive">غير مفعل</span>
+                                        <span class="dropdown-badge inactive">{{ __('messages.disabled') }}</span>
                                     @endif
                                     <i class="fas fa-chevron-left arrow"></i>
                                 </a>
@@ -175,7 +176,7 @@
                                     <div class="dropdown-icon">
                                         <i class="fas fa-lock"></i>
                                     </div>
-                                    <span>تغيير كلمة المرور</span>
+                                    <span>{{ __('messages.change_password') }}</span>
                                     <i class="fas fa-chevron-left arrow"></i>
                                 </a>
 
@@ -183,11 +184,11 @@
                                     <div class="dropdown-icon">
                                         <i class="fas fa-id-card"></i>
                                     </div>
-                                    <span>توثيق الهوية</span>
+                                    <span>{{ __('messages.identity_verification') }}</span>
                                     @if(Auth::user()->identity_verified)
-                                        <span class="dropdown-badge active">موثق</span>
+                                        <span class="dropdown-badge active">{{ __('messages.verified') }}</span>
                                     @else
-                                        <span class="dropdown-badge inactive">غير موثق</span>
+                                        <span class="dropdown-badge inactive">{{ __('messages.not_verified') }}</span>
                                     @endif
                                     <i class="fas fa-chevron-left arrow"></i>
                                 </a>
@@ -195,7 +196,7 @@
                                 <!-- Google Login -->
                                 <div class="dropdown-subheader">
                                     <i class="fab fa-google"></i>
-                                    <span>التسجيل عبر جوجل</span>
+                                    <span>{{ __('messages.google_signin') }}</span>
                                 </div>
 
                                 @if(Auth::user()->google_id)
@@ -205,7 +206,7 @@
                                             <div class="dropdown-icon">
                                                 <i class="fas fa-unlink"></i>
                                             </div>
-                                            <span>فك ارتباط جوجل</span>
+                                            <span>{{ __('messages.unlink_google') }}</span>
                                             <i class="fas fa-chevron-left arrow"></i>
                                         </button>
                                     </form>
@@ -214,7 +215,7 @@
                                         <div class="dropdown-icon">
                                             <i class="fab fa-google"></i>
                                         </div>
-                                        <span>ربط حساب جوجل</span>
+                                        <span>{{ __('messages.link_google_account') }}</span>
                                         <i class="fas fa-chevron-left arrow"></i>
                                     </a>
                                 @endif
@@ -223,14 +224,14 @@
                                 @if(Auth::user()->two_factor_confirmed_at)
                                     <div class="dropdown-subheader">
                                         <i class="fas fa-file-alt"></i>
-                                        <span>أكواد الاسترجاع</span>
+                                        <span>{{ __('messages.recovery_codes') }}</span>
                                     </div>
 
                                     <a href="{{ route('two-factor.recovery-codes.show') }}" class="dropdown-item">
                                         <div class="dropdown-icon">
                                             <i class="fas fa-key"></i>
                                         </div>
-                                        <span>عرض أكواد الاسترجاع</span>
+                                        <span>{{ __('messages.view_recovery_codes') }}</span>
                                         <i class="fas fa-chevron-left arrow"></i>
                                     </a>
 
@@ -240,7 +241,7 @@
                                             <div class="dropdown-icon">
                                                 <i class="fas fa-redo"></i>
                                             </div>
-                                            <span>إنشاء أكواد جديدة</span>
+                                            <span>{{ __('messages.generate_new_codes') }}</span>
                                             <i class="fas fa-chevron-left arrow"></i>
                                         </button>
                                     </form>
@@ -259,7 +260,7 @@
                                     <div class="dropdown-icon">
                                         <i class="fas fa-external-link-alt"></i>
                                     </div>
-                                    <span>زيارة الموقع</span>
+                                    <span>{{ __('messages.visit_site') }}</span>
                                     <i class="fas fa-chevron-left arrow"></i>
                                 </a>
 
@@ -269,7 +270,7 @@
                                         <div class="dropdown-icon">
                                             <i class="fas fa-sign-out-alt"></i>
                                         </div>
-                                        <span>تسجيل الخروج</span>
+                                        <span>{{ __('messages.logout') }}</span>
                                         <i class="fas fa-chevron-left arrow"></i>
                                     </button>
                                 </form>
@@ -310,17 +311,17 @@
             <!-- Page Header -->
             <div class="page-header">
                 <div class="header-content">
-                    <h2 class="page-title">لوحة التحكم</h2>
-                    <p class="page-subtitle">مرحباً بعودتك! إليك ملخص نشاطاتك</p>
+                    <h2 class="page-title">{{ __('messages.user_dashboard') }}</h2>
+                    <p class="page-subtitle">{{ __('messages.welcome_back_user') }}</p>
                 </div>
                 <div class="header-actions">
-                    <a href="{{ route('home') }}" class="btn btn-new-trip" title="العودة للموقع ->">
+                    <a href="{{ route('home') }}" class="btn btn-new-trip" title="{{ __('messages.back_to_site') }}">
                         <i class="fas fa-arrow-right"></i>
-                        <span>العودة للموقع</span>
+                        <span>{{ __('messages.back_to_site') }}</span>
                     </a>
                     <a href="{{ route('bookings.create') }}" class="btn btn-new-trip">
                         <i class="fas fa-calendar-check"></i>
-                        <span>احجز رحلة</span>
+                        <span>{{ __('messages.book_trip') }}</span>
                     </a>
                 </div>
             </div>
@@ -331,41 +332,41 @@
                     <!-- Card 1 -->
                     <div class="stat-card card-bookings">
                         <div class="card-header">
-                            <h3 class="card-title">الحجوزات النشطة</h3>
+                            <h3 class="card-title">{{ __('messages.active_bookings') }}</h3>
                             <div class="card-icon">
                                 <i class="fas fa-calendar-check"></i>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="stat-number">{{ $activeBookingsCount }}</div>
-                            <p class="stat-desc">حجز فعال</p>
+                            <p class="stat-desc">{{ __('messages.active_booking') }}</p>
                         </div>
                         <div class="card-footer">
-                            <a href="{{ route('my-bookings') }}" class="card-link">عرض التفاصيل <i class="fas fa-arrow-left"></i></a>
+                            <a href="{{ route('my-bookings') }}" class="card-link">{{ __('messages.view_details') }} <i class="fas fa-arrow-left"></i></a>
                         </div>
                     </div>
 
                     <!-- Card 2 -->
                     <div class="stat-card card-articles">
                         <div class="card-header">
-                            <h3 class="card-title">المقالات المنشورة</h3>
+                            <h3 class="card-title">{{ __('messages.published_articles') }}</h3>
                             <div class="card-icon">
                                 <i class="fas fa-newspaper"></i>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="stat-number">{{ $publishedArticlesCount }}</div>
-                            <p class="stat-desc">مقال نشط</p>
+                            <p class="stat-desc">{{ __('messages.active_article') }}</p>
                         </div>
                         <div class="card-footer">
-                            <a href="{{ route('my-articles') }}" class="card-link">كتابة مقال <i class="fas fa-arrow-left"></i></a>
+                            <a href="{{ route('my-articles') }}" class="card-link">{{ __('messages.write_article') }} <i class="fas fa-arrow-left"></i></a>
                         </div>
                     </div>
 
                     <!-- Card 3 -->
                     <div class="stat-card card-status">
                         <div class="card-header">
-                            <h3 class="card-title">حالة الحساب</h3>
+                            <h3 class="card-title">{{ __('messages.account_status') }}</h3>
                             <div class="card-icon">
                                 <i class="fas fa-user-check"></i>
                             </div>
@@ -376,9 +377,9 @@
                         </div>
                         <div class="card-footer">
                             @if(!Auth::user()->identity_verified)
-                                <a href="{{ route('identity-verification.create') }}" class="card-link">توثيق الهوية <i class="fas fa-arrow-left"></i></a>
+                                <a href="{{ route('identity-verification.create') }}" class="card-link">{{ __('messages.verify_identity') }} <i class="fas fa-arrow-left"></i></a>
                             @else
-                                <a href="{{ route('profile.show') }}" class="card-link">عرض الملف الشخصي <i class="fas fa-arrow-left"></i></a>
+                                <a href="{{ route('profile.show') }}" class="card-link">{{ __('messages.view_profile') }} <i class="fas fa-arrow-left"></i></a>
                             @endif
                         </div>
                     </div>
@@ -388,11 +389,11 @@
             <!-- ========== ACTIVITY SECTION ========== -->
             <div class="activity-section">
                 <div class="section-header">
-                    <h3 class="section-title">النشاطات الحديثة</h3>
+                    <h3 class="section-title">{{ __('messages.recent_activities') }}</h3>
                     <div class="section-actions">
                         <button class="btn btn-filter">
                             <i class="fas fa-filter"></i>
-                            تصفية
+                            {{ __('messages.filter') }}
                         </button>
                     </div>
                 </div>
@@ -404,7 +405,7 @@
                             <div class="activity-icon">
                                 <i class="fas fa-calendar-alt"></i>
                             </div>
-                            <h4 class="activity-title">آخر الحجوزات</h4>
+                            <h4 class="activity-title">{{ __('messages.recent_bookings') }}</h4>
                         </div>
                         <div class="activity-body">
                             @if($recentBookings->count() > 0)
@@ -415,7 +416,7 @@
                                                 <i class="fas fa-calendar-check"></i>
                                             </div>
                                             <div class="activity-item-content">
-                                                <h5>{{ $booking->trip->title ?? 'رحلة محذوفة' }}</h5>
+                                                <h5>{{ $booking->trip->title ?? __('messages.deleted_trip') }}</h5>
                                                 <p>
                                                     <span class="status-badge status-{{ $booking->status === 'مؤكدة' ? 'confirmed' : ($booking->status === 'معلقة' ? 'pending' : 'rejected') }}">
                                                         {{ $booking->status }}
@@ -428,7 +429,7 @@
                                 </div>
                                 <div class="activity-footer">
                                     <a href="{{ route('my-bookings') }}" class="btn btn-view-all">
-                                        عرض الكل <i class="fas fa-arrow-left"></i>
+                                        {{ __('messages.view_all') }} <i class="fas fa-arrow-left"></i>
                                     </a>
                                 </div>
                             @else
@@ -436,11 +437,11 @@
                                     <div class="empty-icon">
                                         <i class="fas fa-calendar-times"></i>
                                     </div>
-                                    <h5>لا توجد حجوزات حديثة</h5>
-                                    <p>ابدأ رحلتك الأولى وقم بحجز رحلة جديدة</p>
+                                    <h5>{{ __('messages.no_recent_bookings') }}</h5>
+                                    <p>{{ __('messages.start_first_trip') }}</p>
                                     <a href="{{ route('bookings.create') }}" class="btn btn-explore">
                                         <i class="fas fa-search"></i>
-                                        استعرض الرحلات
+                                        {{ __('messages.browse_trips') }}
                                     </a>
                                 </div>
                             @endif
@@ -453,7 +454,7 @@
                             <div class="activity-icon">
                                 <i class="fas fa-edit"></i>
                             </div>
-                            <h4 class="activity-title">آخر المقالات</h4>
+                            <h4 class="activity-title">{{ __('messages.recent_articles') }}</h4>
                         </div>
                         <div class="activity-body">
                             @if($recentArticles->count() > 0)
@@ -477,7 +478,7 @@
                                 </div>
                                 <div class="activity-footer">
                                     <a href="{{ route('my-articles') }}" class="btn btn-view-all">
-                                        عرض الكل <i class="fas fa-arrow-left"></i>
+                                        {{ __('messages.view_all') }} <i class="fas fa-arrow-left"></i>
                                     </a>
                                 </div>
                             @else
@@ -485,11 +486,11 @@
                                     <div class="empty-icon">
                                         <i class="fas fa-newspaper"></i>
                                     </div>
-                                    <h5>لا توجد مقالات حديثة</h5>
-                                    <p>شارك تجاربك واكتب عن رحلاتك</p>
+                                    <h5>{{ __('messages.no_recent_articles') }}</h5>
+                                    <p>{{ __('messages.share_experiences') }}</p>
                                     <a href="{{ route('articles.create') }}" class="btn btn-write">
                                         <i class="fas fa-pen"></i>
-                                        كتابة مقال جديد
+                                        {{ __('messages.write_new_article') }}
                                     </a>
                                 </div>
                             @endif
@@ -505,11 +506,11 @@
                         <i class="fas fa-compass"></i>
                         <span>MyJourney</span>
                     </div>
-                    <p class="footer-text">منصة السفر والرحلات المميزة © 2024</p>
+                    <p class="footer-text">{{ __('messages.travel_platform_copyright') }}</p>
                     <div class="footer-links">
-                        <a href="#" class="footer-link">الشروط والأحكام</a>
-                        <a href="#" class="footer-link">سياسة الخصوصية</a>
-                        <a href="#" class="footer-link">الدعم والمساعدة</a>
+                        <a href="#" class="footer-link">{{ __('messages.terms_conditions_link') }}</a>
+                        <a href="#" class="footer-link">{{ __('messages.privacy_policy_link') }}</a>
+                        <a href="#" class="footer-link">{{ __('messages.support_help') }}</a>
                     </div>
                 </div>
             </footer>

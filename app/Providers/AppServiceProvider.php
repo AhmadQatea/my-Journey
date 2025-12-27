@@ -155,7 +155,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Dashboard - متاح للجميع
         $items[] = [
-            'title' => 'لوحة التحكم',
+            'title' => __('messages.dashboard'),
             'route' => $adminRoleSlug ? route('admin.dashboard', ['role' => $adminRoleSlug]) : route('admin.dashboard.redirect'),
             'icon' => 'fas fa-tachometer-alt',
             'routePattern' => 'admin.dashboard*',
@@ -166,7 +166,7 @@ class AppServiceProvider extends ServiceProvider
         if ($isSiteManagerOnly) {
             // الملاحظات والتقييمات - متاحة لـ site manager حتى بدون صلاحية view_users
             $items[] = [
-                'title' => 'الملاحظات والتقييمات',
+                'title' => __('messages.feedback_ratings'),
                 'route' => 'admin.feedback.index',
                 'icon' => 'fas fa-comment-dots',
                 'routePattern' => 'admin.feedback.*',
@@ -175,7 +175,7 @@ class AppServiceProvider extends ServiceProvider
 
             // إعدادات الموقع
             $items[] = [
-                'title' => 'إعدادات الموقع',
+                'title' => __('messages.site_settings'),
                 'route' => 'admin.site.index',
                 'icon' => 'fas fa-cog',
                 'routePattern' => 'admin.site.*',
@@ -188,7 +188,7 @@ class AppServiceProvider extends ServiceProvider
         // المحافظات
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_governorates'))) {
             $items[] = [
-                'title' => 'المحافظات',
+                'title' => __('messages.governorates'),
                 'route' => 'admin.governorates.index',
                 'icon' => 'fas fa-mountain',
                 'routePattern' => 'admin.governorates.*',
@@ -199,7 +199,7 @@ class AppServiceProvider extends ServiceProvider
         // الأماكن السياحية
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_tourist_spots'))) {
             $items[] = [
-                'title' => 'الأماكن السياحية',
+                'title' => __('messages.tourist_spots'),
                 'route' => 'admin.tourist-spots.index',
                 'icon' => 'fas fa-map-marker-alt',
                 'routePattern' => 'admin.tourist-spots.*',
@@ -210,7 +210,7 @@ class AppServiceProvider extends ServiceProvider
         // الفئات
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_categories'))) {
             $items[] = [
-                'title' => 'الفئات',
+                'title' => __('messages.categories'),
                 'route' => 'admin.categories.index',
                 'icon' => 'fas fa-tags',
                 'routePattern' => 'admin.categories.*',
@@ -221,7 +221,7 @@ class AppServiceProvider extends ServiceProvider
         // الرحلات
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_trips'))) {
             $items[] = [
-                'title' => 'الرحلات',
+                'title' => __('messages.trips'),
                 'route' => 'admin.trips.index',
                 'icon' => 'fas fa-map-marked-alt',
                 'routePattern' => 'admin.trips.*',
@@ -232,7 +232,7 @@ class AppServiceProvider extends ServiceProvider
         // العروض
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_deals'))) {
             $items[] = [
-                'title' => 'العروض',
+                'title' => __('messages.deals'),
                 'route' => 'admin.deals.index',
                 'icon' => 'fas fa-tag',
                 'routePattern' => 'admin.deals.*',
@@ -243,7 +243,7 @@ class AppServiceProvider extends ServiceProvider
         // الحجوزات
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_bookings'))) {
             $items[] = [
-                'title' => 'الحجوزات',
+                'title' => __('messages.bookings'),
                 'route' => 'admin.bookings.index',
                 'icon' => 'fas fa-calendar-check',
                 'routePattern' => 'admin.bookings.*',
@@ -254,7 +254,7 @@ class AppServiceProvider extends ServiceProvider
         // المقالات
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_articles'))) {
             $items[] = [
-                'title' => 'المقالات',
+                'title' => __('messages.articles'),
                 'route' => 'admin.articles.index',
                 'icon' => 'fas fa-newspaper',
                 'routePattern' => 'admin.articles.*',
@@ -265,7 +265,7 @@ class AppServiceProvider extends ServiceProvider
         // المستخدمين
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('view_users'))) {
             $items[] = [
-                'title' => 'المستخدمين',
+                'title' => __('messages.users'),
                 'route' => 'admin.users.index',
                 'icon' => 'fas fa-users',
                 'routePattern' => 'admin.users.*',
@@ -277,7 +277,7 @@ class AppServiceProvider extends ServiceProvider
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('view_users'))) {
             $pendingCount = \App\Models\IdentityVerification::where('status', 'pending')->count();
             $items[] = [
-                'title' => 'توثيق الهوية',
+                'title' => __('messages.identity_verification'),
                 'route' => 'admin.identity-verifications.index',
                 'icon' => 'fas fa-id-card',
                 'routePattern' => 'admin.identity-verifications.*',
@@ -289,7 +289,7 @@ class AppServiceProvider extends ServiceProvider
         // المسؤولين
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_admins'))) {
             $items[] = [
-                'title' => 'المسؤولين',
+                'title' => __('messages.admins'),
                 'route' => 'admin.admins.index',
                 'icon' => 'fas fa-user-shield',
                 'routePattern' => 'admin.admins.*',
@@ -300,7 +300,7 @@ class AppServiceProvider extends ServiceProvider
         // الأدوار
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_admins'))) {
             $items[] = [
-                'title' => 'الأدوار',
+                'title' => __('messages.roles'),
                 'route' => 'admin.roles.index',
                 'icon' => 'fas fa-user-tag',
                 'routePattern' => 'admin.roles.*',
@@ -312,7 +312,7 @@ class AppServiceProvider extends ServiceProvider
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('view_users'))) {
             $unreadMessagesCount = \App\Models\ContactMessage::where('status', '!=', 'replied')->count();
             $items[] = [
-                'title' => 'رسائل المستخدمين',
+                'title' => __('messages.user_messages'),
                 'route' => 'admin.contact-messages.index',
                 'icon' => 'fas fa-envelope',
                 'routePattern' => 'admin.contact-messages.*',
@@ -324,7 +324,7 @@ class AppServiceProvider extends ServiceProvider
         // الملاحظات والتقييمات
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('view_users') || $admin->hasPermission('manage_feedback') || $admin->hasPermission('site-manager') || $admin->hasPermission('settings.manage'))) {
             $items[] = [
-                'title' => 'الملاحظات والتقييمات',
+                'title' => __('messages.feedback_ratings'),
                 'route' => 'admin.feedback.index',
                 'icon' => 'fas fa-comment-dots',
                 'routePattern' => 'admin.feedback.*',
@@ -335,7 +335,7 @@ class AppServiceProvider extends ServiceProvider
         // إعدادات الموقع
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('site-manager') || $admin->hasPermission('settings.manage'))) {
             $items[] = [
-                'title' => 'إعدادات الموقع',
+                'title' => __('messages.site_settings'),
                 'route' => 'admin.site.index',
                 'icon' => 'fas fa-cog',
                 'routePattern' => 'admin.site.*',

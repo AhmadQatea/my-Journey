@@ -1,24 +1,24 @@
 @extends('website.pages.layouts.app')
 
-@section('title', 'MyJourney - الرئيسية')
+@section('title', 'MyJourney - ' . __('messages.home'))
 
 @section('content')
     <!-- ========== HERO SECTION ========== -->
     <section class="hero-section">
         <div class="container">
             <div class="hero-content">
-                <h1 class="hero-title">اكتشف جمال سوريا مع MyJourney</h1>
+                <h1 class="hero-title">{{ __('messages.discover_syria') }}</h1>
                 <p class="hero-subtitle">
-                    منصة سياحية متكاملة تقدم أفضل الرحلات والعروض في جميع المحافظات السورية
+                    {{ __('messages.platform_description') }}
                 </p>
                 <div class="hero-actions">
                     <a href="{{ route('trips') }}" class="btn btn-primary btn-lg">
                         <i class="fas fa-search"></i>
-                        استعرض الرحلات
+                        {{ __('messages.browse_trips') }}
                     </a>
                     <a href="{{ route('about') }}" class="btn btn-outline btn-lg">
                         <i class="fas fa-info-circle"></i>
-                        تعرف علينا
+                        {{ __('messages.learn_more') }}
                     </a>
                 </div>
             </div>
@@ -29,8 +29,8 @@
     <section class="section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">رحلات مميزة</h2>
-                <p class="section-subtitle">استمتع بأفضل الرحلات السياحية في سوريا</p>
+                <h2 class="section-title">{{ __('messages.featured_trips') }}</h2>
+                <p class="section-subtitle">{{ __('messages.enjoy_best_trips') }}</p>
             </div>
 
             <!-- Swiper Slider -->
@@ -58,21 +58,21 @@
                                 <div class="card-body">
                                     <h3>{{ $trip->title }}</h3>
                                     <p style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.5rem;">
-                                        <i class="fas fa-map-marker-alt"></i> {{ $trip->governorate->name ?? 'غير محدد' }}
+                                        <i class="fas fa-map-marker-alt"></i> {{ $trip->governorate->name ?? __('messages.not_specified') }}
                                     </p>
                                     <p style="font-size: 0.875rem; line-height: 1.5; margin-bottom: 1rem;">
                                         {{ Str::limit($trip->description, 100) }}
                                     </p>
                                     <div class="trip-info" style="display: flex; justify-content: space-between; margin-top: 1rem; font-size: 0.875rem; color: var(--gray-600);">
-                                        <span><i class="fas fa-clock"></i> {{ $trip->duration_hours }} ساعة</span>
-                                        <span><i class="fas fa-users"></i> {{ $trip->max_persons }} أشخاص</span>
-                                        <span><i class="fas fa-money-bill-wave"></i> {{ number_format($trip->price, 0) }} ل.س</span>
+                                        <span><i class="fas fa-clock"></i> {{ $trip->duration_hours }} {{ __('messages.hours') }}</span>
+                                        <span><i class="fas fa-users"></i> {{ $trip->max_persons }} {{ __('messages.persons') }}</span>
+                                        <span><i class="fas fa-money-bill-wave"></i> {{ number_format($trip->price, 0) }} {{ __('messages.syrian_pounds') }}</span>
                                     </div>
                                 </div>
                                 <div class="card-footer">
                                     <a href="{{ route('trips') }}" class="btn btn-primary btn-sm" style="width: 100%;">
                                         <i class="fas fa-calendar-check"></i>
-                                        احجز الآن
+                                        {{ __('messages.book_now') }}
                                     </a>
                                 </div>
                             </div>
@@ -82,7 +82,7 @@
                             <div class="card">
                                 <div class="card-body text-center" style="padding: 3rem;">
                                     <i class="fas fa-info-circle" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
-                                    <p style="color: var(--gray-500);">لا توجد رحلات مميزة حالياً</p>
+                                    <p style="color: var(--gray-500);">{{ __('messages.no_featured_trips') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -105,10 +105,10 @@
             <div class="grid grid-4">
                 @php
                     $statsData = [
-                        ['icon' => 'fas fa-map-marker-alt', 'count' => $stats['governorates_count'], 'label' => 'محافظة'],
-                        ['icon' => 'fas fa-calendar-check', 'count' => $stats['trips_count'], 'label' => 'رحلة'],
-                        ['icon' => 'fas fa-user-friends', 'count' => $stats['travelers_count'], 'label' => 'مسافر'],
-                        ['icon' => 'fas fa-star', 'count' => $stats['average_rating'], 'label' => 'تقييم']
+                        ['icon' => 'fas fa-map-marker-alt', 'count' => $stats['governorates_count'], 'label' => __('messages.governorate')],
+                        ['icon' => 'fas fa-calendar-check', 'count' => $stats['trips_count'], 'label' => __('messages.trip')],
+                        ['icon' => 'fas fa-user-friends', 'count' => $stats['travelers_count'], 'label' => app()->getLocale() === 'ar' ? 'مسافر' : 'Traveler'],
+                        ['icon' => 'fas fa-star', 'count' => $stats['average_rating'], 'label' => __('messages.rating')]
                     ];
                 @endphp
 
@@ -129,8 +129,8 @@
     <section class="section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">استكشف محافظات سوريا</h2>
-                <p class="section-subtitle">اكتشف أجمل الأماكن السياحية في كل محافظة</p>
+                <h2 class="section-title">{{ app()->getLocale() === 'ar' ? 'استكشف محافظات سوريا' : 'Explore Syrian Governorates' }}</h2>
+                <p class="section-subtitle">{{ app()->getLocale() === 'ar' ? 'اكتشف أجمل الأماكن السياحية في كل محافظة' : 'Discover the most beautiful tourist spots in each governorate' }}</p>
             </div>
 
             <!-- Governorates Slider -->
@@ -164,7 +164,7 @@
                                     <div class="card-body" style="padding: 2rem 1.5rem; display: flex; align-items: center; justify-content: center; min-height: 200px; background: rgba(255, 255, 255, 0);">
                                         <a href="{{ route('provinces.show', $governorate) }}" class="btn btn-primary" style="width: 100%; padding: 1.25rem 1.75rem; font-weight: 700; border-radius: var(--radius-lg); font-size: 1.125rem; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3); transition: all 0.3s ease;">
                                             <i class="fas fa-arrow-left" style="margin-left: 0.5rem;"></i>
-                                            عرض المزيد
+                                            {{ __('messages.read_more') }}
                                         </a>
                                     </div>
                                 </div>
@@ -175,7 +175,7 @@
                             <div class="card">
                                 <div class="card-body text-center" style="padding: 3rem;">
                                     <i class="fas fa-info-circle" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
-                                    <p style="color: var(--gray-500);">لا توجد محافظات متاحة حالياً</p>
+                                    <p style="color: var(--gray-500);">{{ app()->getLocale() === 'ar' ? 'لا توجد محافظات متاحة حالياً' : 'No governorates available' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -196,8 +196,8 @@
     <section class="section" style="background: var(--gray-50);">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">أماكن سياحية مميزة</h2>
-                <p class="section-subtitle">اكتشف أجمل الأماكن السياحية في سوريا</p>
+                <h2 class="section-title">{{ app()->getLocale() === 'ar' ? 'أماكن سياحية مميزة' : 'Featured Tourist Spots' }}</h2>
+                <p class="section-subtitle">{{ app()->getLocale() === 'ar' ? 'اكتشف أجمل الأماكن السياحية في سوريا' : 'Discover the most beautiful tourist spots in Syria' }}</p>
             </div>
 
             <!-- Tourist Spots Slider -->
@@ -231,7 +231,7 @@
                                     <div class="card-body" style="padding: 2rem 1.5rem; display: flex; align-items: center; justify-content: center; min-height: 200px; background: rgba(255, 255, 255, 0);">
                                         <a href="{{ route('provinces') }}" class="btn btn-primary" style="width: 100%; padding: 1.25rem 1.75rem; font-weight: 700; border-radius: var(--radius-lg); font-size: 1.125rem; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3); transition: all 0.3s ease;">
                                             <i class="fas fa-arrow-left" style="margin-left: 0.5rem;"></i>
-                                            عرض المزيد
+                                            {{ __('messages.read_more') }}
                                         </a>
                                     </div>
                                 </div>
@@ -242,7 +242,7 @@
                             <div class="card">
                                 <div class="card-body text-center" style="padding: 3rem;">
                                     <i class="fas fa-info-circle" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
-                                    <p style="color: var(--gray-500);">لا توجد أماكن سياحية متاحة حالياً</p>
+                                    <p style="color: var(--gray-500);">{{ __('messages.no_tourist_spots') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -263,13 +263,13 @@
     <section class="section" style="background: var(--gradient-primary); color: white;">
         <div class="container">
             <div class="text-center">
-                <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">جاهز لرحلتك القادمة؟</h2>
+                <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">{{ app()->getLocale() === 'ar' ? 'جاهز لرحلتك القادمة؟' : 'Ready for Your Next Trip?' }}</h2>
                 <p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9;">
-                    انضم إلى آلاف المسافرين الذين اختاروا MyJourney لرحلاتهم
+                    {{ app()->getLocale() === 'ar' ? 'انضم إلى آلاف المسافرين الذين اختاروا MyJourney لرحلاتهم' : 'Join thousands of travelers who chose MyJourney for their trips' }}
                 </p>
                 <a href="{{ route('register') }}" class="btn btn-outline btn-lg" style="background: white; color: var(--primary); border-color: white;">
                     <i class="fas fa-user-plus"></i>
-                    انضم إلينا الآن
+                    {{ app()->getLocale() === 'ar' ? 'انضم إلينا الآن' : 'Join Us Now' }}
                 </a>
             </div>
         </div>

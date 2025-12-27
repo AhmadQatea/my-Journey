@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,58 +51,62 @@
                     <li class="nav-item">
                         <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
                             <i class="fas fa-home"></i>
-                            <span>الرئيسية</span>
+                            <span>{{ __('messages.home') }}</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('about') }}" class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}">
                             <i class="fas fa-info-circle"></i>
-                            <span>عن الموقع</span>
+                            <span>{{ __('messages.about') }}</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('trips') }}" class="nav-link {{ request()->routeIs('trips') ? 'active' : '' }}">
                             <i class="fas fa-map-marked-alt"></i>
-                            <span>الرحلات والعروض</span>
+                            <span>{{ __('messages.trips') }}</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('provinces') }}" class="nav-link {{ request()->routeIs('provinces') ? 'active' : '' }}">
                             <i class="fas fa-map"></i>
-                            <span>المحافظات</span>
+                            <span>{{ __('messages.provinces') }}</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('articles') }}" class="nav-link {{ request()->routeIs('articles') ? 'active' : '' }}">
                             <i class="fas fa-newspaper"></i>
-                            <span>المقالات والتقييمات</span>
+                            <span>{{ __('messages.articles') }}</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('contact') }}" class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">
                             <i class="fas fa-envelope"></i>
-                            <span>اتصل بنا</span>
+                            <span>{{ __('messages.contact') }}</span>
                         </a>
                     </li>
                 </ul>
 
-                <!-- Auth Buttons -->
-                <div class="auth-buttons">
-                    @auth
-                        <a href="{{ route('dashboard') }}" class="btn btn-primary">
-                            <i class="fas fa-tachometer-alt"></i>
-                            لوحة التحكم
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}" class="btn btn-outline">
-                            <i class="fas fa-sign-in-alt"></i>
-                            تسجيل الدخول
-                        </a>
-                        <a href="{{ route('register') }}" class="btn btn-primary">
-                            <i class="fas fa-user-plus"></i>
-                            إنشاء حساب
-                        </a>
-                    @endauth
+                <!-- Language Switcher & Auth Buttons -->
+                <div class="header-actions" style="display: flex; align-items: center; gap: 1rem;">
+                    <x-language-switcher />
+                    
+                    <div class="auth-buttons">
+                        @auth
+                            <a href="{{ route('dashboard') }}" class="btn btn-primary">
+                                <i class="fas fa-tachometer-alt"></i>
+                                {{ __('messages.dashboard') }}
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-outline">
+                                <i class="fas fa-sign-in-alt"></i>
+                                {{ __('messages.login') }}
+                            </a>
+                            <a href="{{ route('register') }}" class="btn btn-primary">
+                                <i class="fas fa-user-plus"></i>
+                                {{ __('messages.register') }}
+                            </a>
+                        @endauth
+                    </div>
                 </div>
 
                 <!-- Mobile Menu Toggle -->

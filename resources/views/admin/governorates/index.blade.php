@@ -1,22 +1,22 @@
 {{-- governorates/index.blade.php --}}
 @extends('admin.layouts.admin')
 
-@section('title', 'إدارة المحافظات')
-@section('page-title', 'المحافظات')
+@section('title', __('messages.manage_governorates'))
+@section('page-title', __('messages.governorates'))
 
 @section('content')
 <div class="container mx-auto px-4 py-4">
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-black">المحافظات</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">إدارة جميع محافظات النظام</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-black">{{ __('messages.governorates') }}</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ __('messages.manage_all_governorates') }}</p>
         </div>
 
         <a href="{{ route('admin.governorates.create') }}"
            class="btn btn-primary inline-flex items-center gap-2">
             <i class="fas fa-plus text-sm"></i>
-            <span>إضافة محافظة جديدة</span>
+            <span>{{ __('messages.add_new_governorate') }}</span>
         </a>
     </div>
 
@@ -26,7 +26,7 @@
             <div class="search-box">
                 <input type="text"
                        class="search-input"
-                       placeholder="ابحث عن محافظة..."
+                       placeholder="{{ __('messages.search_governorate') }}"
                        id="searchInput"
                        autocomplete="off">
                 <i class="fas fa-search search-icon"></i>
@@ -39,7 +39,7 @@
         <div class="stat-card">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="stat-label">إجمالي المحافظات</p>
+                    <p class="stat-label">{{ __('messages.total_governorates') }}</p>
                     <p class="stat-value">{{ $governorates->total() }}</p>
                 </div>
                 <div class="stat-icon bg-gradient-to-br from-blue-500 to-cyan-500">
@@ -51,7 +51,7 @@
         <div class="stat-card">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="stat-label">الأماكن السياحية</p>
+                    <p class="stat-label">{{ __('messages.tourist_spots') }}</p>
                     <p class="stat-value">{{ $governorates->sum('tourist_spots_count') }}</p>
                 </div>
                 <div class="stat-icon bg-gradient-to-br from-emerald-500 to-green-500">
@@ -63,7 +63,7 @@
         <div class="stat-card">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="stat-label">الرحلات</p>
+                    <p class="stat-label">{{ __('messages.trips') }}</p>
                     <p class="stat-value">{{ $governorates->sum('trips_count') }}</p>
                 </div>
                 <div class="stat-icon bg-gradient-to-br from-violet-500 to-purple-500">
@@ -89,9 +89,9 @@
     <div class="card">
         <div class="card-header">
             <div class="flex items-center justify-between">
-                <h3 class="card-title">قائمة المحافظات</h3>
+                <h3 class="card-title">{{ app()->getLocale() === 'ar' ? 'قائمة المحافظات' : 'Governorates List' }}</h3>
                 <span class="text-sm text-gray-600 dark:text-gray-400">
-                    عرض {{ $governorates->firstItem() ?? 0 }} - {{ $governorates->lastItem() ?? 0 }} من {{ $governorates->total() }}
+                    {{ __('messages.showing') }} {{ $governorates->firstItem() ?? 0 }} {{ __('messages.to') }} {{ $governorates->lastItem() ?? 0 }} {{ __('messages.of') }} {{ $governorates->total() }}
                 </span>
             </div>
         </div>
@@ -102,13 +102,13 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th class="w-16">الصورة</th>
-                                <th>المحافظة</th>
-                                <th class="w-32">الموقع</th>
-                                <th class="w-24">الأماكن</th>
-                                <th class="w-24">الرحلات</th>
-                                <th class="w-28">التاريخ</th>
-                                <th class="w-28">الإجراءات</th>
+                                <th class="w-16">{{ __('messages.image') }}</th>
+                                <th>{{ __('messages.governorate') }}</th>
+                                <th class="w-32">{{ __('messages.location') }}</th>
+                                <th class="w-24">{{ __('messages.tourist_spots') }}</th>
+                                <th class="w-24">{{ __('messages.trips') }}</th>
+                                <th class="w-28">{{ __('messages.date') }}</th>
+                                <th class="w-28">{{ __('messages.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -164,26 +164,26 @@
                                         <div class="action-buttons justify-center">
                                             <a href="{{ route('admin.governorates.show', $governorate) }}"
                                                class="action-btn view"
-                                               title="عرض التفاصيل"
-                                               data-tooltip="عرض">
+                                               title="{{ __('messages.view') }}"
+                                               data-tooltip="{{ __('messages.view') }}">
                                                 <i class="fas fa-eye text-xs"></i>
                                             </a>
                                             <a href="{{ route('admin.governorates.edit', $governorate) }}"
                                                class="action-btn edit"
-                                               title="تعديل"
-                                               data-tooltip="تعديل">
+                                               title="{{ __('messages.edit') }}"
+                                               data-tooltip="{{ __('messages.edit') }}">
                                                 <i class="fas fa-edit text-xs"></i>
                                             </a>
                                             <form action="{{ route('admin.governorates.destroy', $governorate) }}"
                                                   method="POST"
                                                   class="inline"
-                                                  onsubmit="return confirm('هل أنت متأكد من حذف {{ $governorate->name }}؟');">
+                                                  onsubmit="return confirm('{{ __('messages.are_you_sure') }} {{ __('messages.delete') }} {{ $governorate->name }}?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
                                                         class="action-btn delete"
-                                                        title="حذف"
-                                                        data-tooltip="حذف">
+                                                        title="{{ __('messages.delete') }}"
+                                                        data-tooltip="{{ __('messages.delete') }}">
                                                     <i class="fas fa-trash text-xs"></i>
                                                 </button>
                                             </form>
@@ -199,7 +199,7 @@
                     <div class="empty-state-icon">
                         <i class="fas fa-mountain"></i>
                     </div>
-                    <h4 class="empty-state-title">لا توجد محافظات</h4>
+                    <h4 class="empty-state-title">{{ __('messages.no_governorates_found') }}</h4>
                     <p class="empty-state-description">
                         لم يتم إضافة أي محافظات بعد. ابدأ بإضافة أول محافظة.
                     </p>

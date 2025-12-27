@@ -1,16 +1,16 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'ملاحظات المستخدمين')
-@section('page-title', 'ملاحظات وتقييمات المستخدمين')
+@section('title', __('messages.user_feedback'))
+@section('page-title', __('messages.user_feedback_ratings'))
 
 @section('content')
 <div class="container mx-auto px-4 py-4">
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">ملاحظات وتقييمات المستخدمين</h1>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">{{ __('messages.user_feedback_ratings') }}</h1>
             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                عرض آراء المستخدمين حول المنصة والتجربة العامة
+                {{ __('messages.view_user_feedback') }}
             </p>
         </div>
     </div>
@@ -19,10 +19,10 @@
     <div class="card">
         <div class="card-header">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <h3 class="card-title">جميع الملاحظات</h3>
+                <h3 class="card-title">{{ __('messages.all_feedback') }}</h3>
                 @if($feedback->count() > 0)
                     <span class="text-sm text-gray-600 dark:text-gray-400">
-                        عرض {{ $feedback->firstItem() ?? 0 }} - {{ $feedback->lastItem() ?? 0 }} من {{ $feedback->total() }}
+                        {{ __('messages.showing') }} {{ $feedback->firstItem() ?? 0 }} {{ __('messages.to') }} {{ $feedback->lastItem() ?? 0 }} {{ __('messages.of') }} {{ $feedback->total() }}
                     </span>
                 @endif
             </div>
@@ -48,11 +48,11 @@
                         <thead>
                         <tr>
                             <th class="w-16">#</th>
-                            <th>الاسم</th>
-                            <th class="w-24">التقييم</th>
-                            <th>ما أعجبه</th>
-                            <th class="w-40">تاريخ الإرسال</th>
-                            <th class="w-40">الإجراءات</th>
+                            <th>{{ __('messages.name') }}</th>
+                            <th class="w-24">{{ __('messages.rating') }}</th>
+                            <th>{{ __('messages.what_they_liked') }}</th>
+                            <th class="w-40">{{ __('messages.submission_date') }}</th>
+                            <th class="w-40">{{ __('messages.actions') }}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -65,7 +65,7 @@
                                     </div>
                                     @if($item->user)
                                         <div class="text-xs text-gray-500 dark:text-gray-400">
-                                            مستخدم مسجل: {{ $item->user->full_name }}
+                                            {{ __('messages.registered_user') }}: {{ $item->user->full_name }}
                                         </div>
                                     @endif
                                 </td>
@@ -94,7 +94,7 @@
                                 <td>
                                     <div class="flex items-center gap-2">
                                         <a href="{{ route('admin.feedback.show', $item) }}"
-                                           class="btn btn-info btn-sm" title="عرض التفاصيل والرد">
+                                           class="btn btn-info btn-sm" title="{{ __('messages.view_details_reply') }}">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <form action="{{ route('admin.feedback.destroy', $item) }}" method="POST"

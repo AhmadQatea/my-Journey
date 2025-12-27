@@ -41,7 +41,7 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">{{ $pageTitle ?? $title }}</h1>
-                @if($model)
+                @if(isset($model) && $model)
                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         @if(isset($model->title))
                             {{ Str::limit($model->title, 50) }}
@@ -57,7 +57,7 @@
             </a>
         </div>
 
-        <form action="{{ $action }}" method="POST" @if($enctype) enctype="multipart/form-data" @endif>
+        <form id="site-settings-form" action="{{ $action }}" method="POST" @if($enctype) enctype="multipart/form-data" @endif>
             @csrf
             @method('PUT')
 

@@ -1,14 +1,14 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'لوحة التحكم')
-@section('page-title', 'لوحة التحكم')
+@section('title', __('messages.dashboard'))
+@section('page-title', __('messages.dashboard'))
 
 @section('content')
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
     <x-card title="">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm text-gray-600 mb-1">إجمالي المستخدمين</p>
+                <p class="text-sm text-gray-600 mb-1">{{ __('messages.total_users') }}</p>
                 <p class="text-2xl font-bold text-gray-900">{{ $totalUsers }}</p>
             </div>
             <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -20,7 +20,7 @@
     <x-card title="">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">إجمالي المستخدمين الموثقين</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">{{ __('messages.total_verified_users') }}</p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-black">{{ $totalVerifiedUsers }}</p>
             </div>
             <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center">
@@ -31,7 +31,7 @@
     <x-card title="">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">إجمالي العروض</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">{{ __('messages.total_offers') }}</p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-black">{{ $totalOffers }}</p>
             </div>
             <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center">
@@ -43,7 +43,7 @@
     <x-card title="">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm text-gray-600 mb-1">إجمالي الحجوزات</p>
+                <p class="text-sm text-gray-600 mb-1">{{ __('messages.total_bookings') }}</p>
                 <p class="text-2xl font-bold text-gray-900">{{ $totalBookings }}</p>
             </div>
             <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -78,7 +78,7 @@
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    <x-card title="نظرة عامة على الحجوزات">
+    <x-card :title="__('messages.bookings_overview')">
         <canvas id="bookingsChart" height="250"></canvas>
     </x-card>
 
@@ -120,7 +120,7 @@
         </div>
     </x-card>
 
-    <x-card title="الحجوزات الأخيرة">
+    <x-card :title="__('messages.recent_bookings')">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -177,7 +177,7 @@
         data: {
             labels: bookingsLabels,
             datasets: [{
-                label: 'الحجوزات',
+                label: '{{ __('messages.bookings') }}',
                 data: bookingsData,
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',

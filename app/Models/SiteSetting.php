@@ -11,6 +11,7 @@ class SiteSetting extends Model
 
     protected $fillable = [
         'about_story',
+        'about_story_en',
         'about_mission',
         'about_vision',
         'contact_email',

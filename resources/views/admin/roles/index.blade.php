@@ -1,14 +1,14 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Roles Management')
-@section('page-title', 'Roles Management')
+@section('title', __('messages.manage_roles'))
+@section('page-title', __('messages.manage_roles'))
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">All Roles</h3>
+        <h3 class="card-title">{{ __('messages.all_roles') }}</h3>
         <a href="{{ route('admin.roles.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Create Role
+            <i class="fas fa-plus"></i> {{ __('messages.create_role') }}
         </a>
     </div>
     <div class="card-body">
@@ -16,13 +16,13 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Permissions Count</th>
-                        <th>Admins Count</th>
-                        <th>Users Count</th>
-                        <th>Actions</th>
+                        <th>{{ __('messages.id') }}</th>
+                        <th>{{ __('messages.name') }}</th>
+                        <th>{{ __('messages.description') }}</th>
+                        <th>{{ __('messages.permissions_count') }}</th>
+                        <th>{{ __('messages.admins_count') }}</th>
+                        <th>{{ __('messages.users_count') }}</th>
+                        <th>{{ __('messages.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,7 +32,7 @@
                         <td>
                             <span class="badge badge-info">{{ $role->name }}</span>
                         </td>
-                        <td>{{ $role->description ?? 'No description' }}</td>
+                        <td>{{ $role->description ?? __('messages.no_description') }}</td>
                         <td>
                             <span class="badge badge-primary">{{ count($role->permissions ?? []) }}</span>
                         </td>
@@ -50,7 +50,7 @@
                                 <form action="{{ route('admin.roles.destroy', $role) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('هل أنت متأكد من حذف هذا الدور؟')">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{{ __('messages.are_you_sure_delete_role') }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>

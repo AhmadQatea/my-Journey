@@ -274,11 +274,11 @@
         <div class="trip-actions">
             <a href="{{ route('bookings.create', ['trip_id' => $trip->id]) }}" class="btn btn-primary btn-lg">
                 <i class="fas fa-calendar-check"></i>
-                احجز الرحلة
+                {{ __('messages.book_trip') }}
             </a>
             <a href="{{ route('trips') }}" class="btn btn-outline btn-lg" style="background: rgba(255,255,255,0.2); color: white; border-color: rgba(255,255,255,0.6);">
                 <i class="fas fa-arrow-right"></i>
-                العودة للرحلات
+                {{ __('messages.back') }} {{ __('messages.trips') }}
             </a>
         </div>
     </div>
@@ -291,7 +291,7 @@
                 <div class="trip-card">
                     <h3>
                         <i class="fas fa-align-right"></i>
-                        وصف الرحلة
+                        {{ __('messages.trip_description') }}
                     </h3>
                     <div style="color: #1e293b; line-height: 1.9; font-size: 1.05rem;">
                         {!! $trip->description !!}
@@ -304,7 +304,7 @@
                 <div class="trip-card">
                     <h3>
                         <i class="fas fa-images"></i>
-                        معرض الصور
+                        {{ __('messages.trip_images') }}
                     </h3>
                     <div class="trip-images-gallery">
                         @foreach($trip->images as $image)
@@ -334,7 +334,7 @@
                 <div class="trip-card">
                     <h3>
                         <i class="fas fa-map-pin"></i>
-                        الأماكن السياحية المضمنة
+                        {{ __('messages.included_places') }}
                     </h3>
                     <div class="tourist-spots-grid">
                         @foreach($touristSpots as $spot)
@@ -367,7 +367,7 @@
                 <div class="trip-card">
                     <h3>
                         <i class="fas fa-route"></i>
-                        المحافظات التي سنمر بها
+                        {{ __('messages.passing_governorates') }}
                     </h3>
                     <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
                         @foreach($passingGovernorates as $governorate)
@@ -391,7 +391,7 @@
                     <div class="trip-card">
                         <h3>
                             <i class="fas fa-map"></i>
-                            خريطة الرحلة التفاعلية
+                            {{ __('messages.trip_map') }}
                         </h3>
                         <div id="tripMap" style="height: 500px; width: 100%; border-radius: 12px; margin-top: 1rem;"></div>
 
@@ -436,7 +436,7 @@
             <div class="trip-card">
                 <h3>
                     <i class="fas fa-info-circle"></i>
-                    تفاصيل الرحلة
+                    {{ __('messages.trip_details') }}
                 </h3>
                 <div class="info-item">
                     <label>المحافظة</label>
@@ -551,18 +551,23 @@
                 @endforeach
 
                 // Add departure point if available
-                @if($trip->departureGovernorate && $trip->departureGovernorate->latitude && $trip->departureGovernorate->longitude)
-                    const departurePoint = {
-                        lat: {{ $trip->departureGovernorate->latitude }},
-                        lng: {{ $trip->departureGovernorate->longitude }},
-                        name: '{{ addslashes($trip->departureGovernorate->name) }} - نقطة الانطلاق'
-                    };
-                    coordinates.unshift(departurePoint);
+                @if($trip->departureGovernorate && $trip->departureGovernorate->coordinates)
+                    @php
+                        $departureCoords = \App\Services\MapService::parseCoordinates($trip->departureGovernorate->coordinates);
+                    @endphp
+                    @if($departureCoords)
+                        const departurePoint = {
+                            lat: {{ $departureCoords['lat'] }},
+                            lng: {{ $departureCoords['lng'] }},
+                            name: '{{ addslashes($trip->departureGovernorate->name) }} - نقطة الانطلاق'
+                        };
+                        coordinates.unshift(departurePoint);
+                    @endif
                 @endif
 
                 // Add markers
                 coordinates.forEach((coord, index) => {
-                    const isDeparture = index === 0 && {{ $trip->departureGovernorate && $trip->departureGovernorate->latitude ? 'true' : 'false' }};
+                    const isDeparture = index === 0 && {{ $trip->departureGovernorate && $trip->departureGovernorate->coordinates ? 'true' : 'false' }};
                     const iconColor = isDeparture ? 'red' : 'blue';
                     const icon = L.divIcon({
                         className: 'custom-marker',

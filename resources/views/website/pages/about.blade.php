@@ -20,24 +20,26 @@
         <div class="container">
             <div class="grid grid-2 align-items-center gap-4">
                 <div class="fade-in">
-                    <h2 class="section-title">قصتنا ورؤيتنا</h2>
+                    <h2 class="section-title">{{ __('messages.about_us') }}</h2>
                     @php
-                        $aboutText = $siteSettings->about_story ?? null;
+                        $locale = app()->getLocale();
+                        if ($locale === 'en') {
+                            $aboutText = $siteSettings->about_story_en ?? null;
+                            // إذا لم يكن هناك نص إنجليزي، استخدم النص الافتراضي
+                            if (!$aboutText) {
+                                $aboutText = 'MyJourney is an electronic tourism platform established to facilitate the booking and exploration of tourist trips in Syria. We believe that Syria possesses a huge tourism wealth that deserves to be discovered by the world. We strive to make our platform the first window for local and international tourists to discover the beauty of Syria by providing an easy and safe booking experience, with accurate and detailed displays of the best tourist places in each governorate.';
+                            }
+                        } else {
+                            $aboutText = $siteSettings->about_story ?? null;
+                            // إذا لم يكن هناك نص عربي، استخدم النص الافتراضي
+                            if (!$aboutText) {
+                                $aboutText = 'MyJourney هي منصة سياحية إلكترونية تأسست بهدف تسهيل عملية حجز واستكشاف الرحلات السياحية في سوريا. نحن نؤمن بأن سوريا تمتلك ثروة سياحية هائلة تستحق أن تكتشف من قبل العالم. نسعى ليكون موقعنا النافذة الأولى للسياح المحليين والدوليين لاكتشاف جمال سوريا من خلال تقديم تجربة حجز سهلة وآمنة، مع عرض دقيق ومفصل لأفضل الأماكن السياحية في كل محافظة.';
+                            }
+                        }
                     @endphp
-                    @if($aboutText)
-                        <div style="line-height: 1.8; color: var(--gray-700); font-size: 1.05rem;">
-                            {!! nl2br(e($aboutText)) !!}
-                        </div>
-                    @else
-                        <p>
-                            MyJourney هي منصة سياحية إلكترونية تأسست بهدف تسهيل عملية حجز واستكشاف الرحلات السياحية في سوريا.
-                            نحن نؤمن بأن سوريا تمتلك ثروة سياحية هائلة تستحق أن تكتشف من قبل العالم.
-                        </p>
-                        <p>
-                            نسعى ليكون موقعنا النافذة الأولى للسياح المحليين والدوليين لاكتشاف جمال سوريا من خلال تقديم
-                            تجربة حجز سهلة وآمنة، مع عرض دقيق ومفصل لأفضل الأماكن السياحية في كل محافظة.
-                        </p>
-                    @endif
+                    <div style="line-height: 1.8; color: var(--gray-700); font-size: 1.05rem;">
+                        {!! nl2br(e($aboutText)) !!}
+                    </div>
                 </div>
                 <div class="fade-in">
                     <img src="{{ asset('assets/images/damascus.jpg') }}"

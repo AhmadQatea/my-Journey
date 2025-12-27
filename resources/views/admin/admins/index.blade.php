@@ -1,18 +1,18 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Admins Management')
-@section('page-title', 'Admins Management')
+@section('title', __('messages.manage_admins'))
+@section('page-title', __('messages.manage_admins'))
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">All Administrators</h3>
+        <h3 class="card-title">{{ __('messages.all_administrators') }}</h3>
         <div class="flex gap-3">
             <a href="{{ route('admin.roles.create') }}" class="btn btn-success">
-                <i class="fas fa-user-tag"></i> Create Role
+                <i class="fas fa-user-tag"></i> {{ __('messages.create_role') }}
             </a>
             <a href="{{ route('admin.admins.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Add Admin
+                <i class="fas fa-plus"></i> {{ __('messages.add_admin') }}
             </a>
         </div>
     </div>
@@ -21,12 +21,12 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Super Admin</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>{{ __('messages.name') }}</th>
+                        <th>{{ __('messages.email') }}</th>
+                        <th>{{ __('messages.role') }}</th>
+                        <th>{{ __('messages.super_admin') }}</th>
+                        <th>{{ __('messages.status') }}</th>
+                        <th>{{ __('messages.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,7 +39,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-medium">{{ $admin->name }}</h4>
-                                    <p class="text-sm text-gray-500">ID: {{ $admin->id }}</p>
+                                    <p class="text-sm text-gray-500">{{ __('messages.id') }}: {{ $admin->id }}</p>
                                 </div>
                             </div>
                         </td>
@@ -48,19 +48,19 @@
                             @if($admin->role)
                                 <span class="badge badge-info">{{ $admin->role->name }}</span>
                             @else
-                                <span class="badge badge-secondary">No Role</span>
+                                <span class="badge badge-secondary">{{ __('messages.no_role') }}</span>
                             @endif
                         </td>
                         <td>
                             @if($admin->is_super_admin)
-                                <span class="badge badge-success">Yes</span>
+                                <span class="badge badge-success">{{ __('messages.yes') }}</span>
                             @else
-                                <span class="badge badge-secondary">No</span>
+                                <span class="badge badge-secondary">{{ __('messages.no') }}</span>
                             @endif
                         </td>
                         <td>
                             <span class="badge badge-{{ $admin->is_active ? 'success' : 'danger' }}">
-                                {{ $admin->is_active ? 'Active' : 'Inactive' }}
+                                {{ $admin->is_active ? __('messages.active') : __('messages.inactive') }}
                             </span>
                         </td>
                         <td>
@@ -100,7 +100,7 @@
             <i class="fas fa-user-shield"></i>
         </div>
         <div class="stat-number">{{ $totalAdmins }}</div>
-        <div class="stat-label">Total Admins</div>
+        <div class="stat-label">{{ __('messages.total_admins') }}</div>
     </div>
     
     <div class="stat-card">
@@ -108,7 +108,7 @@
             <i class="fas fa-crown"></i>
         </div>
         <div class="stat-number">{{ $superAdmins }}</div>
-        <div class="stat-label">Super Admins</div>
+        <div class="stat-label">{{ __('messages.super_admins') }}</div>
     </div>
     
     <div class="stat-card">
@@ -116,7 +116,7 @@
             <i class="fas fa-user-check"></i>
         </div>
         <div class="stat-number">{{ $activeAdmins }}</div>
-        <div class="stat-label">Active Admins</div>
+        <div class="stat-label">{{ __('messages.active_admins') }}</div>
     </div>
     
     <div class="stat-card">
@@ -124,7 +124,7 @@
             <i class="fas fa-user-times"></i>
         </div>
         <div class="stat-number">{{ $inactiveAdmins }}</div>
-        <div class="stat-label">Inactive Admins</div>
+        <div class="stat-label">{{ __('messages.inactive_admins') }}</div>
     </div>
 </div>
 

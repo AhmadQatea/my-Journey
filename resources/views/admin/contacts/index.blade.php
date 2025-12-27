@@ -1,16 +1,16 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'رسائل المستخدمين')
-@section('page-title', 'رسائل المستخدمين')
+@section('title', __('messages.contact_messages'))
+@section('page-title', __('messages.contact_messages'))
 
 @section('content')
 <div class="container mx-auto px-4 py-4">
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">رسائل المستخدمين</h1>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">{{ __('messages.contact_messages') }}</h1>
             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                عرض وإدارة رسائل نموذج الاتصال من موقع MyJourney
+                {{ __('messages.view_contact_messages') }}
             </p>
         </div>
     </div>
@@ -19,10 +19,10 @@
     <div class="card">
         <div class="card-header">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <h3 class="card-title">جميع رسائل الاتصال</h3>
+                <h3 class="card-title">{{ __('messages.all_contact_messages') }}</h3>
                 @if($messages->count() > 0)
                     <span class="text-sm text-gray-600 dark:text-gray-400">
-                        عرض {{ $messages->firstItem() ?? 0 }} - {{ $messages->lastItem() ?? 0 }} من {{ $messages->total() }}
+                        {{ __('messages.showing') }} {{ $messages->firstItem() ?? 0 }} {{ __('messages.to') }} {{ $messages->lastItem() ?? 0 }} {{ __('messages.of') }} {{ $messages->total() }}
                     </span>
                 @endif
             </div>
@@ -48,12 +48,12 @@
                         <thead>
                         <tr>
                             <th class="w-16">#</th>
-                            <th>الاسم</th>
-                            <th>البريد الإلكتروني</th>
-                            <th>الموضوع</th>
-                            <th class="w-24">الحالة</th>
-                            <th class="w-40">تاريخ الإرسال</th>
-                            <th class="w-40">الإجراءات</th>
+                            <th>{{ __('messages.name') }}</th>
+                            <th>{{ __('messages.email') }}</th>
+                            <th>{{ __('messages.subject') }}</th>
+                            <th class="w-24">{{ __('messages.status') }}</th>
+                            <th class="w-40">{{ __('messages.submission_date') }}</th>
+                            <th class="w-40">{{ __('messages.actions') }}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -66,7 +66,7 @@
                                     </div>
                                     @if($message->user)
                                         <div class="text-xs text-gray-500 dark:text-gray-400">
-                                            مستخدم مسجل: {{ $message->user->full_name }}
+                                            {{ __('messages.registered_user') }}: {{ $message->user->full_name }}
                                         </div>
                                     @endif
                                 </td>
@@ -82,7 +82,7 @@
                                 </td>
                                 <td>
                                     <span class="badge {{ $message->status === 'replied' ? 'badge-success' : 'badge-secondary' }}">
-                                        {{ $message->status === 'replied' ? 'تم الرد' : 'جديد' }}
+                                        {{ $message->status === 'replied' ? __('messages.replied') : __('messages.new') }}
                                     </span>
                                 </td>
                                 <td>
@@ -96,7 +96,7 @@
                                 <td>
                                     <div class="flex items-center gap-2">
                                         <a href="{{ route('admin.contact-messages.show', $message) }}"
-                                           class="btn btn-info btn-sm" title="عرض التفاصيل والرد">
+                                           class="btn btn-info btn-sm" title="{{ __('messages.view_details_reply') }}">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <form action="{{ route('admin.contact-messages.destroy', $message) }}"

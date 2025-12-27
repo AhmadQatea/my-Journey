@@ -1,16 +1,16 @@
 {{-- resources/views/admin/deals/index.blade.php --}}
 @extends('admin.layouts.admin')
 
-@section('title', 'إدارة العروض')
-@section('page-title', 'إدارة العروض')
+@section('title', __('messages.manage_deals'))
+@section('page-title', __('messages.manage_deals'))
 
 @section('content')
 <div class="container mx-auto px-4 py-4">
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">إدارة العروض</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">إدارة جميع العروض والصفقات الخاصة</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">{{ __('messages.manage_deals') }}</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ __('messages.manage_all_deals') }}</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -18,11 +18,11 @@
             <div class="hidden sm:flex items-center gap-4 text-sm">
                 <div class="flex items-center gap-1">
                     <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                    <span class="text-gray-600 dark:text-gray-400">مفعل: {{ $stats['active'] }}</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ __('messages.active') }}: {{ $stats['active'] }}</span>
                 </div>
                 <div class="flex items-center gap-1">
                     <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                    <span class="text-gray-600 dark:text-gray-400">منتهي: {{ $stats['expired'] }}</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ __('messages.expired') }}: {{ $stats['expired'] }}</span>
                 </div>
             </div>
 
@@ -41,29 +41,29 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <!-- Search -->
                     <div class="form-group">
-                        <label class="form-label">بحث</label>
+                        <label class="form-label">{{ __('messages.search') }}</label>
                         <input type="text"
                                name="search"
                                value="{{ request('search') }}"
                                class="form-control"
-                               placeholder="ابحث عن عرض...">
+                               placeholder="{{ __('messages.search_deal') }}">
                     </div>
 
                     <!-- Status Filter -->
                     <div class="form-group">
-                        <label class="form-label">الحالة</label>
+                        <label class="form-label">{{ __('messages.status') }}</label>
                         <select name="status" class="form-control form-select">
-                            <option value="">جميع الحالات</option>
-                            <option value="مفعل" {{ request('status') == 'مفعل' ? 'selected' : '' }}>مفعل</option>
-                            <option value="منتهي" {{ request('status') == 'منتهي' ? 'selected' : '' }}>منتهي</option>
+                            <option value="">{{ __('messages.all_statuses') }}</option>
+                            <option value="مفعل" {{ request('status') == 'مفعل' ? 'selected' : '' }}>{{ __('messages.active') }}</option>
+                            <option value="منتهي" {{ request('status') == 'منتهي' ? 'selected' : '' }}>{{ __('messages.expired') }}</option>
                         </select>
                     </div>
 
                     <!-- Trip Filter -->
                     <div class="form-group">
-                        <label class="form-label">الرحلة</label>
+                        <label class="form-label">{{ __('messages.trip') }}</label>
                         <select name="trip_id" class="form-control form-select">
-                            <option value="">جميع الرحلات</option>
+                            <option value="">{{ __('messages.all_trips') }}</option>
                             @foreach($trips as $trip)
                                 <option value="{{ $trip->id }}" {{ request('trip_id') == $trip->id ? 'selected' : '' }}>
                                     {{ $trip->title }}
@@ -76,11 +76,11 @@
                 <div class="flex items-center gap-3">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-search ml-1"></i>
-                        بحث
+                        {{ __('messages.search') }}
                     </button>
                     <a href="{{ route('admin.deals.index') }}" class="btn btn-outline">
                         <i class="fas fa-redo ml-1"></i>
-                        إعادة تعيين
+                        {{ __('messages.reset') }}
                     </a>
                 </div>
             </form>
@@ -93,7 +93,7 @@
             <div class="card-body p-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">إجمالي العروض</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.total_deals') }}</p>
                         <p class="text-2xl font-bold text-gray-900 dark:text-gray mt-1">{{ $stats['total'] }}</p>
                     </div>
                     <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">

@@ -9,12 +9,7 @@ class Governorate extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'location', 'featured_image', 'latitude', 'longitude'];
-
-    protected $casts = [
-        'latitude' => 'decimal:8',
-        'longitude' => 'decimal:8',
-    ];
+    protected $fillable = ['name', 'description', 'location', 'featured_image', 'coordinates'];
 
     // العلاقة مع الأماكن السياحية
     public function touristSpots()

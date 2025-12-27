@@ -28,20 +28,23 @@ class MapController extends Controller
         $departurePoint = null;
 
         // إضافة نقطة الانطلاق إذا كانت موجودة
-        if ($trip->departureGovernorate && $trip->departureGovernorate->latitude && $trip->departureGovernorate->longitude) {
-            $departurePoint = [
-                'lat' => (float) $trip->departureGovernorate->latitude,
-                'lng' => (float) $trip->departureGovernorate->longitude,
-            ];
-            $coordinates[] = $departurePoint;
-            $places[] = [
-                'id' => 'departure',
-                'name' => $trip->departureGovernorate->name.' - نقطة الانطلاق',
-                'lat' => $departurePoint['lat'],
-                'lng' => $departurePoint['lng'],
-                'governorate' => $trip->departureGovernorate->name,
-                'type' => 'departure',
-            ];
+        if ($trip->departureGovernorate && $trip->departureGovernorate->coordinates) {
+            $departureCoords = MapService::parseCoordinates($trip->departureGovernorate->coordinates);
+            if ($departureCoords) {
+                $departurePoint = [
+                    'lat' => $departureCoords['lat'],
+                    'lng' => $departureCoords['lng'],
+                ];
+                $coordinates[] = $departurePoint;
+                $places[] = [
+                    'id' => 'departure',
+                    'name' => $trip->departureGovernorate->name.' - نقطة الانطلاق',
+                    'lat' => $departurePoint['lat'],
+                    'lng' => $departurePoint['lng'],
+                    'governorate' => $trip->departureGovernorate->name,
+                    'type' => 'departure',
+                ];
+            }
         }
 
         // جلب الأماكن السياحية المضمنة في الرحلة

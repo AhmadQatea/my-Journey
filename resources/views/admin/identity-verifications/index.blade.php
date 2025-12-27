@@ -1,7 +1,7 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'طلبات توثيق الهوية')
-@section('page-title', 'طلبات توثيق الهوية')
+@section('title', __('messages.identity_verification_requests'))
+@section('page-title', __('messages.identity_verification'))
 
 @section('content')
 <div class="container mx-auto px-4 py-4">
@@ -11,7 +11,7 @@
             <div class="card-body">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">المعلقة</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.pending_verifications') }}</p>
                         <p class="text-2xl font-bold text-yellow-600">{{ $stats['pending'] }}</p>
                     </div>
                     <i class="fas fa-clock text-3xl text-yellow-500"></i>
@@ -22,7 +22,7 @@
             <div class="card-body">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">المقبولة</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.approved_verifications') }}</p>
                         <p class="text-2xl font-bold text-green-600">{{ $stats['approved'] }}</p>
                     </div>
                     <i class="fas fa-check-circle text-3xl text-green-500"></i>
@@ -33,7 +33,7 @@
             <div class="card-body">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">المرفوضة</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.rejected_verifications') }}</p>
                         <p class="text-2xl font-bold text-red-600">{{ $stats['rejected'] }}</p>
                     </div>
                     <i class="fas fa-times-circle text-3xl text-red-500"></i>
@@ -44,7 +44,7 @@
             <div class="card-body">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">الإجمالي</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.total_verifications') }}</p>
                         <p class="text-2xl font-bold text-blue-600">{{ $stats['total'] }}</p>
                     </div>
                     <i class="fas fa-list text-3xl text-blue-500"></i>
@@ -61,23 +61,23 @@
                     <input type="text" 
                            name="search" 
                            value="{{ request('search') }}" 
-                           placeholder="البحث بالاسم أو البريد..."
+                           placeholder="{{ __('messages.search_by_name_email') }}"
                            class="form-input w-full">
                 </div>
                 <div class="min-w-[150px]">
                     <select name="status" class="form-select w-full">
-                        <option value="">جميع الحالات</option>
-                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>معلقة</option>
-                        <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>مقبولة</option>
-                        <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>مرفوضة</option>
+                        <option value="">{{ __('messages.all_statuses') }}</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>{{ __('messages.pending') }}</option>
+                        <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>{{ __('messages.accepted') }}</option>
+                        <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>{{ __('messages.rejected') }}</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search ml-1"></i>بحث
+                    <i class="fas fa-search ml-1"></i>{{ __('messages.search') }}
                 </button>
                 @if(request()->hasAny(['search', 'status']))
                     <a href="{{ route('admin.identity-verifications.index') }}" class="btn btn-outline">
-                        <i class="fas fa-times ml-1"></i>إعادة تعيين
+                        <i class="fas fa-times ml-1"></i>{{ __('messages.reset') }}
                     </a>
                 @endif
             </form>
@@ -92,12 +92,12 @@
                     <table class="w-full">
                         <thead>
                             <tr class="border-b">
-                                <th class="text-right p-3">المستخدم</th>
-                                <th class="text-right p-3">تاريخ الطلب</th>
-                                <th class="text-right p-3">الحالة</th>
-                                <th class="text-right p-3">المراجع</th>
-                                <th class="text-right p-3">تاريخ المراجعة</th>
-                                <th class="text-right p-3">الإجراءات</th>
+                                <th class="text-right p-3">{{ __('messages.users') }}</th>
+                                <th class="text-right p-3">{{ __('messages.request_date') }}</th>
+                                <th class="text-right p-3">{{ __('messages.status') }}</th>
+                                <th class="text-right p-3">{{ __('messages.reviewer') }}</th>
+                                <th class="text-right p-3">{{ __('messages.review_date') }}</th>
+                                <th class="text-right p-3">{{ __('messages.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>

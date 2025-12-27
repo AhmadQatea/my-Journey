@@ -1,16 +1,16 @@
 {{-- resources/views/admin/articles/index.blade.php --}}
 @extends('admin.layouts.admin')
 
-@section('title', 'إدارة المقالات')
-@section('page-title', 'إدارة المقالات')
+@section('title', __('messages.manage_articles'))
+@section('page-title', __('messages.manage_articles'))
 
 @section('content')
 <div class="container mx-auto px-4 py-4">
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">إدارة المقالات</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">إدارة جميع المقالات في النظام</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">{{ __('messages.manage_articles') }}</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ __('messages.manage_all_articles') }}</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -18,15 +18,15 @@
             <div class="hidden sm:flex items-center gap-4 text-sm">
                 <div class="flex items-center gap-1">
                     <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                    <span class="text-gray-600 dark:text-gray-400">منشورة: {{ $stats['published'] }}</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ __('messages.published') }}: {{ $stats['published'] }}</span>
                 </div>
                 <div class="flex items-center gap-1">
                     <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <span class="text-gray-600 dark:text-gray-400">معلقة: {{ $stats['pending'] }}</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ __('messages.pending') }}: {{ $stats['pending'] }}</span>
                 </div>
                 <div class="flex items-center gap-1">
                     <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                    <span class="text-gray-600 dark:text-gray-400">مرفوضة: {{ $stats['rejected'] }}</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ __('messages.rejected') }}: {{ $stats['rejected'] }}</span>
                 </div>
             </div>
 
@@ -45,30 +45,30 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     <!-- Search -->
                     <div class="form-group">
-                        <label class="form-label">بحث</label>
+                        <label class="form-label">{{ __('messages.search') }}</label>
                         <input type="text"
                                name="search"
                                value="{{ request('search') }}"
                                class="form-control"
-                               placeholder="ابحث عن مقال...">
+                               placeholder="{{ __('messages.search_article') }}">
                     </div>
 
                     <!-- Status Filter -->
                     <div class="form-group">
-                        <label class="form-label">الحالة</label>
+                        <label class="form-label">{{ __('messages.status') }}</label>
                         <select name="status" class="form-control form-select">
-                            <option value="all">جميع الحالات</option>
-                            <option value="معلقة" {{ request('status') == 'معلقة' ? 'selected' : '' }}>معلقة</option>
-                            <option value="منشورة" {{ request('status') == 'منشورة' ? 'selected' : '' }}>منشورة</option>
-                            <option value="مرفوضة" {{ request('status') == 'مرفوضة' ? 'selected' : '' }}>مرفوضة</option>
+                            <option value="all">{{ __('messages.all_statuses') }}</option>
+                            <option value="معلقة" {{ request('status') == 'معلقة' ? 'selected' : '' }}>{{ __('messages.pending') }}</option>
+                            <option value="منشورة" {{ request('status') == 'منشورة' ? 'selected' : '' }}>{{ __('messages.published') }}</option>
+                            <option value="مرفوضة" {{ request('status') == 'مرفوضة' ? 'selected' : '' }}>{{ __('messages.rejected') }}</option>
                         </select>
                     </div>
 
                     <!-- Trip Filter -->
                     <div class="form-group">
-                        <label class="form-label">الرحلة</label>
+                        <label class="form-label">{{ __('messages.trip') }}</label>
                         <select name="trip_id" class="form-control form-select">
-                            <option value="">جميع الرحلات</option>
+                            <option value="">{{ __('messages.all_trips') }}</option>
                             @foreach($trips as $trip)
                                 <option value="{{ $trip->id }}" {{ request('trip_id') == $trip->id ? 'selected' : '' }}>
                                     {{ $trip->title }}
@@ -79,9 +79,9 @@
 
                     <!-- User Filter -->
                     <div class="form-group">
-                        <label class="form-label">المستخدم</label>
+                        <label class="form-label">{{ __('messages.users') }}</label>
                         <select name="user_id" class="form-control form-select">
-                            <option value="">جميع المستخدمين</option>
+                            <option value="">{{ __('messages.all_users') }}</option>
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
                                     {{ $user->full_name }}
@@ -94,11 +94,11 @@
                 <div class="flex items-center gap-3">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-filter ml-1"></i>
-                        فلترة
+                        {{ __('messages.filter') }}
                     </button>
                     <a href="{{ route('admin.articles.index') }}" class="btn btn-outline">
                         <i class="fas fa-sync ml-1"></i>
-                        إعادة تعيين
+                        {{ __('messages.reset') }}
                     </a>
                 </div>
             </form>

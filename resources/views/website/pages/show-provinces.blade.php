@@ -4,7 +4,7 @@
     use Illuminate\Support\Facades\Storage;
 @endphp
 
-@section('title', $governorate->name . ' - المحافظات والأماكن السياحية - MyJourney')
+@section('title', $governorate->name . ' - ' . __('messages.provinces') . ' - MyJourney')
 
 @section('content')
     <!-- ========== PROVINCE HERO ========== -->
@@ -13,16 +13,16 @@
             <div class="hero-content">
                 <h1 class="hero-title">{{ $governorate->name }}</h1>
                 <p class="hero-subtitle">
-                    اكتشف جمال {{ $governorate->name }} وأهم الأماكن السياحية فيها
+                    {{ str_replace(':name', $governorate->name, __('messages.discover_province')) }}
                 </p>
                 <div class="hero-actions">
                     <a href="#places" class="btn btn-primary btn-lg">
                         <i class="fas fa-map-marked-alt"></i>
-                        الأماكن السياحية
+                        {{ __('messages.tourist_spots') }}
                     </a>
                     <a href="#map" class="btn btn-outline btn-lg">
                         <i class="fas fa-map"></i>
-                        الخريطة التفاعلية
+                        {{ __('messages.interactive_map') }}
                     </a>
                 </div>
             </div>
@@ -39,41 +39,41 @@
                             <div class="card-body">
                                 <h2 class="section-title" style="margin-bottom: 1.5rem;">
                                     <i class="fas fa-info-circle"></i>
-                                    معلومات عن {{ $governorate->name }}
+                                    {{ str_replace(':name', $governorate->name, __('messages.province_info')) }}
                                 </h2>
 
                                 <div class="province-details">
                                     <div class="detail-item" style="display: flex; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-200);">
                                         <div style="min-width: 120px;">
-                                            <strong style="color: var(--gray-700);">الموقع:</strong>
+                                            <strong style="color: var(--gray-700);">{{ __('messages.location') }}:</strong>
                                         </div>
                                         <div>
-                                            <span>{{ $governorate->location ?? 'غير محدد' }}</span>
+                                            <span>{{ $governorate->location ?? __('messages.not_specified') }}</span>
                                         </div>
                                     </div>
 
                                     <div class="detail-item" style="display: flex; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-200);">
                                         <div style="min-width: 120px;">
-                                            <strong style="color: var(--gray-700);">عدد الأماكن السياحية:</strong>
+                                            <strong style="color: var(--gray-700);">{{ __('messages.tourist_spots_count') }}:</strong>
                                         </div>
                                         <div>
-                                            <span>{{ $governorate->touristSpots->count() }} مكان</span>
+                                            <span>{{ $governorate->touristSpots->count() }} {{ __('messages.place') }}</span>
                                         </div>
                                     </div>
 
                                     <div class="detail-item" style="display: flex; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-200);">
                                         <div style="min-width: 120px;">
-                                            <strong style="color: var(--gray-700);">عدد الرحلات:</strong>
+                                            <strong style="color: var(--gray-700);">{{ __('messages.trips_count') }}:</strong>
                                         </div>
                                         <div>
-                                            <span>{{ $governorate->trips->count() }} رحلة</span>
+                                            <span>{{ $governorate->trips->count() }} {{ __('messages.trip') }}</span>
                                         </div>
                                     </div>
 
                                     @if($governorate->touristSpots->count() > 0)
                                         <div class="detail-item" style="display: flex; margin-bottom: 1.5rem;">
                                             <div style="min-width: 120px;">
-                                                <strong style="color: var(--gray-700);">أشهر الأماكن:</strong>
+                                                <strong style="color: var(--gray-700);">{{ __('messages.famous_places') }}:</strong>
                                             </div>
                                             <div>
                                                 <div class="landmarks-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
@@ -91,7 +91,7 @@
                                 <div class="province-description">
                                     <h3 style="margin-bottom: 1rem; color: var(--gray-800);">
                                         <i class="fas fa-book-open"></i>
-                                        وصف المحافظة
+                                        {{ __('messages.province_description') }}
                                     </h3>
                                     <p style="color: var(--gray-600); line-height: 1.8; text-align: justify;">
                                         {{ $governorate->description ?? 'تعتبر ' . $governorate->name . ' من المحافظات السورية المميزة التي تجمع بين التاريخ العريق والطبيعة الخلابة. تزخر المحافظة بالعديد من الأماكن السياحية والتاريخية التي تجذب السياح من مختلف أنحاء العالم.' }}
@@ -120,7 +120,7 @@
                                             {{ $governorate->places_count ?? $governorate->touristSpots->count() }}
                                         </div>
                                         <div class="stat-label" style="color: var(--gray-600); font-size: 0.875rem;">
-                                            مكان سياحي
+                                            {{ __('messages.tourist_place') }}
                                         </div>
                                     </div>
 
@@ -132,7 +132,7 @@
                                             4.5
                                         </div>
                                         <div class="stat-label" style="color: var(--gray-600); font-size: 0.875rem;">
-                                            متوسط التقييم
+                                            {{ __('messages.average_rating') }}
                                         </div>
                                     </div>
 
@@ -144,7 +144,7 @@
                                             {{ number_format(rand(1000, 5000)) }}
                                         </div>
                                         <div class="stat-label" style="color: var(--gray-600); font-size: 0.875rem;">
-                                            مشاهدة شهرياً
+                                            {{ __('messages.monthly_views') }}
                                         </div>
                                     </div>
 
@@ -165,7 +165,7 @@
                                 <div class="best-time-visit" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
                                     <h3 style="margin-bottom: 1rem; color: var(--gray-800); text-align: center;">
                                         <i class="fas fa-calendar-alt"></i>
-                                        أفضل وقت للزيارة
+                                        {{ __('messages.best_visiting_time') }}
                                     </h3>
                                     <div style="display: flex; align-items: center; gap: 1rem; justify-content: center;">
                                         <div class="season-badges" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -194,7 +194,7 @@
                                                     </span>
                                                     @if($isSelected)
                                                         <span class="badge" style="background: {{ $season->color ?? '#4361ee' }}; color: white; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: var(--radius-full);">
-                                                            ممتاز
+                                                            {{ __('messages.excellent') }}
                                                         </span>
                                                     @endif
                                                 </div>
@@ -216,8 +216,8 @@
     <section id="map" class="section" style="background: var(--gray-50);">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">الخريطة التفاعلية</h2>
-                <p class="section-subtitle">موقع {{ $governorate->name }} على خريطة سوريا</p>
+                <h2 class="section-title">{{ __('messages.interactive_map') }}</h2>
+                <p class="section-subtitle">{{ str_replace(':name', $governorate->name, __('messages.province_location')) }}</p>
             </div>
 
             <div class="map-container fade-in">
@@ -318,25 +318,25 @@
                                     <div class="map-legend" style="position: absolute; top: 1rem; left: 1rem; background: rgba(255, 255, 255, 0.9); padding: 1rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); max-width: 200px;">
                                         <h4 style="margin-bottom: 0.75rem; color: var(--gray-800);">
                                             <i class="fas fa-map-signs"></i>
-                                            دليل الخريطة
+                                            {{ __('messages.map_legend') }}
                                         </h4>
                                         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                                 <div style="width: 12px; height: 12px; background: {{ $currentProvince['color'] }}; border-radius: var(--radius-full);"></div>
                                                 <span style="font-size: 0.875rem; color: var(--gray-700);">
-                                                    {{ $governorate->name }} (المحافظة الحالية)
+                                                    {{ $governorate->name }} ({{ __('messages.current_province') }})
                                                 </span>
                                             </div>
                                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                                 <div style="width: 8px; height: 8px; background: white; border: 2px solid {{ $currentProvince['color'] }}; border-radius: var(--radius-full);"></div>
                                                 <span style="font-size: 0.875rem; color: var(--gray-700);">
-                                                    المدن الرئيسية
+                                                    {{ __('messages.main_cities') }}
                                                 </span>
                                             </div>
                                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                                 <div style="width: 100%; height: 2px; background: var(--gray-400);"></div>
                                                 <span style="font-size: 0.875rem; color: var(--gray-700);">
-                                                    حدود المحافظات
+                                                    {{ __('messages.province_borders') }}
                                                 </span>
                                             </div>
                                         </div>
@@ -348,7 +348,7 @@
                             <div class="nearby-provinces" style="position: absolute; bottom: 1rem; left: 1rem; background: rgba(255, 255, 255, 0.9); padding: 1rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); max-width: 250px;">
                                 <h4 style="margin-bottom: 0.75rem; color: var(--gray-800);">
                                     <i class="fas fa-map-marker-alt"></i>
-                                    المحافظات المجاورة
+                                    {{ __('messages.nearby_provinces') }}
                                 </h4>
                                 <div class="nearby-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                                     @php
@@ -373,8 +373,8 @@
                                         <i class="fas fa-road"></i>
                                     </div>
                                     <div class="info-text" style="font-size: 0.875rem; color: var(--gray-600);">
-                                        <strong>{{ rand(50, 500) }} كم</strong>
-                                        <div>من دمشق</div>
+                                        <strong>{{ rand(50, 500) }} {{ __('messages.km') }}</strong>
+                                        <div>{{ __('messages.from_damascus') }}</div>
                                     </div>
                                 </div>
 
@@ -383,8 +383,8 @@
                                         <i class="fas fa-car"></i>
                                     </div>
                                     <div class="info-text" style="font-size: 0.875rem; color: var(--gray-600);">
-                                        <strong>{{ rand(1, 5) }} ساعات</strong>
-                                        <div>بالسيارة</div>
+                                        <strong>{{ rand(1, 5) }} {{ __('messages.hours') }}</strong>
+                                        <div>{{ __('messages.by_car') }}</div>
                                     </div>
                                 </div>
 
@@ -393,8 +393,8 @@
                                         <i class="fas fa-bus"></i>
                                     </div>
                                     <div class="info-text" style="font-size: 0.875rem; color: var(--gray-600);">
-                                        <strong>نعم</strong>
-                                        <div>مواصلات عامة</div>
+                                        <strong>{{ __('messages.yes_available') }}</strong>
+                                        <div>{{ __('messages.public_transport') }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -409,7 +409,7 @@
     <section id="places" class="section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">الأماكن السياحية في {{ $governorate->name }}</h2>
+                <h2 class="section-title">{{ __('messages.tourist_spots_in') }} {{ $governorate->name }}</h2>
                 <p class="section-subtitle">اكتشف أجمل المعالم والوجهات السياحية</p>
             </div>
 
@@ -447,10 +447,10 @@
 
                             <div class="sort-options" style="margin-right: auto;">
                                 <select class="form-select" style="padding: 0.375rem 0.75rem; font-size: 0.875rem;">
-                                    <option value="popular">الأكثر شهرة</option>
-                                    <option value="rating">الأعلى تقييماً</option>
-                                    <option value="newest">الأحدث</option>
-                                    <option value="name">حسب الاسم</option>
+                                    <option value="popular">{{ __('messages.most_popular') }}</option>
+                                    <option value="rating">{{ __('messages.highest_rated') }}</option>
+                                    <option value="newest">{{ __('messages.newest') }}</option>
+                                    <option value="name">{{ __('messages.by_name') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -513,9 +513,9 @@
                                               style="background: {{ $spot->entrance_fee && $spot->entrance_fee > 0 ? ($spot->entrance_fee < 1000 ? '#fbbf24' : '#ef4444') : '#4ade80' }};
                                                      color: white; padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem;">
                                             @if($spot->entrance_fee && $spot->entrance_fee > 0)
-                                                {{ $spot->entrance_fee < 1000 ? 'منخفض' : 'متوسط' }}
+                                                {{ $spot->entrance_fee < 1000 ? __('messages.low_cost') : __('messages.medium_cost') }}
                                             @else
-                                                مجاني
+                                                {{ __('messages.free') }}
                                             @endif
                                         </span>
                                     </div>
@@ -548,7 +548,7 @@
                                                 <div style="color: var(--primary); margin-bottom: 0.25rem;">
                                                     <i class="fas fa-money-bill-wave"></i>
                                                 </div>
-                                                <div>مجاني</div>
+                                                <div>{{ __('messages.free') }}</div>
                                             </div>
                                         @endif
                                         <div class="detail" style="text-align: center;">
@@ -563,7 +563,7 @@
                                     <div style="display: flex; gap: 0.5rem;">
                                         <a href="{{ route('trips') }}" class="btn btn-primary btn-sm" style="flex: 1;">
                                             <i class="fas fa-info-circle"></i>
-                                            التفاصيل
+                                            {{ __('messages.view') }}
                                         </a>
                                         <button class="btn btn-outline btn-sm btn-save" data-place="{{ $spot->name }}">
                                             <i class="fas fa-heart"></i>
@@ -604,8 +604,8 @@
     <section class="section" style="background: var(--gray-50);">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">رحلات سياحية في {{ $governorate->name }}</h2>
-                <p class="section-subtitle">احجز رحلتك لاكتشاف {{ $governorate->name }}</p>
+                <h2 class="section-title">{{ app()->getLocale() === 'ar' ? 'رحلات سياحية في' : 'Tourist Trips in' }} {{ $governorate->name }}</h2>
+                <p class="section-subtitle">{{ app()->getLocale() === 'ar' ? 'احجز رحلتك لاكتشاف' : 'Book your trip to discover' }} {{ $governorate->name }}</p>
             </div>
 
             <!-- Tours Slider -->
@@ -630,7 +630,7 @@
                                         <div class="tour-badge"
                                              style="position: absolute; top: 1rem; right: 1rem; background: var(--primary); color: white;
                                                     padding: 0.5rem 1rem; border-radius: var(--radius-full); font-weight: bold;">
-                                            مميز
+                                            {{ app()->getLocale() === 'ar' ? 'مميز' : 'Featured' }}
                                         </div>
                                     @endif
                                 </div>
@@ -645,13 +645,13 @@
                                             <div style="color: var(--primary); margin-bottom: 0.25rem;">
                                                 <i class="fas fa-clock"></i>
                                             </div>
-                                            <div>{{ $trip->duration_hours }} ساعة</div>
+                                            <div>{{ $trip->duration_hours }} {{ __('messages.hours') }}</div>
                                         </div>
                                         <div class="detail" style="text-align: center;">
                                             <div style="color: var(--primary); margin-bottom: 0.25rem;">
                                                 <i class="fas fa-user-friends"></i>
                                             </div>
-                                            <div>{{ $trip->max_persons }} أشخاص</div>
+                                            <div>{{ $trip->max_persons }} {{ __('messages.persons') }}</div>
                                         </div>
                                         <div class="detail" style="text-align: center;">
                                             <div style="color: var(--primary); margin-bottom: 0.25rem;">
@@ -664,15 +664,15 @@
                                     <div class="tour-price" style="display: flex; justify-content: space-between; align-items: center;">
                                         <div>
                                             <div style="font-size: 1.25rem; font-weight: bold; color: var(--primary);">
-                                                {{ number_format($trip->price, 0) }} ل.س
+                                                {{ number_format($trip->price, 0) }} {{ __('messages.syrian_pounds') }}
                                             </div>
                                             <div style="font-size: 0.75rem; color: var(--gray-500);">
-                                                للفرد
+                                                {{ app()->getLocale() === 'ar' ? 'للفرد' : 'Per Person' }}
                                             </div>
                                         </div>
                                         <a href="{{ route('trips') }}" class="btn btn-primary btn-sm">
                                             <i class="fas fa-calendar-check"></i>
-                                            احجز الآن
+                                            {{ __('messages.book_now') }}
                                         </a>
                                     </div>
                                 </div>
@@ -683,7 +683,7 @@
                             <div class="card">
                                 <div class="card-body text-center" style="padding: 3rem;">
                                     <i class="fas fa-info-circle" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
-                                    <p style="color: var(--gray-500);">لا توجد رحلات متاحة حالياً في {{ $governorate->name }}</p>
+                                    <p style="color: var(--gray-500);">{{ __('messages.no_related_trips') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -702,18 +702,18 @@
         <div class="container">
             <div class="grid grid-2 align-items-center gap-4">
                 <div class="fade-in">
-                    <h2 style="font-size: 2rem; margin-bottom: 1rem;">هل زرت {{ $governorate->name }} من قبل؟</h2>
+                    <h2 style="font-size: 2rem; margin-bottom: 1rem;">{{ app()->getLocale() === 'ar' ? 'هل زرت' : 'Have you visited' }} {{ $governorate->name }} {{ app()->getLocale() === 'ar' ? 'من قبل؟' : 'before?' }}</h2>
                     <p style="font-size: 1.125rem; opacity: 0.9; margin-bottom: 1.5rem; line-height: 1.6;">
-                        شارك تجربتك مع المسافرين الآخرين وساعدهم في التخطيط لرحلتهم
+                        {{ app()->getLocale() === 'ar' ? 'شارك تجربتك مع المسافرين الآخرين وساعدهم في التخطيط لرحلتهم' : 'Share your experience with other travelers and help them plan their trip' }}
                     </p>
                     <div style="display: flex; gap: 1rem;">
                         <a href="#" class="btn btn-outline" style="background: white; color: var(--primary); border-color: white;">
                             <i class="fas fa-star"></i>
-                            اكتب تقييماً
+                            {{ app()->getLocale() === 'ar' ? 'اكتب تقييماً' : 'Write a Review' }}
                         </a>
                         <a href="#" class="btn btn-outline" style="background: transparent; color: white; border-color: white;">
                             <i class="fas fa-camera"></i>
-                            أضف صوراً
+                            {{ app()->getLocale() === 'ar' ? 'أضف صوراً' : 'Add Photos' }}
                         </a>
                     </div>
                 </div>
@@ -725,7 +725,7 @@
                         <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">
                             {{ rand(1000, 5000) }}
                         </div>
-                        <p style="opacity: 0.9;">مسافر زاروا {{ $governorate->name }} هذا العام</p>
+                        <p style="opacity: 0.9;">{{ app()->getLocale() === 'ar' ? 'مسافر زاروا' : 'Travelers visited' }} {{ $governorate->name }} {{ app()->getLocale() === 'ar' ? 'هذا العام' : 'this year' }}</p>
                     </div>
                 </div>
             </div>

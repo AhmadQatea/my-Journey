@@ -18,13 +18,13 @@
         id="notificationsDropdown">
         <!-- Header -->
         <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-            <h3 class="font-bold text-gray-900 dark:text-gray-100">الإشعارات</h3>
+            <h3 class="font-bold text-gray-900 dark:text-gray-100">{{ __('messages.notifications') }}</h3>
             <div class="flex items-center gap-2">
                 <button 
                     onclick="markAllAsRead()"
                     class="text-sm text-blue-600 dark:text-blue-400 hover:underline"
                     id="markAllReadBtn">
-                    تحديد الكل كمقروء
+                    {{ app()->getLocale() === 'ar' ? 'تحديد الكل كمقروء' : 'Mark All as Read' }}
                 </button>
                 <button 
                     onclick="closeNotifications()"
@@ -38,14 +38,14 @@
         <div class="max-h-96 overflow-y-auto" id="notificationsList">
             <div class="p-8 text-center text-gray-500">
                 <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                <p>جاري التحميل...</p>
+                <p>{{ __('messages.loading') }}</p>
             </div>
         </div>
 
         <!-- Footer -->
         <div class="p-3 border-t border-gray-200 dark:border-gray-700 text-center">
             <a href="#" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                عرض جميع الإشعارات
+                {{ app()->getLocale() === 'ar' ? 'عرض جميع الإشعارات' : 'View All Notifications' }}
             </a>
         </div>
     </div>

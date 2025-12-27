@@ -48,6 +48,7 @@ class SiteController extends Controller
         $validated = $request->validate([
             // وصف مختصر عن الموقع (يُستخدم في صفحة about)
             'about_story' => ['nullable', 'string'],
+            'about_story_en' => ['nullable', 'string'],
             'contact_email' => ['nullable', 'email'],
             'contact_phone' => ['nullable', 'string', 'max:255'],
             'contact_address' => ['nullable', 'string', 'max:500'],

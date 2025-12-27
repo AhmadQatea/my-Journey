@@ -1,16 +1,16 @@
 {{-- resources/views/admin/categories/index.blade.php --}}
 @extends('admin.layouts.admin')
 
-@section('title', 'إدارة الفئات')
-@section('page-title', 'إدارة الفئات')
+@section('title', __('messages.manage_categories'))
+@section('page-title', __('messages.manage_categories'))
 
 @section('content')
 <div class="container mx-auto px-4 py-4">
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">إدارة الفئات</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">إدارة جميع فئات الرحلات في النظام</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray">{{ __('messages.manage_categories') }}</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ __('messages.manage_all_categories') }}</p>
         </div>
     </div>
 
@@ -19,19 +19,19 @@
         <div class="lg:col-span-1">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">إضافة فئة جديدة</h3>
+                    <h3 class="card-title">{{ __('messages.add_new_category') }}</h3>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.categories.store') }}" method="POST" id="categoryForm">
                         @csrf
                         <div class="form-group">
-                            <label class="form-label">اسم الفئة *</label>
+                            <label class="form-label">{{ __('messages.category_name') }} *</label>
                             <input type="text"
                                    name="name"
                                    id="categoryName"
                                    class="form-control @error('name') is-invalid @enderror"
                                    value="{{ old('name') }}"
-                                   placeholder="مثال: بحرية"
+                                   placeholder="{{ app()->getLocale() === 'ar' ? 'مثال: بحرية' : 'Example: Marine' }}"
                                    required>
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -39,7 +39,7 @@
                         </div>
                         <button type="submit" class="btn btn-primary w-full">
                             <i class="fas fa-plus ml-1"></i>
-                            إضافة فئة
+                            {{ __('messages.add_category') }}
                         </button>
                     </form>
                 </div>
@@ -51,9 +51,9 @@
             <div class="card">
                 <div class="card-header">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <h3 class="card-title">قائمة الفئات</h3>
+                        <h3 class="card-title">{{ __('messages.categories_list') }}</h3>
                         <span class="text-sm text-gray-600 dark:text-gray-400">
-                            إجمالي: {{ $categories->count() }} فئة
+                            {{ __('messages.total_categories') }}: {{ $categories->count() }} {{ __('messages.category') }}
                         </span>
                     </div>
                 </div>
@@ -65,10 +65,10 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>اسم الفئة</th>
-                                        <th>عدد الرحلات</th>
-                                        <th>تاريخ الإنشاء</th>
-                                        <th class="w-32">الإجراءات</th>
+                                        <th>{{ __('messages.category_name') }}</th>
+                                        <th>{{ __('messages.trips_count') }}</th>
+                                        <th>{{ __('messages.created_at') }}</th>
+                                        <th class="w-32">{{ __('messages.actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -99,13 +99,13 @@
                                                     <form action="{{ route('admin.categories.destroy', $category) }}"
                                                           method="POST"
                                                           class="inline"
-                                                          onsubmit="return confirm('هل أنت متأكد من حذف الفئة {{ $category->name }}؟');">
+                                                          onsubmit="return confirm('{{ __('messages.are_you_sure') }} {{ __('messages.delete') }} {{ __('messages.category') }} {{ $category->name }}?');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit"
                                                                 class="action-btn delete"
-                                                                title="حذف"
-                                                                data-tooltip="حذف">
+                                                                title="{{ __('messages.delete') }}"
+                                                                data-tooltip="{{ __('messages.delete') }}">
                                                             <i class="fas fa-trash text-xs"></i>
                                                         </button>
                                                     </form>
@@ -121,9 +121,9 @@
                             <div class="empty-state-icon">
                                 <i class="fas fa-tags"></i>
                             </div>
-                            <h4 class="empty-state-title">لا توجد فئات</h4>
+                            <h4 class="empty-state-title">{{ __('messages.no_categories_found') }}</h4>
                             <p class="empty-state-description">
-                                لم يتم إضافة أي فئات بعد. ابدأ بإضافة أول فئة.
+                                {{ app()->getLocale() === 'ar' ? 'لم يتم إضافة أي فئات بعد. ابدأ بإضافة أول فئة.' : 'No categories have been added yet. Start by adding the first category.' }}
                             </p>
                         </div>
                     @endif

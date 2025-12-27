@@ -20,12 +20,23 @@
                 </div>
                 <div class="card-body space-y-4">
                     <div class="form-group">
-                        <label class="form-label">الوصف</label>
+                        <label class="form-label">الوصف (عربي)</label>
                         <textarea name="about_story"
                                   rows="6"
                                   class="form-control @error('about_story') is-invalid @enderror"
                                   placeholder="اكتب نصاً مختصراً يصف الموقع وسيظهر في صفحة (عن الموقع)...">{{ old('about_story', $settings->about_story) }}</textarea>
                         @error('about_story')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الوصف (إنجليزي)</label>
+                        <textarea name="about_story_en"
+                                  rows="6"
+                                  class="form-control @error('about_story_en') is-invalid @enderror"
+                                  placeholder="Write a brief description of the site that will appear on the (About) page...">{{ old('about_story_en', $settings->about_story_en) }}</textarea>
+                        <small class="text-gray-500">سيتم استخدام هذا النص عند اختيار اللغة الإنجليزية</small>
+                        @error('about_story_en')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
