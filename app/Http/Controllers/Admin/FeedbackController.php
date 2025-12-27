@@ -6,10 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Mail\FeedbackReplyMail;
 use App\Models\Feedback;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 
 class FeedbackController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            // السماح لـ site manager أو view_users أو manage_feedback بالوصول
+            if (! Gate::allows('manage_feedback') && ! Gate::allows('site-manager') && ! Gate::allows('view_users')) {
+                abort(403, 'غير مصرح لك بالوصول إلى هذه الصفحة');
+            }
+
+            return $next($request);
+        });
+    }
+
     /**
      * Display a listing of the resource.
      */

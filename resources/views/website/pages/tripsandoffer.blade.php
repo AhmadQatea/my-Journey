@@ -152,7 +152,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                                     <div style="display: flex; flex-direction: column; gap: 0.25rem;">
                                         <span style="font-weight: bold; color: var(--danger); font-size: 1.125rem;">
                                             {{ number_format($offer->getFinalPrice(), 0) }} ل.س
@@ -161,17 +161,23 @@
                                             {{ number_format($offer->trip->price, 0) }} ل.س
                                         </span>
                                     </div>
-                                    @auth
-                                        <a href="{{ route('bookings.create', ['trip_id' => $offer->trip->id, 'offer_id' => $offer->id]) }}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-calendar-check"></i>
-                                            احجز
+                                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                        <a href="{{ route('trips.show', $offer->trip) }}" class="btn btn-outline btn-sm" style="border-color: var(--primary); color: var(--primary);">
+                                            <i class="fas fa-eye"></i>
+                                            عرض الرحلة
                                         </a>
-                                    @else
-                                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-sign-in-alt"></i>
-                                            سجل الدخول
-                                        </a>
-                                    @endauth
+                                        @auth
+                                            <a href="{{ route('bookings.create', ['trip_id' => $offer->trip->id, 'offer_id' => $offer->id]) }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-calendar-check"></i>
+                                                احجز
+                                            </a>
+                                        @else
+                                            <a href="{{ route('login') }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-sign-in-alt"></i>
+                                                سجل الدخول
+                                            </a>
+                                        @endauth
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -259,21 +265,27 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                                     <span style="font-weight: bold; color: var(--primary);">
                                         {{ number_format($trip->price, 0) }} ل.س
                                     </span>
-                                    @auth
-                                        <a href="{{ route('bookings.create', ['trip_id' => $trip->id]) }}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-calendar-check"></i>
-                                            احجز
+                                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                        <a href="{{ route('trips.show', $trip) }}" class="btn btn-outline btn-sm" style="border-color: var(--primary); color: var(--primary);">
+                                            <i class="fas fa-eye"></i>
+                                            عرض الرحلة
                                         </a>
-                                    @else
-                                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-sign-in-alt"></i>
-                                            سجل الدخول
-                                        </a>
-                                    @endauth
+                                        @auth
+                                            <a href="{{ route('bookings.create', ['trip_id' => $trip->id]) }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-calendar-check"></i>
+                                                احجز
+                                            </a>
+                                        @else
+                                            <a href="{{ route('login') }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-sign-in-alt"></i>
+                                                سجل الدخول
+                                            </a>
+                                        @endauth
+                                    </div>
                                 </div>
                             </div>
                         </div>

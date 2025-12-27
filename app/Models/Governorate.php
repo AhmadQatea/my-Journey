@@ -9,7 +9,12 @@ class Governorate extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'location', 'featured_image'];
+    protected $fillable = ['name', 'description', 'location', 'featured_image', 'latitude', 'longitude'];
+
+    protected $casts = [
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8',
+    ];
 
     // العلاقة مع الأماكن السياحية
     public function touristSpots()
@@ -21,5 +26,11 @@ class Governorate extends Model
     public function trips()
     {
         return $this->hasMany(Trip::class);
+    }
+
+    // العلاقة مع أفضل أوقات الزيارة
+    public function bestVisitingTimes()
+    {
+        return $this->belongsToMany(BestVisitingTime::class, 'governorate_best_visiting_time');
     }
 }

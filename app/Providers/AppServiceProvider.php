@@ -76,7 +76,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('site-manager', function ($admin = null) {
             $admin = $admin ?? Auth::guard('admin')->user();
 
-            return $admin && ($admin->isSuperAdmin() || $admin->hasPermission('site-manager'));
+            return $admin && ($admin->isSuperAdmin() || $admin->hasPermission('site-manager') || $admin->hasPermission('settings.manage'));
+        });
+
+        Gate::define('manage_feedback', function ($admin = null) {
+            $admin = $admin ?? Auth::guard('admin')->user();
+
+            return $admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_feedback') || $admin->hasPermission('view_users') || $admin->hasPermission('site-manager') || $admin->hasPermission('settings.manage'));
         });
 
         // تمرير معلومات الأدمن إلى جميع الـ views
@@ -132,6 +138,21 @@ class AppServiceProvider extends ServiceProvider
     {
         $items = [];
 
+        // التحقق إذا كان المسؤول site manager فقط (وليس super admin)
+        // site manager لديه صلاحية site-manager أو settings.manage فقط بدون صلاحيات أخرى
+        $roleName = $admin?->role?->name ?? null;
+        $hasSiteManagerPermission = $admin && ($admin->hasPermission('site-manager') || $admin->hasPermission('settings.manage'));
+        $isSiteManagerOnly = $admin
+            && ! $admin->isSuperAdmin()
+            && $hasSiteManagerPermission
+            && ! $admin->hasPermission('manage_governorates')
+            && ! $admin->hasPermission('manage_tourist_spots')
+            && ! $admin->hasPermission('manage_trips')
+            && ! $admin->hasPermission('manage_deals')
+            && ! $admin->hasPermission('manage_bookings')
+            && ! $admin->hasPermission('manage_articles')
+            && ! $admin->hasPermission('manage_admins');
+
         // Dashboard - متاح للجميع
         $items[] = [
             'title' => 'لوحة التحكم',
@@ -140,6 +161,29 @@ class AppServiceProvider extends ServiceProvider
             'routePattern' => 'admin.dashboard*',
             'permission' => null, // متاح للجميع
         ];
+
+        // إذا كان site manager فقط، نعرض فقط الملاحظات والتقييمات وإعدادات الموقع
+        if ($isSiteManagerOnly) {
+            // الملاحظات والتقييمات - متاحة لـ site manager حتى بدون صلاحية view_users
+            $items[] = [
+                'title' => 'الملاحظات والتقييمات',
+                'route' => 'admin.feedback.index',
+                'icon' => 'fas fa-comment-dots',
+                'routePattern' => 'admin.feedback.*',
+                'permission' => null, // متاحة لـ site manager
+            ];
+
+            // إعدادات الموقع
+            $items[] = [
+                'title' => 'إعدادات الموقع',
+                'route' => 'admin.site.index',
+                'icon' => 'fas fa-cog',
+                'routePattern' => 'admin.site.*',
+                'permission' => null, // متاحة لـ site manager
+            ];
+
+            return $items;
+        }
 
         // المحافظات
         if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('manage_governorates'))) {
@@ -278,18 +322,18 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // الملاحظات والتقييمات
-        if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('view_users'))) {
+        if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('view_users') || $admin->hasPermission('manage_feedback') || $admin->hasPermission('site-manager') || $admin->hasPermission('settings.manage'))) {
             $items[] = [
                 'title' => 'الملاحظات والتقييمات',
                 'route' => 'admin.feedback.index',
                 'icon' => 'fas fa-comment-dots',
                 'routePattern' => 'admin.feedback.*',
-                'permission' => 'view_users',
+                'permission' => 'manage_feedback',
             ];
         }
 
         // إعدادات الموقع
-        if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('site-manager'))) {
+        if ($admin && ($admin->isSuperAdmin() || $admin->hasPermission('site-manager') || $admin->hasPermission('settings.manage'))) {
             $items[] = [
                 'title' => 'إعدادات الموقع',
                 'route' => 'admin.site.index',

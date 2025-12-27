@@ -34,7 +34,7 @@ class ProvincesController extends Controller
 
     public function show(Governorate $governorate): \Illuminate\Contracts\View\View
     {
-        // جلب المحافظة مع الأماكن السياحية والرحلات
+        // جلب المحافظة مع الأماكن السياحية والرحلات وأفضل أوقات الزيارة
         $governorate->load([
             'touristSpots' => function ($query) {
                 $query->latest();
@@ -44,6 +44,7 @@ class ProvincesController extends Controller
                     ->latest()
                     ->limit(6);
             },
+            'bestVisitingTimes',
         ]);
 
         // إحصائيات المحافظة

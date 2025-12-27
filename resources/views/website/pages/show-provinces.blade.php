@@ -161,47 +161,49 @@
                                     </div>
                                 </div>
 
+                                @if($governorate->bestVisitingTimes->count() > 0)
                                 <div class="best-time-visit" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
                                     <h3 style="margin-bottom: 1rem; color: var(--gray-800); text-align: center;">
                                         <i class="fas fa-calendar-alt"></i>
                                         أفضل وقت للزيارة
                                     </h3>
                                     <div style="display: flex; align-items: center; gap: 1rem; justify-content: center;">
-                                        <div class="season-badges" style="display: flex; gap: 0.5rem;">
+                                        <div class="season-badges" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                                             @php
-                                                $bestSeasons = ['spring', 'autumn'];
+                                                $allSeasons = \App\Models\BestVisitingTime::all()->keyBy('name');
+                                                $selectedSeasonNames = $governorate->bestVisitingTimes->pluck('name')->toArray();
                                             @endphp
 
-                                            @foreach(['spring', 'summer', 'autumn', 'winter'] as $season)
+                                            @foreach(['spring', 'summer', 'autumn', 'winter'] as $seasonKey)
                                                 @php
-                                                    $seasonNames = [
-                                                        'spring' => ['name' => 'الربيع', 'icon' => 'fas fa-seedling', 'color' => '#4ade80'],
-                                                        'summer' => ['name' => 'الصيف', 'icon' => 'fas fa-sun', 'color' => '#fbbf24'],
-                                                        'autumn' => ['name' => 'الخريف', 'icon' => 'fas fa-leaf', 'color' => '#f97316'],
-                                                        'winter' => ['name' => 'الشتاء', 'icon' => 'fas fa-snowflake', 'color' => '#60a5fa']
-                                                    ];
+                                                    $season = $allSeasons->get($seasonKey);
+                                                    $isSelected = in_array($seasonKey, $selectedSeasonNames);
                                                 @endphp
 
+                                                @if($season)
                                                 <div class="season-badge"
                                                      style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem;
-                                                            border-radius: var(--radius-lg); background: {{ in_array($season, $bestSeasons) ? $seasonNames[$season]['color'] . '20' : 'var(--gray-100)' }};
-                                                            border: 2px solid {{ in_array($season, $bestSeasons) ? $seasonNames[$season]['color'] : 'transparent' }};">
-                                                    <i class="{{ $seasonNames[$season]['icon'] }}"
-                                                       style="color: {{ in_array($season, $bestSeasons) ? $seasonNames[$season]['color'] : 'var(--gray-500)' }}; font-size: 1.5rem;">
+                                                            border-radius: var(--radius-lg); background: {{ $isSelected ? ($season->color ?? '#4361ee') . '20' : 'var(--gray-100)' }};
+                                                            border: 2px solid {{ $isSelected ? ($season->color ?? '#4361ee') : 'transparent' }};
+                                                            transition: var(--transition-base);">
+                                                    <i class="{{ $season->icon ?? 'fas fa-calendar' }}"
+                                                       style="color: {{ $isSelected ? ($season->color ?? '#4361ee') : 'var(--gray-500)' }}; font-size: 1.5rem;">
                                                     </i>
                                                     <span style="font-size: 0.875rem; color: var(--gray-700);">
-                                                        {{ $seasonNames[$season]['name'] }}
+                                                        {{ $season->name_ar }}
                                                     </span>
-                                                    @if(in_array($season, $bestSeasons))
-                                                        <span class="badge" style="background: {{ $seasonNames[$season]['color'] }}; color: white; font-size: 0.75rem;">
+                                                    @if($isSelected)
+                                                        <span class="badge" style="background: {{ $season->color ?? '#4361ee' }}; color: white; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: var(--radius-full);">
                                                             ممتاز
                                                         </span>
                                                     @endif
                                                 </div>
+                                                @endif
                                             @endforeach
                                         </div>
                                     </div>
                                 </div>
+                                @endif
                             </div>
                         </div>
                     </div>

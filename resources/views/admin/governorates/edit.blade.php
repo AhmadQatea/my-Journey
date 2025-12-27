@@ -41,6 +41,26 @@
         value="{{ old('location', $governorate->location) }}"
     />
 
+    <div class="grid grid-cols-2 gap-4">
+        <x-form.input
+            name="latitude"
+            label="خط العرض (Latitude)"
+            type="number"
+            step="any"
+            placeholder="مثال: 33.5138"
+            value="{{ old('latitude', $governorate->latitude) }}"
+        />
+
+        <x-form.input
+            name="longitude"
+            label="خط الطول (Longitude)"
+            type="number"
+            step="any"
+            placeholder="مثال: 36.2765"
+            value="{{ old('longitude', $governorate->longitude) }}"
+        />
+    </div>
+
     <x-slot name="sidebar">
         <!-- Featured Image -->
         <x-card title="الصورة الرئيسية" class="!mb-0">
@@ -76,6 +96,44 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </x-card>
+
+        <!-- Best Visiting Times -->
+        <x-card title="أفضل أوقات الزيارة" class="!mb-0">
+            <div class="space-y-3">
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    اختر أفضل الأوقات لزيارة هذه المحافظة (يمكن اختيار أكثر من خيار)
+                </p>
+                @if(isset($bestVisitingTimes) && $bestVisitingTimes->count() > 0)
+                    @php
+                        $selectedTimes = old('best_visiting_time_ids', $governorate->bestVisitingTimes->pluck('id')->toArray());
+                    @endphp
+                    @foreach($bestVisitingTimes as $visitingTime)
+                        <div class="form-check">
+                            <input class="form-check-input @error('best_visiting_time_ids') is-invalid @enderror"
+                                   type="checkbox"
+                                   name="best_visiting_time_ids[]"
+                                   value="{{ $visitingTime->id }}"
+                                   id="visiting_time_{{ $visitingTime->id }}"
+                                   {{ in_array($visitingTime->id, $selectedTimes) ? 'checked' : '' }}>
+                            <label class="form-check-label d-flex align-items-center gap-2" for="visiting_time_{{ $visitingTime->id }}">
+                                @if($visitingTime->icon)
+                                    <i class="{{ $visitingTime->icon }}" style="color: {{ $visitingTime->color ?? '#4361ee' }};"></i>
+                                @endif
+                                <span>{{ $visitingTime->name_ar }}</span>
+                            </label>
+                        </div>
+                    @endforeach
+                @else
+                    <p class="text-sm text-gray-500">لا توجد أوقات زيارة متاحة</p>
+                @endif
+                @error('best_visiting_time_ids')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                @enderror
+                @error('best_visiting_time_ids.*')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                @enderror
             </div>
         </x-card>
 

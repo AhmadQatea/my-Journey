@@ -336,6 +336,9 @@
     .tourist-spot-card .btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        background: #3a0ca3 !important;
+        border-color: #3a0ca3 !important;
+        color: white !important;
     }
 
     .governorates-slider .swiper-button-next,

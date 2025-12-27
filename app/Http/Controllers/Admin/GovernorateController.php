@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\BestVisitingTime;
 use App\Models\Governorate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +19,9 @@ class GovernorateController extends AdminController
 
     public function create()
     {
-        return view('admin.governorates.create');
+        $bestVisitingTimes = BestVisitingTime::all();
+
+        return view('admin.governorates.create', compact('bestVisitingTimes'));
     }
 
     public function store(Request $request)
@@ -27,16 +30,24 @@ class GovernorateController extends AdminController
             'name' => 'required|string|max:255|unique:governorates,name',
             'description' => 'required|string|min:50',
             'location' => 'required|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'featured_image' => 'required|image|max:2048',
+            'best_visiting_time_ids' => 'nullable|array',
+            'best_visiting_time_ids.*' => 'exists:best_visiting_times,id',
         ]);
 
-        $data = $request->except('featured_image');
+        $data = $request->except(['featured_image', 'best_visiting_time_ids']);
 
         if ($request->hasFile('featured_image')) {
             $data['featured_image'] = $request->file('featured_image')->store('governorates', 'public');
         }
 
-        Governorate::create($data);
+        $governorate = Governorate::create($data);
+
+        if ($request->has('best_visiting_time_ids')) {
+            $governorate->bestVisitingTimes()->sync($request->best_visiting_time_ids);
+        }
 
         return redirect()->route('admin.governorates.index')->with('success', 'تم إنشاء المحافظة بنجاح');
     }
@@ -50,19 +61,26 @@ class GovernorateController extends AdminController
 
     public function edit(Governorate $governorate)
     {
-        return view('admin.governorates.edit', compact('governorate'));
+        $governorate->load('bestVisitingTimes');
+        $bestVisitingTimes = BestVisitingTime::all();
+
+        return view('admin.governorates.edit', compact('governorate', 'bestVisitingTimes'));
     }
 
     public function update(Request $request, Governorate $governorate)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:governorates,name,' . $governorate->id,
+            'name' => 'required|string|max:255|unique:governorates,name,'.$governorate->id,
             'description' => 'required|string|min:50',
             'location' => 'required|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'featured_image' => 'sometimes|image|max:2048',
+            'best_visiting_time_ids' => 'nullable|array',
+            'best_visiting_time_ids.*' => 'exists:best_visiting_times,id',
         ]);
 
-        $data = $request->except('featured_image');
+        $data = $request->except(['featured_image', 'best_visiting_time_ids']);
 
         if ($request->hasFile('featured_image')) {
             if ($governorate->featured_image) {
@@ -72,6 +90,12 @@ class GovernorateController extends AdminController
         }
 
         $governorate->update($data);
+
+        if ($request->has('best_visiting_time_ids')) {
+            $governorate->bestVisitingTimes()->sync($request->best_visiting_time_ids);
+        } else {
+            $governorate->bestVisitingTimes()->sync([]);
+        }
 
         return redirect()->route('admin.governorates.index')->with('success', 'تم تحديث المحافظة بنجاح');
     }

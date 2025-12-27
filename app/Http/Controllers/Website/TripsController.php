@@ -106,4 +106,58 @@ class TripsController extends Controller
             'categoryStats'
         ));
     }
+
+    public function show(Trip $trip): \Illuminate\Contracts\View\View
+    {
+        // التحقق من أن الرحلة مقبولة أو قيد التفعيل
+        if (! in_array($trip->status, ['مقبولة', 'قيد التفعيل'])) {
+            abort(404, 'الرحلة غير متاحة');
+        }
+
+        // زيادة عدد المشاهدات
+        $trip->increment('views_count');
+
+        // تحميل العلاقات
+        $trip->load([
+            'governorate',
+            'departureGovernorate',
+        ]);
+
+        // جلب الأماكن السياحية المضمنة في الرحلة
+        $touristSpots = collect();
+        if ($trip->included_places) {
+            $placeIds = array_filter($trip->included_places, 'is_numeric');
+            if (! empty($placeIds)) {
+                $touristSpots = \App\Models\TouristSpot::whereIn('id', $placeIds)
+                    ->with('governorate')
+                    ->get();
+            }
+        }
+
+        // جلب المحافظات التي سنمر بها
+        $passingGovernorates = collect();
+        if ($trip->passing_governorates) {
+            $governorateIds = array_filter($trip->passing_governorates, 'is_numeric');
+            if (! empty($governorateIds)) {
+                $passingGovernorates = \App\Models\Governorate::whereIn('id', $governorateIds)->get();
+            }
+        }
+
+        // جلب عروض خاصة بهذه الرحلة
+        $offers = \App\Models\Offer::where('trip_id', $trip->id)
+            ->where('status', 'مفعل')
+            ->where(function ($query) {
+                $query->whereNull('end_date')
+                    ->orWhere('end_date', '>=', now()->toDateString());
+            })
+            ->latest()
+            ->get();
+
+        return view('website.pages.trip-show', compact(
+            'trip',
+            'touristSpots',
+            'passingGovernorates',
+            'offers'
+        ));
+    }
 }

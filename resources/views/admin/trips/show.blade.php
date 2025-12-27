@@ -80,6 +80,44 @@
                 </div>
             </div>
 
+            <!-- Trip Route Map -->
+            @if($trip->included_places && count($trip->included_places) > 0)
+            @php
+                $placeIds = array_filter($trip->included_places, 'is_numeric');
+                $touristSpots = \App\Models\TouristSpot::whereIn('id', $placeIds)->with('governorate')->get();
+                $hasCoordinates = $touristSpots->filter(function($spot) {
+                    return $spot->coordinates && !empty(trim($spot->coordinates));
+                })->count() > 0;
+            @endphp
+            @if($hasCoordinates)
+            <div class="card">
+                <div class="card-body p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray mb-4">مسار الرحلة على الخريطة</h3>
+                    <div id="tripMap" style="width: 100%; height: 500px; border-radius: 12px;"></div>
+                    <div id="routeInfo" style="margin-top: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 8px; display: none;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div>
+                                <strong style="color: var(--gray-700);">المسافة:</strong>
+                                <span id="routeDistance" style="color: var(--primary); font-weight: 600;">-</span>
+                            </div>
+                            <div>
+                                <strong style="color: var(--gray-700);">الوقت المقدر:</strong>
+                                <span id="routeDuration" style="color: var(--primary); font-weight: 600;">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="hotelsSection" style="margin-top: 1.5rem; display: none;">
+                        <h4 style="margin-bottom: 1rem; color: var(--gray-800);">
+                            <i class="fas fa-hotel"></i>
+                            الفنادق القريبة من المسار
+                        </h4>
+                        <div id="hotelsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;"></div>
+                    </div>
+                </div>
+            </div>
+            @endif
+            @endif
+
             <!-- Included Places -->
             @if($trip->included_places && count($trip->included_places) > 0)
             @php
@@ -437,7 +475,36 @@
 </div>
 @endsection
 
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #tripMap {
+        z-index: 1;
+    }
+    .hotel-marker {
+        background: #f59e0b;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .hotel-card {
+        background: var(--color-gray-700);
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        transition: all 0.3s ease;
+    }
+    .hotel-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+</style>
+@endpush
+
 @push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 function openImageModal(imageSrc) {
     document.getElementById('modalImage').src = imageSrc;
@@ -518,5 +585,157 @@ if (updateStatusBtn) {
         form.submit();
     });
 }
+
+// Initialize Trip Map
+@if($trip->included_places && count($trip->included_places) > 0)
+    @php
+        $placeIds = array_filter($trip->included_places, 'is_numeric');
+        $touristSpots = \App\Models\TouristSpot::whereIn('id', $placeIds)->with('governorate')->get();
+        $hasCoordinates = $touristSpots->filter(function($spot) {
+            return $spot->coordinates && !empty(trim($spot->coordinates));
+        })->count() > 0;
+    @endphp
+    @if($hasCoordinates)
+    document.addEventListener('DOMContentLoaded', function() {
+        const tripMapElement = document.getElementById('tripMap');
+        if (!tripMapElement) return;
+
+        // Initialize map
+        const map = L.map('tripMap').setView([33.5138, 36.2765], 7);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Fetch route data
+        fetch('{{ route("api.map.trip.route", $trip) }}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.route) {
+                    // Draw route
+                    const routeLayer = L.geoJSON(data.route.geometry, {
+                        style: {
+                            color: '#4361ee',
+                            weight: 5,
+                            opacity: 0.8
+                        }
+                    }).addTo(map);
+
+                    // Add markers for places
+                    const markers = [];
+                    data.places.forEach((place, index) => {
+                        const marker = L.marker([place.lat, place.lng])
+                            .addTo(map)
+                            .bindPopup(`
+                                <div style="text-align: right;">
+                                    <strong>${place.name}</strong><br>
+                                    ${place.governorate ? '<small>' + place.governorate + '</small>' : ''}
+                                </div>
+                            `);
+                        markers.push([place.lat, place.lng]);
+                    });
+
+                    // Fit map to show all markers and route
+                    if (markers.length > 0) {
+                        const group = new L.featureGroup(markers.map(m => L.marker(m)));
+                        map.fitBounds(group.getBounds().extend(routeLayer.getBounds()), {
+                            padding: [50, 50]
+                        });
+                    }
+
+                    // Display route info
+                    document.getElementById('routeInfo').style.display = 'block';
+                    document.getElementById('routeDistance').textContent = data.route.distance + ' كم';
+                    document.getElementById('routeDuration').textContent = data.route.duration_hours + ' ساعة';
+
+                    // Display hotels
+                    if (data.hotels && data.hotels.length > 0) {
+                        document.getElementById('hotelsSection').style.display = 'block';
+                        const hotelsList = document.getElementById('hotelsList');
+
+                        data.hotels.forEach(hotel => {
+                            const hotelName = hotel.name_ar || hotel.name;
+                            const hotelCard = document.createElement('div');
+                            hotelCard.className = 'hotel-card';
+                            hotelCard.innerHTML = `
+                                <h5 style="margin-bottom: 0.5rem; color: var(--gray-800);">
+                                    <i class="fas fa-hotel" style="color: #f59e0b;"></i>
+                                    ${hotelName}
+                                </h5>
+                                ${hotel.address ? '<p style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.5rem;"><i class="fas fa-map-marker-alt"></i> ' + hotel.address + '</p>' : ''}
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                                    <span style="font-size: 0.75rem; color: var(--gray-500);">
+                                        <i class="fas fa-ruler"></i> ${(hotel.distance / 1000).toFixed(1)} كم
+                                    </span>
+                                    ${hotel.phone ? '<a href="tel:' + hotel.phone + '" style="font-size: 0.75rem; color: var(--primary);"><i class="fas fa-phone"></i></a>' : ''}
+                                </div>
+                            `;
+                            hotelsList.appendChild(hotelCard);
+
+                            // Add hotel marker
+                            L.marker([hotel.lat, hotel.lng], {
+                                icon: L.divIcon({
+                                    className: 'hotel-marker',
+                                    html: '<i class="fas fa-hotel"></i>',
+                                    iconSize: [30, 30]
+                                })
+                            }).addTo(map)
+                            .bindPopup(`
+                                <div style="text-align: right;">
+                                    <strong>${hotelName}</strong><br>
+                                    ${hotel.address ? '<small>' + hotel.address + '</small><br>' : ''}
+                                    <small style="color: #f59e0b;">${(hotel.distance / 1000).toFixed(1)} كم من المسار</small>
+                                </div>
+                            `);
+                        });
+                    }
+                } else {
+                    // Fallback: just show markers without route
+                    const markers = [];
+                    @foreach($touristSpots as $spot)
+                        @if($spot->coordinates)
+                            @php
+                                $coords = explode(',', trim($spot->coordinates));
+                                $lat = trim($coords[0] ?? '');
+                                $lng = trim($coords[1] ?? '');
+                            @endphp
+                            @if($lat && $lng)
+                                markers.push([{{ $lat }}, {{ $lng }}]);
+                                L.marker([{{ $lat }}, {{ $lng }}])
+                                    .addTo(map)
+                                    .bindPopup('<strong>{{ $spot->name }}</strong>');
+                            @endif
+                        @endif
+                    @endforeach
+
+                    if (markers.length > 0) {
+                        const group = new L.featureGroup(markers.map(m => L.marker(m)));
+                        map.fitBounds(group.getBounds(), { padding: [50, 50] });
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading map:', error);
+                // Fallback: show basic markers
+                @foreach($touristSpots as $spot)
+                    @if($spot->coordinates)
+                        @php
+                            $coords = explode(',', trim($spot->coordinates));
+                            $lat = trim($coords[0] ?? '');
+                            $lng = trim($coords[1] ?? '');
+                        @endphp
+                        @if($lat && $lng)
+                            L.marker([{{ $lat }}, {{ $lng }}])
+                                .addTo(map)
+                                .bindPopup('<strong>{{ $spot->name }}</strong>');
+                        @endif
+                    @endif
+                @endforeach
+            });
+    });
+    @endif
+@endif
 </script>
 @endpush

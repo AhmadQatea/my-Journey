@@ -70,6 +70,8 @@ class Role extends Model
             'offers.update',
             'offers.delete',
             'settings.manage',
+            'site-manager',
+            'manage_feedback',
             'manage_governorates',
             'manage_tourist_spots',
             'manage_trips',

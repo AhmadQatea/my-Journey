@@ -292,10 +292,24 @@ class TwoFactorAuthController extends Controller
 
     /**
      * Show recovery codes
+     * Reads directly from database to avoid Fortify encryption/decryption issues
      */
     public function showRecoveryCodes()
     {
-        $recoveryCodes = json_decode(Auth::user()->two_factor_recovery_codes, true) ?? [];
+        $user = Auth::user();
+        $recoveryCodes = [];
+
+        // Always read directly from database (stored as plain JSON)
+        // This avoids "The payload is invalid" error from Fortify
+        if ($user->two_factor_recovery_codes) {
+            $decoded = json_decode($user->two_factor_recovery_codes, true);
+            if (is_array($decoded)) {
+                $recoveryCodes = $decoded;
+            } elseif (is_string($user->two_factor_recovery_codes)) {
+                // If it's a string, try to decode it
+                $recoveryCodes = json_decode($user->two_factor_recovery_codes, true) ?? [];
+            }
+        }
 
         return view('auth.two-factor-recovery-codes', compact('recoveryCodes'));
     }
