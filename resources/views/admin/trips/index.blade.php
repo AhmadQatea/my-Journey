@@ -654,7 +654,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            if (confirm(`{{ str_replace(':count', vipTripIds.length, __('messages.do_you_want_to_accept')) }}`)) {
+            const acceptMessage = '{{ __('messages.do_you_want_to_accept') }}'.replace(':count', vipTripIds.length);
+            if (confirm(acceptMessage)) {
                 sendBulkAction('accept', vipTripIds);
             }
         });

@@ -29,6 +29,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
 
     // Dashboard - مع دعم role في الـ URL
     Route::get('/dashboard', [DashboardController::class, 'redirectToRoleDashboard'])->name('dashboard.redirect');
+    Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
     Route::get('/dashboard-{role}', [DashboardController::class, 'index'])->name('dashboard');
 
     // المحافظات

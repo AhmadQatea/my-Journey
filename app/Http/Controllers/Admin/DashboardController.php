@@ -66,10 +66,10 @@ class DashboardController extends AdminController
         $recentUsers = User::latest()->take(5)->get();
         $recentBookings = Booking::with(['user', 'trip'])->latest()->take(5)->get();
 
-        // بيانات الحجوزات حسب الشهر (آخر 6 أشهر)
+        // بيانات الحجوزات حسب الشهر (آخر 6 أشهر) - افتراضي
         $bookingsData = $this->getBookingsByMonth(6);
 
-        // بيانات الإيرادات حسب الشهر (آخر 6 أشهر)
+        // بيانات الإيرادات حسب الشهر (آخر 6 أشهر) - افتراضي
         $revenueData = $this->getRevenueByMonth(6);
 
         return view('admin.dashboard', compact(
@@ -84,6 +84,34 @@ class DashboardController extends AdminController
             'bookingsData',
             'revenueData'
         ));
+    }
+
+    /**
+     * API endpoint لجلب بيانات الحجوزات والإيرادات حسب الفترة
+     */
+    public function getChartData()
+    {
+        $period = request('period', 'months'); // days, weeks, months
+        $count = (int) request('count', 6);
+
+        $bookingsData = match ($period) {
+            'days' => $this->getBookingsByDays($count),
+            'weeks' => $this->getBookingsByWeeks($count),
+            'months' => $this->getBookingsByMonth($count),
+            default => $this->getBookingsByMonth(6),
+        };
+
+        $revenueData = match ($period) {
+            'days' => $this->getRevenueByDays($count),
+            'weeks' => $this->getRevenueByWeeks($count),
+            'months' => $this->getRevenueByMonth($count),
+            default => $this->getRevenueByMonth(6),
+        };
+
+        return response()->json([
+            'bookings' => $bookingsData,
+            'revenue' => $revenueData,
+        ]);
     }
 
     /**
@@ -131,6 +159,110 @@ class DashboardController extends AdminController
 
             $data[] = (float) $revenue;
             $labels[] = $this->getArabicMonthName($date->month);
+        }
+
+        return [
+            'labels' => $labels,
+            'data' => $data,
+        ];
+    }
+
+    /**
+     * جلب بيانات الحجوزات حسب الأيام
+     */
+    private function getBookingsByDays(int $days = 7): array
+    {
+        $data = [];
+        $labels = [];
+
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $startOfDay = $date->copy()->startOfDay();
+            $endOfDay = $date->copy()->endOfDay();
+
+            $count = Booking::whereBetween('created_at', [$startOfDay, $endOfDay])->count();
+
+            $data[] = $count;
+            $labels[] = $date->format('d/m');
+        }
+
+        return [
+            'labels' => $labels,
+            'data' => $data,
+        ];
+    }
+
+    /**
+     * جلب بيانات الحجوزات حسب الأسابيع
+     */
+    private function getBookingsByWeeks(int $weeks = 4): array
+    {
+        $data = [];
+        $labels = [];
+
+        for ($i = $weeks - 1; $i >= 0; $i--) {
+            $date = now()->subWeeks($i);
+            $startOfWeek = $date->copy()->startOfWeek();
+            $endOfWeek = $date->copy()->endOfWeek();
+
+            $count = Booking::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count();
+
+            $data[] = $count;
+            $labels[] = $startOfWeek->format('d/m').' - '.$endOfWeek->format('d/m');
+        }
+
+        return [
+            'labels' => $labels,
+            'data' => $data,
+        ];
+    }
+
+    /**
+     * جلب بيانات الإيرادات حسب الأيام
+     */
+    private function getRevenueByDays(int $days = 7): array
+    {
+        $data = [];
+        $labels = [];
+
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $startOfDay = $date->copy()->startOfDay();
+            $endOfDay = $date->copy()->endOfDay();
+
+            $revenue = Booking::where('status', 'مؤكدة')
+                ->whereBetween('created_at', [$startOfDay, $endOfDay])
+                ->sum('total_price');
+
+            $data[] = (float) $revenue;
+            $labels[] = $date->format('d/m');
+        }
+
+        return [
+            'labels' => $labels,
+            'data' => $data,
+        ];
+    }
+
+    /**
+     * جلب بيانات الإيرادات حسب الأسابيع
+     */
+    private function getRevenueByWeeks(int $weeks = 4): array
+    {
+        $data = [];
+        $labels = [];
+
+        for ($i = $weeks - 1; $i >= 0; $i--) {
+            $date = now()->subWeeks($i);
+            $startOfWeek = $date->copy()->startOfWeek();
+            $endOfWeek = $date->copy()->endOfWeek();
+
+            $revenue = Booking::where('status', 'مؤكدة')
+                ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                ->sum('total_price');
+
+            $data[] = (float) $revenue;
+            $labels[] = $startOfWeek->format('d/m').' - '.$endOfWeek->format('d/m');
         }
 
         return [
