@@ -9,7 +9,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
         if (Auth::guard('admin')->check()) {
             /** @var \App\Models\Admin $admin */
@@ -29,7 +29,19 @@ class AuthController extends Controller
             return redirect()->route('admin.dashboard.redirect');
         }
 
+        // التأكد من إنشاء جلسة جديدة وتحديث CSRF token
+        $request->session()->regenerateToken();
+
         return view('admin.auth.login');
+    }
+
+    public function getCsrfToken(Request $request)
+    {
+        $request->session()->regenerateToken();
+
+        return response()->json([
+            'token' => csrf_token(),
+        ]);
     }
 
     public function login(Request $request)

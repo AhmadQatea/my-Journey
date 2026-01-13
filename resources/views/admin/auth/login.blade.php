@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ا ت<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -44,6 +44,16 @@
                     <div class="alert-content">
                         <strong>فشل المصادقة</strong>
                         <span>{{ session('error') }}</span>
+                    </div>
+                </div>
+                @endif
+
+                @if(session('csrf_error'))
+                <div class="admin-alert admin-alert-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="alert-content">
+                        <strong>انتهت صلاحية الجلسة</strong>
+                        <span>{{ session('csrf_error') }}</span>
                     </div>
                 </div>
                 @endif
@@ -183,12 +193,66 @@
                 this.classList.toggle('active');
             });
 
-            // Form submission loading state
+            // Form submission loading state and CSRF token refresh
             const loginForm = document.querySelector('.admin-login-form');
             const loginBtn = document.querySelector('.admin-login-btn');
+            const csrfTokenInput = loginForm.querySelector('input[name="_token"]');
+            const csrfMetaTag = document.querySelector('meta[name="csrf-token"]');
 
-            loginForm.addEventListener('submit', function() {
+            // Function to refresh CSRF token
+            function refreshCsrfToken() {
+                return fetch('{{ route("admin.csrf-token") }}', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                    cache: 'no-cache'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.token) {
+                        // Update the token in the form
+                        if (csrfTokenInput) {
+                            csrfTokenInput.value = data.token;
+                        }
+                        // Update the meta tag
+                        if (csrfMetaTag) {
+                            csrfMetaTag.setAttribute('content', data.token);
+                        }
+                        return true;
+                    }
+                    return false;
+                })
+                .catch(error => {
+                    console.error('Error refreshing CSRF token:', error);
+                    return false;
+                });
+            }
+
+            // Refresh CSRF token before form submission
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
                 loginBtn.classList.add('loading');
+
+                // Refresh token before submitting
+                refreshCsrfToken().then(success => {
+                    if (success) {
+                        // Submit the form after token refresh
+                        loginForm.submit();
+                    } else {
+                        // If refresh fails, try submitting anyway
+                        loginBtn.classList.remove('loading');
+                        alert('حدث خطأ في تحديث الجلسة. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
+                    }
+                });
             });
 
             // Input animations
